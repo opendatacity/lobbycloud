@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 /* require node modules */
+var fs = require("fs");
 var path = require("path");
 
 /* require npm modules */
@@ -57,9 +58,22 @@ app.all('*', function(req, res){
 
 /* listen */
 if (config.listen.hasOwnProperty("socket")) {
+	if (fs.existsSync(config.listen.socket)) {
+		console.log("unlinking old socket");
+		fs.unlinkSync(config.listen.socket);
+	}
+
 	app.listen(config.listen.socket, function(){
 		console.log("server listening on socket", config.listen.socket);
-	});	
+	});
+	
+	/* gracefully shutdown on exit */
+	process.on("exit", function(){
+		app.close(function(){
+			console.log("socket closed. bye.")
+		});
+	});
+	
 } else if (config.listen.hasOwnProperty("host")){
 	app.listen(config.listen.host, config.listen.port, function(){
 		console.log("server listening on", [config.listen.host, config.listen.port].join(":"));
