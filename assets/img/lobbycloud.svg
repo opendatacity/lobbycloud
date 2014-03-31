@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1562"
+   height="286"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="cloud.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.5"
+     inkscape:cx="329.41604"
+     inkscape:cy="155.26875"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1239"
+     inkscape:window-height="756"
+     inkscape:window-x="41"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       orientation="0,1"
+       position="652,222.00003"
+       id="guide2995" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="682,68.000031"
+       id="guide2997" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-83.512016,-567.37683)">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;opacity:0"
+       id="rect2999"
+       width="1562"
+       height="286"
+       x="83.512016"
+       y="567.37683" />
+    <path
+       style="fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="m 243.90121,631.3768 c -37.9948,0 -68.81594,29.73801 -68.81594,66.4206 0,4.96042 0.57873,9.77187 1.64679,14.42191 -19.46095,0.3806 -35.13156,16.62133 -35.13156,36.57875 0,19.90628 15.59027,36.11823 34.98186,36.57874 0.28225,0.007 0.5645,0 0.84834,0 l 152.15359,0 0,-0.0997 c 30.47351,-1.44165 54.69346,-25.7632 54.69346,-55.54179 0,-30.70624 -25.78318,-55.59172 -57.58782,-55.59172 -6.13181,0 -12.02324,0.93106 -17.56577,2.64485 -9.1064,-26.38482 -34.83404,-45.41153 -65.22295,-45.41153 z"
+       id="path3050"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:197.27909851px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="469.37799"
+       y="783.28851"
+       id="text2991"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2993"
+         x="469.37799"
+         y="783.28851"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#333333;font-family:Roboto Slab;-inkscape-font-specification:Roboto Slab Bold">LobbyCloud</tspan></text>
+  </g>
+</svg>

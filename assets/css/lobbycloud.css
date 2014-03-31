@@ -1,0 +1,131 @@
+body {
+	
+	display: block;
+	position: relative;
+	height: 100%;
+	line-height: 1.6em;
+	margin: 0px;
+	padding: 0px;
+	font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+	background-color: #e9e9e9;
+	box-shadow: 0px 0px 200px -100px #000 inset;
+	
+}
+
+header {
+	
+	width: 800px;
+	line-height: 1em;
+	padding: 60px 0px 40px;
+	margin: 0px auto;
+	
+}
+
+	header h1 {
+		
+		display: inline-block;
+		font-size: 6em;
+		font-family: "Roboto Slab";
+		padding-left: 1.5em;
+		background: url(../img/cloud.png) left center no-repeat;
+		background-size: auto 70%;
+		text-align: left;
+		line-height: 1em;
+		margin: 0px;
+		text-shadow: 0px 0px 7px #fff;
+		
+	}
+	
+	header h2 {
+		
+		display: block;
+		font-size: 2em;
+		font-family: "Roboto Slab";
+		margin: 0px;
+		text-shadow: 0px 0px 7px #fff;
+		line-height: 1.4em;
+		margin-left: 4.6em;
+		
+	}
+	
+#main {
+	
+	display: block;
+	position: relative;
+	width: 800px;
+	margin: 20px auto;
+	
+}
+
+	#main .box {
+		
+		padding: 5px 20px;
+		background-color: #fff;
+		font-size: 1.2em;
+		line-height: 1.5em;
+		border-radius: 4px;
+		box-shadow: 0px 0px 20px -10px rgba(0,0,0,0.2);
+		margin-bottom: 40px;
+		
+	}
+	
+		#main .box h2 {
+
+			font-family: "Roboto Slab";
+
+		}
+		
+	
+		#main .box p {
+			
+			padding: 20px 0px;
+			margin: 0px;
+			
+		}
+		
+	#main form {
+		
+		padding: 10px 20px 30px ;
+		background-color: #fff;
+		font-size: 1.2em;
+		line-height: 1.5em;
+		border-radius: 4px;
+		box-shadow: 0px 0px 20px -10px rgba(0,0,0,0.2);
+		margin-bottom: 40px;
+		
+	}
+	
+		#main form h2 {
+
+			font-family: "Roboto Slab";
+
+		}
+	
+footer {
+	
+	background-color: #333;
+	color: #fff;
+	margin: 0px;
+	padding: 20px 10px;
+	line-height: 22px;
+	text-align: center;
+	
+}
+
+	footer a.odc {
+		
+		display: inline-block;
+		text-indent: -99999px;
+		width: 70px;
+		background: url(../img/odc.png) center center no-repeat;
+		
+	}
+	
+	footer a.greens-efa {
+		
+		display: inline-block;
+		text-indent: -99999px;
+		width: 50px;
+		background: url(../img/greens-efa.png) center center no-repeat;
+		
+	}

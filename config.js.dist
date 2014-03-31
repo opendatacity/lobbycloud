@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+module.exports = {
+	storage: "storage",
+	hostname: "lobbycloud.eu",
+	listen: {
+		_socket: "/var/www/lobbycloud.eu/lobbycloud.sock",
+		port: 3000
+	},
+	signupdb: "data/signup.sqlite"
+};
