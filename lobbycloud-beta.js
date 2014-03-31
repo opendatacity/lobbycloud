@@ -2,6 +2,7 @@
 
 /* require node modules */
 var fs = require("fs");
+var url = require("url");
 var path = require("path");
 
 /* require npm modules */
@@ -21,6 +22,13 @@ var app = express();
 /* configure */
 app.engine('mustache', mustache_express());
 
+/* build url from hostname */
+config.url = url.format({
+	protocol: "http",
+	hostname: config.hostname,
+	pathname: ""
+}).replace(/\/$/,'');
+
 app.use(express.bodyParser());
 
 app.set('view engine', 'mustache');
@@ -32,7 +40,7 @@ app.use('/assets', express.static(__dirname + '/assets'));
 /* routes */
 app.get('/', function(req, res){
 	res.render('beta', {
-		"url": "http://localhost:3000",
+		"url": config.url,
 		"invite": true
 	});
 });
@@ -45,7 +53,7 @@ app.post('/signup-beta', function(req, res){
 		req.body.motivation
 	], function(err){
 		res.render('beta', {
-			"url": "http://localhost:3000",
+			"url": config.url,
 			"thankyou": (err === null),
 			"error": (err !== null)
 		});
