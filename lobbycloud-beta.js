@@ -58,12 +58,16 @@ app.all('*', function(req, res){
 
 /* listen */
 if (config.listen.hasOwnProperty("socket")) {
+
+	var mask = process.umask(0);
+
 	if (fs.existsSync(config.listen.socket)) {
 		console.log("unlinking old socket");
 		fs.unlinkSync(config.listen.socket);
-	}
-
+	};
+	
 	app.listen(config.listen.socket, function(){
+      if (mask) { process.umask(mask); mask = null; }
 		console.log("server listening on socket", config.listen.socket);
 	});
 	
