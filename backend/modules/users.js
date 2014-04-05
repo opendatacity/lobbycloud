@@ -44,7 +44,7 @@ var Users = function () {
 	var getUnusedID = function () {
 		var id = 1;
 		mockupusers.forEach(function (user) {
-			if (id < user.id)
+			if (id <= user.id)
 				id = user.id + 1;
 		});
 		return id;
@@ -54,9 +54,8 @@ var Users = function () {
 		var user = {id: getUnusedID()};
 		user.username = edit_user.username;
 		user.group = edit_user.group;
-		user.role = userRoles[edit_user.role];
+		user.role = userRoles[edit_user.role.title];
 		user.password = edit_user.password;
-		console.log(user);
 		mockupusers.push(user);
 		cb(null, me.getUser(user));
 	};
@@ -72,7 +71,6 @@ var Users = function () {
 					user.role = userRoles[edit_user.role.title];
 				if (edit_user.password)
 					user.password = edit_user.password;
-				console.log(user);
 				cb(null, me.getUser(user));
 			}
 		});
