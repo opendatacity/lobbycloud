@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+module.exports = {
+	debug: true,
+	server_settings: {
+		listento: "0.0.0.0",
+		port: 3000
+	}
+};

@@ -1,0 +1,166 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: LobbyCloudCentral\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: assets/partials/admin/users.html
+msgid "Actions"
+msgstr "Aktion"
+
+#: assets/index.html
+#, fuzzy
+msgid "Administration"
+msgstr "Administration"
+
+#: assets/partials/admin/users.html
+msgid "Apply"
+msgstr "Anwenden"
+
+#: assets/partials/admin/users.html
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: assets/partials/admin/users.html
+msgid "Delete"
+msgstr "Löschen"
+
+#: assets/partials/admin/users.html
+msgid "Delete User"
+msgstr "Account löschen"
+
+#: assets/partials/admin/users.html
+msgid "Delete User?"
+msgstr "Account löschen?"
+
+#: assets/index.html
+msgid "Documents"
+msgstr "Dokumente"
+
+#: assets/partials/admin/users.html
+msgid "Edit User"
+msgstr "Account bearbeiten"
+
+#: assets/index.html
+msgid "English"
+msgstr "Englisch"
+
+#: assets/partials/admin/users.html
+msgid "Enter group"
+msgstr "Gruppe eingeben"
+
+#: assets/partials/admin/users.html
+msgid "Enter name"
+msgstr "Namen eingeben"
+
+#: assets/partials/admin/users.html
+msgid "Enter password (leave empty for no changes)"
+msgstr "Passwort (leer lassen um für keine Änderung)"
+
+#: assets/index.html
+msgid "German"
+msgstr "Deutsch"
+
+#: assets/partials/admin/users.html
+msgid "Group"
+msgstr "Gruppe"
+
+#: assets/partials/start.html
+msgid "Hello {{user.username}}!"
+msgstr "Hallo {{user.username}}!"
+
+#: assets/partials/start.html
+msgid "Library of influence on public policy"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Loading Data..."
+msgstr "Daten werden geladen..."
+
+#: assets/partials/logout.html
+msgid "Logging out..."
+msgstr "Abmeldung..."
+
+#: assets/index.html
+msgid "Login"
+msgstr "Anmelden"
+
+#: assets/index.html
+msgid "Logout"
+msgstr "Abmelden"
+
+#: assets/partials/start.html assets/partials/admin/groups.html
+msgid "Manage Groups"
+msgstr "Gruppen verwalten"
+
+#: assets/partials/start.html assets/partials/admin/users.html
+msgid "Manage Users"
+msgstr "Accounts verwalten"
+
+#: assets/partials/admin/users.html
+msgid "Name"
+msgstr "Name"
+
+#: assets/partials/admin/users.html
+msgid "New User"
+msgstr "Neuer Account"
+
+#: assets/partials/login.html assets/partials/admin/users.html
+msgid "Password"
+msgstr "Passwort"
+
+#: assets/partials/login.html
+msgid "Please sign in"
+msgstr "Bitte anmelden"
+
+#: assets/partials/admin/users.html
+msgid "Role"
+msgstr "Rolle"
+
+#: assets/partials/login.html
+msgid "Seems like you tried accessing something you don't have access to..."
+msgstr "Für diesen Bereich ist eine Anmeldung nötig"
+
+#: assets/partials/login.html
+msgid "Sign in"
+msgstr "Anmelden"
+
+#: assets/index.html
+msgid "Start"
+msgstr "Start"
+
+#: assets/partials/admin/users.html
+msgid "Sure to delete user {{current_user.username}}?"
+msgstr "Account {{current_user.username}} wirklich löschen?"
+
+#: assets/partials/login.html
+msgid "Username"
+msgstr "Name"
+
+#: assets/partials/logout.html
+msgid "You are logged out"
+msgstr "Abmeldung erfolgreich"
+
+#: assets/partials/error.html
+msgid "You're not authorized to view that page!"
+msgstr "Keine Berechtigung für die Seite!"
+
+#~ msgid "Could not log you out"
+#~ msgstr "Abmeldung fehlgeschlagen"
+
+#~ msgid "Edit User {{current_user.username}}"
+#~ msgstr "Account {{current_user.username}} bearbeiten"
+
+#~ msgid "Enter role"
+#~ msgstr "Rolle eingeben"
+
+#~ msgid "Administration Section"
+#~ msgstr "Administration"

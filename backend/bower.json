@@ -1,0 +1,28 @@
+{
+	"name": "LobbyCloudCentral",
+	"version": "0.0.1",
+	"main": "index.htm",
+	"private": true,
+	"directory": "assets/libs",
+	"dependencies": {
+		"jquery": "*",
+		"bootstrap": "*",
+		"moment": "*",
+		"angular": "*",
+		"angular-cookies": "*",
+		"angular-gettext": "*",
+		"angular-moment": "*",
+		"angular-resource": "*",
+		"angular-sanitize": "*",
+		"angular-ui-router": "*",
+		"fontawesome": "*"
+	},
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"libs",
+		"test",
+		"tests"
+	]
+}

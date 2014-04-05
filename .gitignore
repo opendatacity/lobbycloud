@@ -1,0 +1,3 @@
+backend/assets/libs/*
+node_modules
+config.js

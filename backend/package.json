@@ -1,0 +1,20 @@
+{
+	"private": true,
+	"name": "lobbycloud-backend",
+	"version": "0.0.1",
+	"description": "",
+	"dependencies": {
+		"express": ">= 3.5.1",
+		"passport": ">= 0.2.0",
+		"passport-local": ">= 1.0.0"
+	},
+	"engines": {
+		"node": "0.10.26"
+	},
+	"devDependencies": {
+		"grunt": "*",
+		"grunt-angular-gettext": "*",
+		"grunt-contrib-uglify": "*"
+	}
+}
+

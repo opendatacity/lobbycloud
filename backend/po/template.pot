@@ -1,0 +1,147 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: assets/partials/admin/users.html
+msgid "Actions"
+msgstr ""
+
+#: assets/index.html
+msgid "Administration"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Apply"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Cancel"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Delete"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Delete User"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Delete User?"
+msgstr ""
+
+#: assets/index.html
+msgid "Documents"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Edit User"
+msgstr ""
+
+#: assets/index.html
+msgid "English"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Enter group"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Enter name"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Enter password (leave empty for no changes)"
+msgstr ""
+
+#: assets/index.html
+msgid "German"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Group"
+msgstr ""
+
+#: assets/partials/start.html
+msgid "Hello {{user.username}}!"
+msgstr ""
+
+#: assets/partials/start.html
+msgid "Library of influence on public policy"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Loading Data..."
+msgstr ""
+
+#: assets/partials/logout.html
+msgid "Logging out..."
+msgstr ""
+
+#: assets/index.html
+msgid "Login"
+msgstr ""
+
+#: assets/index.html
+msgid "Logout"
+msgstr ""
+
+#: assets/partials/start.html
+#: assets/partials/admin/groups.html
+msgid "Manage Groups"
+msgstr ""
+
+#: assets/partials/start.html
+#: assets/partials/admin/users.html
+msgid "Manage Users"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Name"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "New User"
+msgstr ""
+
+#: assets/partials/login.html
+#: assets/partials/admin/users.html
+msgid "Password"
+msgstr ""
+
+#: assets/partials/login.html
+msgid "Please sign in"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Role"
+msgstr ""
+
+#: assets/partials/login.html
+msgid "Seems like you tried accessing something you don't have access to..."
+msgstr ""
+
+#: assets/partials/login.html
+msgid "Sign in"
+msgstr ""
+
+#: assets/index.html
+msgid "Start"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Sure to delete user {{current_user.username}}?"
+msgstr ""
+
+#: assets/partials/login.html
+msgid "Username"
+msgstr ""
+
+#: assets/partials/logout.html
+msgid "You are logged out"
+msgstr ""
+
+#: assets/partials/error.html
+msgid "You're not authorized to view that page!"
+msgstr ""
