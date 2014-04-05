@@ -31,14 +31,14 @@ var Users = function () {
 	var me = this;
 
 	me.getGroups = function (cb) {
-		cb(groups);
+		cb(null, groups);
 	};
 
 	me.getUsers = function (cb) {
 		var list = mockupusers.map(function (user) {
 			return me.getUser(user);
 		});
-		cb(list);
+		cb(null, list);
 	};
 
 	var getUnusedID = function () {

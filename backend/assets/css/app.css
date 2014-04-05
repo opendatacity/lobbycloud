@@ -3,3 +3,12 @@ body {
     padding-top: 50px;
     overflow-x: hidden;
 }
+
+.selected {
+    background-color: #d7d7d3 !important;
+}
+
+.doc-view {
+    border: solid #ececec 1px;
+    min-height: 400px;
+}

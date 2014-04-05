@@ -76,7 +76,7 @@ app.get('/api/docs/list', function (req, res) {
 	if (!req.user) {
 		res.send(401);
 	} else {
-		docs.getDocs(function (data) {
+		docs.getDocs(function (err, data) {
 			res.json(data);
 		});
 	}
@@ -88,12 +88,12 @@ app.post('/api/admin/:cmd', function (req, res) {
 	} else {
 		switch (req.params.cmd) {
 			case 'users':
-				users.getUsers(function (data) {
+				users.getUsers(function (err, data) {
 					res.json(data);
 				});
 				break;
 			case 'groups':
-				users.getGroups(function (data) {
+				users.getGroups(function (err, data) {
 					res.json(data);
 				});
 				break;

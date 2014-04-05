@@ -134,12 +134,12 @@ app.controller('AdminUsersController', function ($scope, $location, $state, Auth
 		}
 	};
 
-	$scope.showUserDialog = function (id) {
+	$scope.showUserDialog = function () {
 		var user;
-		if (id == null) // new User
+		if (this.rowuser == null) // new User
 			user = {role: AuthenticationService.userRoles.user};
 		else
-			user = angular.copy(getUserByID(id));
+			user = angular.copy(this.rowuser);
 		if (user) {
 			user.role = AuthenticationService.userRoles[user.role.title];
 			$scope.current_user = user;
@@ -147,8 +147,8 @@ app.controller('AdminUsersController', function ($scope, $location, $state, Auth
 		}
 	};
 
-	$scope.deleteUserDialog = function (id) {
-		$scope.current_user = getUserByID(id);
+	$scope.deleteUserDialog = function () {
+		$scope.current_user = this.rowuser;
 		if ($scope.current_user)
 			$('#modal-deleteUser').modal();
 	};
@@ -171,6 +171,19 @@ app.controller('AdminGroupsController', function ($scope, $state, Authentication
 
 app.controller('DocsController', function ($scope, $state, AuthenticationService, DocsService) {
 	'use strict';
+
+	$scope.selectRow = function () {
+		var clickdoc = this.doc;
+		if (clickdoc.selected) {
+			clickdoc.selected = false;
+			$scope.doc = null;
+		} else {
+			$scope.doc = clickdoc;
+			$scope.docs.forEach(function (doc) {
+				doc.selected = doc == clickdoc;
+			});
+		}
+	};
 
 	$scope.docs = DocsService.list({},
 		function (data) {

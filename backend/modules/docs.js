@@ -16,8 +16,8 @@ var Docs = function () {
 		);
 	}
 
-	me.getDocs = function () {
-		return mockupDocs;
+	me.getDocs = function (cb) {
+		cb(null, mockupDocs);
 	};
 };
 
