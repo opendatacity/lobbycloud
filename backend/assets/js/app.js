@@ -7,12 +7,16 @@ var app = angular
 		'ui.router',
 		'gettext',
 		'ngResource',
+		'ngTable',
 		'ngSanitize',
 		'angularMoment'
 	]);
 
-app.config(function ($stateProvider, $urlRouterProvider) {
+
+app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 	'use strict';
+
+	$logProvider.debugEnabled(false);
 
 	var access = routingConfig.accessLevels;
 

@@ -2,17 +2,19 @@
 
 /* Controllers */
 
-app.controller('BodyController', function ($scope, $location, $window, AuthenticationService, gettextCatalog) {
+app.controller('BodyController', function ($scope, $state, $location, $window, AuthenticationService, gettextCatalog) {
 	'use strict';
 
 	gettextCatalog.debug = false;
 
-	$scope.setLang = function (lng) {
+	$scope.setLang = function (lng, noreload) {
 		$window.moment.lang(lng.substr(0, 2));
 		gettextCatalog.currentLanguage = lng;
+		if (!noreload)
+			$state.go($state.$current, null, { reload: true });
 	};
 
-	$scope.setLang('de_DE');
+	$scope.setLang('de_DE', true);
 
 	$scope.isActiveLang = function (lng) {
 		return gettextCatalog.currentLanguage == lng;
@@ -169,24 +171,80 @@ app.controller('AdminGroupsController', function ($scope, $state, Authentication
 		});
 });
 
-app.controller('DocsController', function ($scope, $state, AuthenticationService, DocsService) {
+app.controller('DocsController', function ($scope, $state, $filter, $templateCache, ngTableParams, gettextCatalog, AuthenticationService, DocsService) {
 	'use strict';
 
-	$scope.selectRow = function () {
-		var clickdoc = this.doc;
-		if (clickdoc.selected) {
-			clickdoc.selected = false;
-			$scope.doc = null;
-		} else {
-			$scope.doc = clickdoc;
-			$scope.docs.forEach(function (doc) {
-				doc.selected = doc == clickdoc;
-			});
+	var data = [];
+	$scope.docs = [];
+	$scope.search = {
+		title: '',
+		range: {
+			startDate: '',
+			endDate: ''
+		},
+		range_enabled: false
+	};
+
+	var reload = function () {
+		if (($scope.tableParams) && (this.last !== undefined)) {
+			$scope.tableParams.reload();
 		}
 	};
 
-	$scope.docs = DocsService.list({},
-		function (data) {
+	$scope.$watch("search.range", function () {
+		if (($scope.tableParams) && (this.last !== undefined)) {
+			if (!$scope.search.range_enabled)
+				$scope.search.range_enabled = true;
+			else
+				$scope.tableParams.reload();
+		}
+	});
+	$scope.$watch("search.range_enabled", reload);
+	$scope.$watch("search.title", reload);
+
+	$scope.selectRow = function (clickdoc) {
+		if (clickdoc.$selected) {
+			clickdoc.$selected = false;
+			$scope.doc = null;
+		} else {
+			if ($scope.doc) {
+				$scope.doc.$selected = false;
+			}
+			clickdoc.$selected = true;
+			$scope.doc = clickdoc;
+		}
+	};
+
+	DocsService.list({},
+		function (docsdata) {
+			data = docsdata;
+
+			$scope.tableParams = new ngTableParams({
+				page: 1,            // show first page
+				count: 10,           // count per page,
+				sorting: {
+					name: 'asc'     // initial sorting
+				}
+			}, {
+				total: data.length, // length of data
+				getData: function ($defer, params) {
+					var
+						orderedData = $scope.search.title ? $filter('filter')(data, {'title': $scope.search.title}) : data;
+					if ($scope.search.range && $scope.search.range_enabled) {
+						var startDate = new Date($scope.search.range.startDate).valueOf();
+						var endDate = new Date($scope.search.range.endDate).valueOf();
+						orderedData = $filter('filter')(orderedData, function (value) {
+							return (value.uploaded >= startDate) && (value.uploaded <= endDate);
+						});
+					}
+
+					orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
+
+					params.total(orderedData.length); // set total for recalc pagination
+					$scope.docs = orderedData;
+					$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+				}
+			});
 		},
 		function (err) {
 			if (err.status == 401) {

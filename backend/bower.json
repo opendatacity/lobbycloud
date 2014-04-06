@@ -5,15 +5,17 @@
 	"private": true,
 	"directory": "assets/libs",
 	"dependencies": {
-		"jquery": "*",
-		"bootstrap": "*",
+		"jquery": "2.1.0",
+		"bootstrap": "3.1.1",
 		"moment": "*",
-		"angular": "*",
+		"angular": "1.2.16",
 		"angular-cookies": "*",
 		"angular-gettext": "*",
 		"angular-moment": "*",
 		"angular-resource": "*",
 		"angular-sanitize": "*",
+		"bootstrap-daterangepicker": "*",
+		"ng-table": "*",
 		"angular-ui-router": "*",
 		"fontawesome": "*"
 	},
@@ -24,5 +26,10 @@
 		"libs",
 		"test",
 		"tests"
-	]
+	],
+	"resolutions": {
+		"angular": "1.2.16",
+		"jquery": "2.1.0",
+		"bootstrap": "3.1.1"
+	}
 }

@@ -1,6 +1,6 @@
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, serif;
-    padding-top: 50px;
+    padding-top: 54px;
     overflow-x: hidden;
 }
 
@@ -11,4 +11,8 @@ body {
 .doc-view {
     border: solid #ececec 1px;
     min-height: 400px;
+}
+
+.input-daterange {
+    width: 180px;
 }

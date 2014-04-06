@@ -12,7 +12,7 @@ msgstr ""
 "X-Generator: Poedit 1.6.4\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: assets/partials/admin/users.html
+#: assets/partials/docs.html assets/partials/admin/users.html
 msgid "Actions"
 msgstr "Aktion"
 
@@ -21,17 +21,22 @@ msgstr "Aktion"
 msgid "Administration"
 msgstr "Administration"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/users.html assets/js/directives.js
 msgid "Apply"
 msgstr "Anwenden"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/users.html assets/js/directives.js
 msgid "Cancel"
 msgstr "Abbrechen"
 
 #: assets/partials/admin/users.html
 msgid "Delete"
 msgstr "Löschen"
+
+#: assets/partials/docs.html
+#, fuzzy
+msgid "Delete Document"
+msgstr "Dokumente"
 
 #: assets/partials/admin/users.html
 msgid "Delete User"
@@ -43,6 +48,11 @@ msgstr "Account löschen?"
 
 #: assets/index.html
 msgid "Documents"
+msgstr "Dokumente"
+
+#: assets/partials/docs.html
+#, fuzzy
+msgid "Edit Document"
 msgstr "Dokumente"
 
 #: assets/partials/admin/users.html
@@ -64,6 +74,18 @@ msgstr "Namen eingeben"
 #: assets/partials/admin/users.html
 msgid "Enter password (leave empty for no changes)"
 msgstr "Passwort (leer lassen um für keine Änderung)"
+
+#: assets/partials/docs.html
+msgid "Filter Date"
+msgstr "Datum-Filter"
+
+#: assets/partials/docs.html
+msgid "Filter Title"
+msgstr "Titel-Filter"
+
+#: assets/js/directives.js
+msgid "From"
+msgstr "von"
 
 #: assets/index.html
 msgid "German"
@@ -113,6 +135,13 @@ msgstr "Name"
 msgid "New User"
 msgstr "Neuer Account"
 
+#: assets/partials/docs.html
+#, fuzzy
+msgid "One document"
+msgid_plural "{{docs.length}} documents"
+msgstr[0] "Dokumente"
+msgstr[1] "Dokumente"
+
 #: assets/partials/login.html assets/partials/admin/users.html
 msgid "Password"
 msgstr "Passwort"
@@ -141,6 +170,22 @@ msgstr "Start"
 msgid "Sure to delete user {{current_user.username}}?"
 msgstr "Account {{current_user.username}} wirklich löschen?"
 
+#: assets/partials/docs.html
+msgid "Tags"
+msgstr "Tags"
+
+#: assets/partials/docs.html
+msgid "Title"
+msgstr "Titel"
+
+#: assets/js/directives.js
+msgid "To"
+msgstr "bis"
+
+#: assets/partials/docs.html
+msgid "Uploaded"
+msgstr "Hochgeladen"
+
 #: assets/partials/login.html
 msgid "Username"
 msgstr "Name"
@@ -152,6 +197,9 @@ msgstr "Abmeldung erfolgreich"
 #: assets/partials/error.html
 msgid "You're not authorized to view that page!"
 msgstr "Keine Berechtigung für die Seite!"
+
+#~ msgid "Flags"
+#~ msgstr "Tags"
 
 #~ msgid "Could not log you out"
 #~ msgstr "Abmeldung fehlgeschlagen"

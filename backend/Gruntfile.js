@@ -10,12 +10,14 @@ module.exports = function (grunt) {
 						'assets/libs/moment/min/moment.min.js',
 						'assets/libs/moment/lang/de.js',
 						'assets/libs/bootstrap/dist/js/bootstrap.min.js',
+						'assets/libs/bootstrap-daterangepicker/daterangepicker.js',
 						'assets/libs/angular/angular.min.js',
 						'assets/libs/angular-gettext/dist/angular-gettext.min.js',
 						'assets/libs/angular-sanitize/angular-sanitize.min.js',
 						'assets/libs/angular-ui-router/release/angular-ui-router.min.js',
 						'assets/libs/angular-resource/angular-resource.min.js',
 						'assets/libs/angular-moment/angular-moment.min.js',
+						'assets/libs/ng-table/ng-table.js',
 						'assets/libs/angular-cookies/angular-cookies.min.js'
 					]
 				}
