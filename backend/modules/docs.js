@@ -10,7 +10,7 @@ var Docs = function () {
 				abstract: 'Abstract ' + i,
 				uploaded: (new Date()).valueOf() - Math.round( Math.random() * 1000 * 60 * 60 * 60 * 60),
 				tags: [
-					'unchecked'
+					'untaged'
 				]
 			}
 		);

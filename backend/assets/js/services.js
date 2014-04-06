@@ -12,6 +12,7 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 
 	function changeUser(user) {
 		$cookieStore.put('user', user);
+		user.isAdmin = user.role.title === userRoles.admin.title;
 		angular.extend(currentUser, user);
 	}
 

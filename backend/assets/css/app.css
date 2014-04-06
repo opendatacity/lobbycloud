@@ -16,3 +16,7 @@ body {
 .input-daterange {
     width: 180px;
 }
+
+.table-docs th {
+    text-align: left;
+}

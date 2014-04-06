@@ -13,7 +13,15 @@
         <!--<p><strong>Count per page:</strong> {{tableParams.count()}}</p>-->
     <!--</div>-->
 
-    <div class="row">
+    <div class="row" ng-show="loading">
+        <div class="col-md-9">
+            <div>
+                <i class="fa fa-spinner fa-spin"></i> <span translate>Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="!loading">
         <div class="col-md-9">
             <div class="well">
                 <form class="form-inline pull-right" role="form">

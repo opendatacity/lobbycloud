@@ -34,9 +34,8 @@ msgid "Delete"
 msgstr "Löschen"
 
 #: assets/partials/docs.html
-#, fuzzy
 msgid "Delete Document"
-msgstr "Dokumente"
+msgstr "Dokument löschen"
 
 #: assets/partials/admin/users.html
 msgid "Delete User"
@@ -51,9 +50,8 @@ msgid "Documents"
 msgstr "Dokumente"
 
 #: assets/partials/docs.html
-#, fuzzy
 msgid "Edit Document"
-msgstr "Dokumente"
+msgstr "Dokument bearbeiten"
 
 #: assets/partials/admin/users.html
 msgid "Edit User"
@@ -136,11 +134,10 @@ msgid "New User"
 msgstr "Neuer Account"
 
 #: assets/partials/docs.html
-#, fuzzy
 msgid "One document"
 msgid_plural "{{docs.length}} documents"
-msgstr[0] "Dokumente"
-msgstr[1] "Dokumente"
+msgstr[0] "1 Dokument"
+msgstr[1] "{{docs.length}} Dokumente"
 
 #: assets/partials/login.html assets/partials/admin/users.html
 msgid "Password"

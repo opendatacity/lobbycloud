@@ -6,15 +6,26 @@
 
         <p class="lead" translate>Library of influence on public policy</p>
     </div>
+    <div class="row">
+        <div class="col-md-4">
+            <h2 translate>Hello {{user.username}}!</h2>
+        </div>
+    </div>
 
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
+            <div class="well">
+                <h3 translate>Documents</h3>
+                <a class="btn btn-default" href="#/docs" translate>Edit Documents</a>
+            </div>
+        </div>
 
-            <h3 translate>Hello {{user.username}}!</h3>
-
-            <a href="#/admin/users" translate>Manage Users</a>
-            <a href="#/admin/groups" translate>Manage Groups</a>
-
+        <div ng-show="user.isAdmin" class="col-md-6">
+            <div class="well">
+                <h3 translate>Administration</h3>
+                <a class="btn btn-default" href="#/admin/users" translate>Manage Users</a>
+                <a class="btn btn-default" href="#/admin/groups" translate>Manage Groups</a>
+            </div>
         </div>
     </div>
 </div>

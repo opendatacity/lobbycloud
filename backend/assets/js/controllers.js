@@ -174,16 +174,9 @@ app.controller('AdminGroupsController', function ($scope, $state, Authentication
 app.controller('DocsController', function ($scope, $state, $filter, $templateCache, ngTableParams, gettextCatalog, AuthenticationService, DocsService) {
 	'use strict';
 
+	$scope.loading = true;
 	var data = [];
 	$scope.docs = [];
-	$scope.search = {
-		title: '',
-		range: {
-			startDate: '',
-			endDate: ''
-		},
-		range_enabled: false
-	};
 
 	var reload = function () {
 		if (($scope.tableParams) && (this.last !== undefined)) {
@@ -218,7 +211,20 @@ app.controller('DocsController', function ($scope, $state, $filter, $templateCac
 	DocsService.list({},
 		function (docsdata) {
 			data = docsdata;
-
+			var min = null;
+			var max = 0;
+			data.forEach(function (doc) {
+				min = min ? Math.min(doc.uploaded, min) : doc.uploaded;
+				max = Math.max(doc.uploaded, max);
+			});
+			$scope.search = {
+				title: '',
+				range: {
+					startDate: moment(min),
+					endDate: moment(max)
+				},
+				range_enabled: false
+			};
 			$scope.tableParams = new ngTableParams({
 				page: 1,            // show first page
 				count: 10,           // count per page,
@@ -245,6 +251,9 @@ app.controller('DocsController', function ($scope, $state, $filter, $templateCac
 					$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 				}
 			});
+
+			$scope.loading = false;
+
 		},
 		function (err) {
 			if (err.status == 401) {
