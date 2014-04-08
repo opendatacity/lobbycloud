@@ -1,0 +1,49 @@
+{{>header}}
+<div id="">
+	<div id="">
+		<h1>{{#__}}LobbyCloud{{/__}}</h1>
+		<h2>{{#__}}Library of influences on public policy{{/__}}</h2>
+	</div>
+	<div id="">
+		{{num_pages}} {{#__}}Pages{{/__}}
+	</div>
+</div>
+{{#just_in}}
+	<div id="">
+		<h3>{{#__}}Just in{{/__}}</h3>
+		<table class="table">
+			{{#document}}
+			<tr>
+				<td>
+					<a href="{{{url}}}/document/{{slug}}">{{title}}</a>
+					{{#__}}{{age}} days ago{{/__}}, 
+					{{#__}}{{pages}} pages{{/__}},
+					{{#comments}}<span class="label">{{#__}}{{comments}} comments{{/__}}<span>{{/comments}}
+				</td>
+				<td>
+					{{#tag}}<a href="{{{url}}}/tags/{{label}}" class="{{class}}">#{{label}}</a>{{/tag}}
+				</td>
+			</tr>
+			{{/document}}
+		</table>
+		<a href="{{{url}}}/documents">{{#__}}more{{/__}} ...</a>
+	</div>
+{{/just_in}}
+<div id="intro" class="row">
+	<div class="col-md-4">
+		<h3><i class="fa fa-cloud-upload"></i> {{#__}}Upload{{/__}}</h3>
+		<p>{{#__}}Just send us your stuff via Email, add #categories in the subject line. We'll add the documents to our repository and make it linkable en detail, cross-referencable and commentable to the public.{{/__}}</p>
+		<a href="" class="btn btn-default">{{#__}}Bring it on!{{/__}}</a>
+	</div>
+	<div class="col-md-4">
+		<h3><i class="fa fa-filter"></i> {{#__}}Research{{/__}}</h3>
+		<p>{{#__}}Whose words are they using? Whose do positions overlap? Which arguments are based on the same set of underlying facts? Navigate the deluge of position papers, proposals and white papers.{{/__}}</p>
+		<a href="" class="btn btn-default">{{#__}}Have a look!{{/__}}</a>
+	</div>
+	<div class="col-md-4">
+		<h3><i class="fa fa-bolt"></i> {{#__}}Engage{{/__}}</h3>
+		<p>{{#__}}Pinpoint key interests and stakeholders, drag backroom positions out to the public view and generate public discussions, encourage drowned out voices to be heard by making{{/__}}</p>
+		<a href="" class="btn btn-default">{{#__}}Get involved!{{/__}}</a>
+	</div>
+</div>
+{{>footer}}
