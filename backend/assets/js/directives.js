@@ -1,3 +1,7 @@
+'use strict';
+
+/* Directives */
+
 app.directive('input', function ($compile, $parse, gettextCatalog) {
 	return {
 		restrict: 'E',

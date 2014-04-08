@@ -9,7 +9,8 @@ var app = angular
 		'ngResource',
 		'ngTable',
 		'ngSanitize',
-		'angularMoment'
+		'angularMoment',
+		'angularFileUpload'
 	]);
 
 
@@ -23,6 +24,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 	$urlRouterProvider.otherwise('/start');
 
 	$urlRouterProvider.when('/admin', '/admin/users');
+	$urlRouterProvider.when('/docs', '/docs/list');
 
 	$stateProvider
 		.state('login', {
@@ -63,15 +65,30 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 				access: access.admin
 			}
 		})
+
+
+		.state('docs', {
+			url: '/docs',
+			abstract: true,
+			templateUrl: '../partials/docs.html',
+			controller: 'DocsController'
+		})
+		.state('docs.list', {
+			url: '/list',
+			templateUrl: '../partials/docs/list.html',
+			controller: 'DocsListController'
+		})
+		.state('docs.upload', {
+			url: '/upload',
+			templateUrl: '../partials/docs/upload.html',
+			controller: 'DocsUploadController'
+		})
+
+
 		.state('logout', {
 			url: '/logout',
 			templateUrl: '../partials/logout.html',
 			controller: 'LogoutController'
-		})
-		.state('docs', {
-			url: '/docs',
-			templateUrl: '../partials/docs.html',
-			controller: 'DocsController'
 		})
 		.state('error', {
 			url: '/error',

@@ -3,12 +3,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: assets/partials/docs.html
 #: assets/partials/admin/users.html
 msgid "Actions"
 msgstr ""
 
 #: assets/index.html
+#: assets/partials/start.html
 msgid "Administration"
 msgstr ""
 
@@ -26,10 +26,6 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: assets/partials/docs.html
-msgid "Delete Document"
-msgstr ""
-
 #: assets/partials/admin/users.html
 msgid "Delete User"
 msgstr ""
@@ -39,11 +35,12 @@ msgid "Delete User?"
 msgstr ""
 
 #: assets/index.html
+#: assets/partials/start.html
 msgid "Documents"
 msgstr ""
 
-#: assets/partials/docs.html
-msgid "Edit Document"
+#: assets/partials/start.html
+msgid "Edit Documents"
 msgstr ""
 
 #: assets/partials/admin/users.html
@@ -64,14 +61,6 @@ msgstr ""
 
 #: assets/partials/admin/users.html
 msgid "Enter password (leave empty for no changes)"
-msgstr ""
-
-#: assets/partials/docs.html
-msgid "Filter Date"
-msgstr ""
-
-#: assets/partials/docs.html
-msgid "Filter Title"
 msgstr ""
 
 #: assets/js/directives.js
@@ -128,12 +117,6 @@ msgstr ""
 msgid "New User"
 msgstr ""
 
-#: assets/partials/docs.html
-msgid "One document"
-msgid_plural "{{docs.length}} documents"
-msgstr[0] ""
-msgstr[1] ""
-
 #: assets/partials/login.html
 #: assets/partials/admin/users.html
 msgid "Password"
@@ -163,20 +146,12 @@ msgstr ""
 msgid "Sure to delete user {{current_user.username}}?"
 msgstr ""
 
-#: assets/partials/docs.html
-msgid "Tags"
-msgstr ""
-
-#: assets/partials/docs.html
-msgid "Title"
-msgstr ""
-
 #: assets/js/directives.js
 msgid "To"
 msgstr ""
 
-#: assets/partials/docs.html
-msgid "Uploaded"
+#: assets/partials/start.html
+msgid "Upload Documents"
 msgstr ""
 
 #: assets/partials/login.html
