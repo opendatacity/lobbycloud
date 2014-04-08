@@ -1,10 +1,37 @@
 #!/usr/bin/env node
 module.exports = {
+
+	/* mongodb config */
+	db: "lobbycloud",
+	
+	/* folder where document files are stored */
 	storage: "storage",
-	hostname: "lobbycloud.eu",
+
+	/* public base url, no trailing slash */
+	url: "http://beta.lobbycloud.eu",
+
+	/* locales for i18n */
+	locales: ["en","de"],
+	
+	/* upload configuration */
+	upload: {
+		tmp: "tmp", // tmp upload folder
+		mimetypes: ["application/pdf"], // allowed mimetypes
+		fileext: ["pdf"], // allowed file extensions
+		filesize: 26214400 // maximum filesize in bytes
+	},
+	
+	/* express webserver config */
 	listen: {
-		_socket: "/var/www/lobbycloud.eu/lobbycloud.sock",
+		
+		/* connect via socket */
+		socket: "/wherever/whatever.sock",
+
+		/* or tcp (remove the socket propery then) */
+		host: "127.0.0.1"
 		port: 3000
 	},
+	
+	/* sqlite with beta signups */
 	signupdb: "data/signup.sqlite"
 };
