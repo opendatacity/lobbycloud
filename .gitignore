@@ -1,3 +1,7 @@
 backend/assets/libs/*
 node_modules
 config.js
+storage
+tmp
+extract
+data
