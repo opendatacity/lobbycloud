@@ -227,7 +227,7 @@ if (config.listen.hasOwnProperty("socket")) {
 		console.log("server listening on socket", config.listen.socket);
 	});
 } else if (config.listen.hasOwnProperty("host")){
-	app.listen(config.listen.host, config.listen.port, function(){
+	app.listen(config.listen.port, config.listen.host, function(){
 		console.log("server listening on", [config.listen.host, config.listen.port].join(":"));
 	});	
 } else {
