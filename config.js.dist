@@ -31,6 +31,11 @@ module.exports = {
 		host: "127.0.0.1",
 		port: 3000
 	},
+
+	/* passport config */
+	passport: {
+		secret: 'keyboard cat is so super happy'
+	},
 	
 	/* sqlite with beta signups */
 	signupdb: "data/signup.sqlite"

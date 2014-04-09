@@ -13,12 +13,17 @@ var mongojs = require("mongojs");
 var express = require("express");
 var multer = require("multer");
 var i18n = require("i18n");
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 
 /* require config */
 var config = require(path.resolve(__dirname, "config.js"), 20);
 
 /* require local modules */
 var users = require("./modules/users")({db: config.db});
+
+/*mockup docs*/
+var mockupdocs = require('./modules/docs')();
 
 /* configure storage */
 var storage = new filedump(path.resolve(__dirname, config.storage));
@@ -35,6 +40,32 @@ i18n.configure({
 	cookie: 'lang',
 	directory: path.resolve(__dirname, "assets/locales")
 });
+
+/* configure passport */
+
+passport.serializeUser(function (user, done) {
+	done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+	users.get(id, function (err, user) {
+		done(err, user);
+	});
+});
+
+passport.use(new LocalStrategy(function (username, password, done) {
+	process.nextTick(function () {
+		users.auth(username, password, function (err, user) {
+			if (err) {
+				done(err);
+			} else if (!user) {
+				done(null, false, { message: 'Invalid Credentials'});
+			} else {
+				done(null, user);
+			}
+		});
+	});
+}));
 
 /* helper function for tags */
 var _totags = function(tags) {
@@ -63,7 +94,9 @@ var _totags = function(tags) {
 var app = express();
 
 app.configure(function(){
-	
+	app.use(express.compress());
+	app.use(express.logger('dev'));
+
 	/* multipart parser for uploads, yay! */
 	app.use(multer({
 		dest: path.resolve(__dirname, config.upload.tmp),
@@ -81,7 +114,10 @@ app.configure(function(){
 
 	/* serve assets */
 	app.use('/assets', express.static(path.resolve(__dirname, 'assets')));
-	
+
+	/* backend interface */
+	app.use('/central', express.static(__dirname + '/backend/assets'));
+
 	/* internationalization */
 	app.use(i18n.init);
 	app.use(function(req, res, next) {
@@ -92,7 +128,7 @@ app.configure(function(){
 		};
 		next();
 	});
-	
+
 	/* upload error handler */
 	app.use(function(err, req, res, next){
 		if (req.url === "/api/upload") {
@@ -102,7 +138,12 @@ app.configure(function(){
 		next(err);
 	});
 	
-	/* FIXME: user/session handling goes here somewhere */
+	/* user & session handling */
+	app.use(express.cookieParser());
+	app.use(express.json());
+	app.use(express.session({ secret: config.passport.secret, store: new express.session.MemoryStore }));
+	app.use(passport.initialize());
+	app.use(passport.session());
 
 });
 
@@ -209,6 +250,69 @@ app.post('/api/upload', function(req, res){
 app.get('/api/whatever', function(req, res){
 	res.json("not implemented");
 });
+
+/* login */
+app.post('/api/login',
+	passport.authenticate('local', {}),
+	function (req, res) {
+		res.json(req.user);
+	}
+);
+
+/* logout */
+app.post('/api/logout', function (req, res) {
+	if (req.user) {
+		req.logout();
+	}
+	res.send(200);
+});
+
+/* protected backend api */
+
+app.post('/api/admin/:cmd', function (req, res) {
+	if ((!req.user) || (req.user.role !== userRoles.admin)) {
+		res.send(401);
+	} else {
+		switch (req.params.cmd) {
+			case 'users':
+				users.list(null, null, function (err, data) {
+					res.json(data);
+				});
+				break;
+			case 'docs':
+				mockupdocs.list(function (err, data) {
+					res.json(data);
+				});
+				break;
+			case 'users.delete':
+				users.delete(req.body.id, function (err) {
+					res.json(err ? 400 : 200, err);
+				});
+				break;
+			case 'users.add':
+				users.add(req.body.user, function (err, user) {
+					if (err)
+						res.send(400, err);
+					else
+						res.json(user);
+				});
+				break;
+			case 'users.update':
+				users.update(req.body.user, function (err, user) {
+					if (err)
+						res.send(400, err);
+					else
+						res.json(user);
+				});
+				break;
+			default :
+				res.send(404);
+				break;
+		}
+	}
+});
+
+
 
 /* default */
 app.all('*', function(req, res){
