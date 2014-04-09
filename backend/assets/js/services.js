@@ -5,14 +5,17 @@
 app.factory('AuthenticationService', function ($http, $cookieStore) {
 
 	var
-		cookieUser = $cookieStore.get('user')
-		, accessLevels = routingConfig.accessLevels
-		, userRoles = routingConfig.userRoles
-		, currentUser = cookieUser || { username: '', role: userRoles.public };
+		cookieName = 'lobbycloud-user',
+		cookieUser = $cookieStore.get(cookieName),
+		accessLevels = routingConfig.accessLevels,
+		userRoles = routingConfig.userRoles,
+		currentUser = cookieUser || { username: '', role: userRoles.public };
+
+	console.log(currentUser);
 
 	function changeUser(user) {
 		user.isAdmin = user.role.title === userRoles.admin.title;
-		$cookieStore.put('user', user);
+		$cookieStore.put(cookieName, user);
 		angular.extend(currentUser, user);
 	}
 
@@ -21,7 +24,6 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 			if (role === undefined) {
 				role = currentUser.role;
 			}
-
 			return accessLevel.bitMask & role.bitMask;
 		},
 		isLoggedIn: function (user) {
@@ -44,6 +46,11 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 		},
 		login: function (user, success, error) {
 			$http.post('/api/login', user).success(function (user) {
+				user.role = userRoles[user.role];
+				if (!user.role) {
+					console.log('Unknown user role, assuming user');
+					user.role = userRoles.user;
+				}
 				changeUser(user);
 				success(user);
 			}).error(error);
@@ -54,7 +61,7 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 					username: '',
 					role: userRoles.public
 				});
-				$cookieStore.remove('user');
+				$cookieStore.remove(cookieName);
 				success();
 			}).error(error);
 		},
@@ -63,7 +70,7 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 				username: '',
 				role: userRoles.public
 			});
-			$cookieStore.remove('user');
+			$cookieStore.remove(cookieName);
 		},
 		accessLevels: accessLevels,
 		userRoles: userRoles,
