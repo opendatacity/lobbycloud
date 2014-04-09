@@ -17,6 +17,9 @@ var i18n = require("i18n");
 /* require config */
 var config = require(path.resolve(__dirname, "config.js"), 20);
 
+/* require local modules */
+var users = require("./modules/users")({db: config.db});
+
 /* configure storage */
 var storage = new filedump(path.resolve(__dirname, config.storage));
 
