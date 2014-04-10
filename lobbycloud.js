@@ -247,6 +247,12 @@ app.post('/api/upload', function(req, res){
 
 });
 
+/* invites testing endpoint REMOVEME */
+app.get('/api/test/invites/:create?', function(req, res){
+	if (req.param("create")) invites.create(req.param("create"));
+	res.json(invites.all());
+});
+
 /* dummy api endpoint */
 app.get('/api/whatever', function(req, res){
 	res.json("not implemented");
