@@ -190,7 +190,7 @@ module.exports = function(opts){
 	};
 	
 	/* change password */
-	user.changepass = function(id, password, oldpassword, callback) {
+	users.changepass = function(id, password, oldpassword, callback) {
 		if (typeof oldpassword === "function") {
 			/* just update the password */
 			users.password(password, function(err, method, key, salt, it, time){
@@ -210,7 +210,7 @@ module.exports = function(opts){
 	};
 	
 	/* get user by apikey */
-	user.apikey = function(apikey, callback) {
+	users.apikey = function(apikey, callback) {
 		var cacheid = "apikey:"+apikey;
 		if (cache.hasOwnProperty(cacheid)) return users.get(cache[cacheid], callback)
 		db.collection("users").findOne({apikey: apikey}, function(err, result){
