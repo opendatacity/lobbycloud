@@ -33,5 +33,9 @@ module.exports = {
 	},
 	
 	/* sqlite with beta signups */
-	signupdb: "data/signup.sqlite"
+	signupdb: "data/signup.sqlite",
+	
+	/* json with invite keys */
+	invitedb: "data/invites.json"
+	
 };
