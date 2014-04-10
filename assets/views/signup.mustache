@@ -1,0 +1,132 @@
+{{>header}}
+<div class="container">
+	<div id="headline">
+		<h1>{{#__}}Sign up{{/__}}</h1>
+	</div>
+	{{^invited}}
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3 white-box">
+			<h2>{{#__}}Are you invited?{{/__}}</h2>
+			<p>{{#__}}LobbyCloud is still in closed beta. In order to sign up, you need an invite key.{{/__}}</p>
+			<form  action="{{{url}}}/signup" method="post" class="form-inline" role="form">
+				<div class="form-group">
+					<label for="invite">{{#__}}Invite key{{/__}}</label>
+					<input type="text" name="invite" class="form-control" id="invite" value="{{invitekey}}" placeholder="{{#__}}Your beta invite key{{/__}}">
+				</div>
+				<button type="submit" class="btn btn-primary">{{#__}}Sign up{{/__}}</button>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3 white-box">
+			<h2>{{#__}}Get invited!{{/__}}</h2>
+			<p>{{#__}}Let us know about your interest in LobbyCloud. We will put you on the waiting list.{{/__}}</p>
+			<form action="{{{url}}}/beta" method="post" role="form">
+				<div class="form-group">
+					<label for="name">{{#__}}Your name{{/__}}</label>
+					<input type="text" name="name" class="form-control" id="name" placeholder="{{#__}}Enter your name{{/__}}">
+				</div>
+				<div class="form-group">
+					<label for="email">{{#__}}Email address{{/__}}</label>
+					<input type="email" name="email" class="form-control" id="email" placeholder="{{#__}}Enter your email address{{/__}}">
+				</div>
+				<div class="form-group">
+					<label>{{#__}}What is your motivation to sign up?{{/__}}</label>
+					<div class="radio">
+						<label>
+							<input type="radio" name="motivation" id="motivation-ctz" value="ctz" checked="checked">
+							{{#__}}I'm an interested citizen{{/__}}
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="motivation" id="motivation-rep" value="rep">
+							{{#__}}I am or work for a representative, political group or party{{/__}}
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="motivation" id="motivation-lob" value="lob">
+							{{#__}}I'm a lobbyist or work at an interest group{{/__}}
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="motivation" id="motivation-ngo" value="ngo">
+							{{#__}}I work for an NGO or political campaign{{/__}}
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="motivation" id="motivation-edu" value="edu">
+							{{#__}}I work in political education{{/__}}
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="motivation" id="motivation-jrn" value="jrn">
+							{{#__}}I'm a blogger, podcaster or other journalist{{/__}}
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="motivation" id="motivation-dev" value="dev">
+							{{#__}}I'm a software developer{{/__}}
+						</label>
+					</div>
+				</div>
+				<button type="submit" class="btn btn-primary">{{#__}}Get invited{{/__}}</button>
+			</form>	
+		</div>
+	</div>
+	{{/invited}}
+	{{#invited}}
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3 white-box">
+			<h2>{{#__}}Ready to sign you up!{{/__}}</h2>
+			<form action="{{{url}}}/signup" method="post" role="form">
+				<fieldset>
+					<div class="form-group">
+						<label for="invite">{{#__}}Invite key{{/__}}</label>
+						<input type="text" name="invite" class="form-control" id="invite" value="{{invite}}" placeholder="{{#__}}Your beta invite key{{/__}}">
+					</div>
+				</fieldset>
+				<fieldset>
+					<div class="form-group">
+						<label for="id">{{#__}}Username{{/__}}</label>
+						<input type="text" name="id" class="form-control" id="id" placeholder="{{#__}}Username{{/__}}">
+					</div>
+					<div class="form-group">
+						<label for="email">{{#__}}Email address{{/__}}</label>
+						<input type="email" name="email" class="form-control" id="email" placeholder="{{#__}}Enter your email address{{/__}}">
+					</div>
+					<div class="form-group">
+						<label for="pass">{{#__}}Pick a strong password{{/__}}</label>
+						<input type="password" name="pass" class="form-control strengthometer" id="pass" placeholder="">
+					</div>
+					<div class="form-group">
+						<label for="pass2">{{#__}}Repeat your chosen password for verification{{/__}}</label>
+						<input type="password" name="pass2" class="form-control" id="pass2" placeholder="">
+					</div>
+				</fieldset>
+				<fieldset>
+					<div class="form-group">
+						<label for="name">{{#__}}Your name{{/__}}</label>
+						<input type="text" name="name" class="form-control" id="name" placeholder="{{#__}}Enter your name{{/__}}">
+					</div>
+					<div class="form-group">
+						<label for="organization">{{#__}}Your organization{{/__}} ({{#__}}optional{{/__}})</label>
+						<input type="text" name="organization" class="form-control" id="organization" placeholder="{{#__}}Your organization{{/__}}">
+					</div>
+					<div class="form-group">
+						<label for="description">{{#__}}Description{{/__}} ({{#__}}optional{{/__}})</label>
+						<textarea class="form-control" rows="3" name="description" id="description" placeholder="{{#__}}Description{{/__}}"></textarea>
+					</div>
+				</fieldset>
+				<button type="submit" class="btn btn-primary">{{#__}}Sign up!{{/__}}</button>
+			</form>
+		</div>
+	</div>
+	{{/invited}}
+</div>
+{{>footer}}
