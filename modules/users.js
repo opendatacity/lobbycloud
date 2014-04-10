@@ -181,6 +181,7 @@ module.exports = function(opts){
 	
 	/* get all users, probably rather not use this */
 	users.list = function(limit, skip, callback) {
+		/* FIXME: limit and skip are not used */
 		db.collection("users").find(function(err,results){
 			if (err) return callback(err);
 			results.forEach(function(user){
@@ -225,17 +226,4 @@ module.exports = function(opts){
 
 	return users;
 	
-};
-
-var example = {
-	"id": "yetzt",
-	"password": ["pbkdf2","<hash>","<salt>","<iterations>"],
-	"name": "Sebastian Vollnhals",
-	"email": "sebastian@vollnhals.info",
-	"url": "http://yetzt.me/",
-	"role": "user",
-	"apikey": "<hex12>",
-	"verification": "<hex12>",
-	"verified": true,
-	"x": "x"
 };
