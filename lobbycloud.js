@@ -8,6 +8,7 @@ var path = require("path");
 /* require npm modules */
 var mustache = require("mustache-express");
 var filedump = require("filedump");
+var sqlite3 = require("sqlite3");
 var mmmagic = require("mmmagic");
 var mongojs = require("mongojs");
 var express = require("express");
@@ -16,6 +17,9 @@ var i18n = require("i18n");
 
 /* require config */
 var config = require(path.resolve(__dirname, "config.js"), 20);
+
+/* signup database */
+var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 
 /* require local modules */
 var users = require("./modules/users")({db: config.db});
@@ -110,6 +114,22 @@ app.configure(function(){
 app.get('/', function(req, res){
 	res.render('index', {
 		"url": config.url
+	});
+});
+
+/* beta sign up */
+app.post('/beta', function(req, res){
+	signupdb.run("INSERT INTO signup (date, name, email, motivation) VALUES (?, ?, ?, ?);", [
+		parseInt((new Date()).getTime()/1000,10),
+		req.body.name,
+		req.body.email,
+		req.body.motivation
+	], function(err){
+		res.render('beta', {
+			"url": config.url,
+			"thankyou": (err === null),
+			"error": (err !== null)
+		});
 	});
 });
 
