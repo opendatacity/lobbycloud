@@ -9,7 +9,8 @@ var app = angular
 		'ngResource',
 		'ngTable',
 		'ngSanitize',
-		'angularMoment'
+		'angularMoment',
+		'angularFileUpload'
 	]);
 
 
@@ -23,11 +24,12 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 	$urlRouterProvider.otherwise('/start');
 
 	$urlRouterProvider.when('/admin', '/admin/users');
+	$urlRouterProvider.when('/docs', '/docs/list');
 
 	$stateProvider
 		.state('login', {
 			url: '/login',
-			templateUrl: '../partials/login.html',
+			templateUrl: 'partials/login.html',
 			controller: 'LoginController',
 			data: {
 				access: access.public
@@ -35,13 +37,13 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 		})
 		.state('app', {
 			url: '/start',
-			templateUrl: '../partials/start.html',
+			templateUrl: 'partials/start.html',
 			controller: 'StartController'
 		})
 		.state('admin', {
 			url: '/admin',
 			abstract: true,
-			templateUrl: '../partials/admin.html',
+			templateUrl: 'partials/admin.html',
 			controller: 'AdminController',
 			data: {
 				access: access.admin
@@ -49,7 +51,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 		})
 		.state('admin.users', {
 			url: '/users',
-			templateUrl: '../partials/admin/users.html',
+			templateUrl: 'partials/admin/users.html',
 			controller: 'AdminUsersController',
 			data: {
 				access: access.admin
@@ -57,25 +59,40 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 		})
 		.state('admin.groups', {
 			url: '/groups',
-			templateUrl: '../partials/admin/groups.html',
+			templateUrl: 'partials/admin/groups.html',
 			controller: 'AdminGroupsController',
 			data: {
 				access: access.admin
 			}
 		})
-		.state('logout', {
-			url: '/logout',
-			templateUrl: '../partials/logout.html',
-			controller: 'LogoutController'
-		})
+
+
 		.state('docs', {
 			url: '/docs',
-			templateUrl: '../partials/docs.html',
+			abstract: true,
+			templateUrl: 'partials/docs.html',
 			controller: 'DocsController'
+		})
+		.state('docs.list', {
+			url: '/list',
+			templateUrl: 'partials/docs/list.html',
+			controller: 'DocsListController'
+		})
+		.state('docs.upload', {
+			url: '/upload',
+			templateUrl: 'partials/docs/upload.html',
+			controller: 'DocsUploadController'
+		})
+
+
+		.state('logout', {
+			url: '/logout',
+			templateUrl: 'partials/logout.html',
+			controller: 'LogoutController'
 		})
 		.state('error', {
 			url: '/error',
-			templateUrl: '../partials/error.html',
+			templateUrl: 'partials/error.html',
 			controller: 'AppController'
 		});
 });

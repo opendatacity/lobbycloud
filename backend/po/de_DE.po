@@ -16,7 +16,7 @@ msgstr ""
 msgid "Actions"
 msgstr "Aktion"
 
-#: assets/index.html
+#: assets/index.html assets/partials/start.html
 #, fuzzy
 msgid "Administration"
 msgstr "Administration"
@@ -45,12 +45,17 @@ msgstr "Account löschen"
 msgid "Delete User?"
 msgstr "Account löschen?"
 
-#: assets/index.html
+#: assets/index.html assets/partials/start.html
 msgid "Documents"
 msgstr "Dokumente"
 
 #: assets/partials/docs.html
 msgid "Edit Document"
+msgstr "Dokument bearbeiten"
+
+#: assets/partials/start.html
+#, fuzzy
+msgid "Edit Documents"
 msgstr "Dokument bearbeiten"
 
 #: assets/partials/admin/users.html
@@ -71,7 +76,7 @@ msgstr "Namen eingeben"
 
 #: assets/partials/admin/users.html
 msgid "Enter password (leave empty for no changes)"
-msgstr "Passwort (leer lassen um für keine Änderung)"
+msgstr "Passwort (leer lassen um es nicht zu ändern)"
 
 #: assets/partials/docs.html
 msgid "Filter Date"
@@ -103,6 +108,11 @@ msgstr ""
 
 #: assets/partials/admin/users.html
 msgid "Loading Data..."
+msgstr "Daten werden geladen..."
+
+#: assets/partials/docs.html
+#, fuzzy
+msgid "Loading..."
 msgstr "Daten werden geladen..."
 
 #: assets/partials/logout.html

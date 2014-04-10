@@ -51,7 +51,7 @@ module.exports = function(opts){
 		
 	}
 	
-	/* ceeck if user exists */
+	/* check if user exists */
 	users.check = function(id, callback){
 		id = slugmaker(id);
 		if (cache.hasOwnProperty(id)) return callback(null, true);
@@ -186,6 +186,7 @@ module.exports = function(opts){
 			results.forEach(function(user){
 				cache[user.id] = user;
 			});
+			callback(null, results);
 		});
 	};
 	

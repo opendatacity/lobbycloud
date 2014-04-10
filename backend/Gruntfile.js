@@ -11,7 +11,9 @@ module.exports = function (grunt) {
 						'assets/libs/moment/lang/de.js',
 						'assets/libs/bootstrap/dist/js/bootstrap.min.js',
 						'assets/libs/bootstrap-daterangepicker/daterangepicker.js',
+						'assets/libs/ng-file-upload/angular-file-upload-shim.min.js', //must be included BEFOR angular.js
 						'assets/libs/angular/angular.min.js',
+						'assets/libs/ng-file-upload/angular-file-upload.min.js',
 						'assets/libs/angular-gettext/dist/angular-gettext.min.js',
 						'assets/libs/angular-sanitize/angular-sanitize.min.js',
 						'assets/libs/angular-ui-router/release/angular-ui-router.min.js',

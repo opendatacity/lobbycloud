@@ -1,4 +1,4 @@
-var Docs = function () {
+module.exports = function () {
 	var me = this;
 
 	var mockupDocs = [];
@@ -19,8 +19,6 @@ var Docs = function () {
 	me.getDocs = function (cb) {
 		cb(null, mockupDocs);
 	};
-};
 
-module.exports = {
-	Docs: Docs
+	return me;
 };
