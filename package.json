@@ -1,7 +1,7 @@
 {
 	"private": true,
 	"name": "lobbycloud",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "all the source for lobbycloud.eu",
 	"dependencies": {
 		"express": ">= 3.5.1",
