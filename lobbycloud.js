@@ -68,6 +68,10 @@ var app = express();
 
 app.configure(function(){
 	
+	/* */
+	app.use(express.json());
+	app.use(express.urlencoded());
+	
 	/* multipart parser for uploads, yay! */
 	app.use(multer({
 		dest: path.resolve(__dirname, config.upload.tmp),
