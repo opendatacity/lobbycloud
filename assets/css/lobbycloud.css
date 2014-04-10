@@ -8,9 +8,9 @@ body {
 	padding: 0px;
 	font-family: "Roboto", "Helvetica", "Arial", sans-serif;
 	background-color: #e9e9e9;
-	background-image:-webkit-radial-gradient(center, #ebebec, #e9e9e9);
-   background-image:-moz-radial-gradient(center, #ebebec, #e9e9e9);
-   background-image:radial-gradient(center, #ebebec, #e9e9e9);
+	background-image:-webkit-radial-gradient(center, #fbfbfb, #f9f9f9);
+   background-image:-moz-radial-gradient(center, #fbfbfb, #f9f9f9);
+   background-image:radial-gradient(center, #fbfbfb, #f9f9f9);
    
 	box-shadow: 0px 0px 200px -100px #000 inset;
 	
@@ -19,15 +19,15 @@ body {
 header {
 	
 	display: block;
+	position: relative;
+	margin: 0px;
+	padding: 0px;
 	height: 51px;
+	background-color: #f00;
 	
 }
 
-	header #navbar {
-		
-		background-color: #333;
-		
-	}
+	header #navbar {}
 	
 		header #navbar a {
 			
@@ -40,44 +40,167 @@ header {
 		header #navbar a:active {
 			
 			color: #fff;
-			background-color: #222;
+			background-color: #f00;
+			background-image: linear-gradient(to bottom, #88aa00 0px, #558800 100%);
+			background-repeat: repeat-x;
+			
+		}
+		
+		header #navbar .navbar-brand {
+			font-size: 1.8em;
+			color: #fff;
+			font-family: "Roboto Slab";
+			font-weight: 300;
+		}
+
+			header #navbar .navbar-brand i {
+				color: #fff;
+			}
+
+			header #navbar .navbar-brand strong {
+				color: #bd0;
+				font-weight: 500;
+			}
+
+		
+		header #navbar .navbar-nav a {
+			
+			font-family: "Roboto Slab";
+			font-size: 1.2em;
+			
+		}
+		
+		header #navbar .navbar-toggle span {
+			
+			background-color: #fff;
+			
+		}
+		
+		header #navbar .navbar-user {
+			
+			margin-right: 20px !important;
+			font-size: .8em;
 			
 		}
 
-	header h1 {
+		header #navbar .navbar-user a {
 		
-		display: inline-block;
-		font-size: 6em;
-		font-family: "Roboto Slab";
-		padding-left: 1.5em;
-		background: url(../img/cloud.png) left center no-repeat;
-		background-size: auto 70%;
-		text-align: left;
-		line-height: 1em;
-		margin: 0px;
-		text-shadow: 0px 0px 7px #fff;
+			padding-right: 10px;
+			padding-left: 10px;
+		
+		}
+		
+		header #navbar .navbar-user li a.profile {
+			
+			padding: 5px 10px;
+			margin: 9px 5px;
+			line-height: 20px;
+			display: block;
+			position: relative;
+			color: #fff;
+			border-radius: 5px;
+			border: 1px solid #666;
+			
+		}
+		
+			header #navbar .navbar-user li a.profile:hover {
+				
+				background: none;
+				
+			}
+		
+			header #navbar .navbar-user li a.profile .fa {
+				
+				color: #bd0;
+				
+			}
+		
+	
+#main {
+	
+	padding-bottom: 20px;
+	
+}
+
+	#headline {
+		
+		margin: 40px -10px 20px;
+		
+	}
+		
+		#headline h1 {
+			
+			font-family: "Roboto Slab";
+			font-size: 3em;
+			color: #8a0;
+			text-shadow: 0px 0px 10px #fff;
+			
+		}
+
+		#headline h2 {
+			
+			font-family: "Roboto Slab";
+			font-size: 1.2em;
+			margin: 0px;
+			text-shadow: 0px 0px 10px #fff;
+			
+		}
+	
+	#intro {
+		
+		background-color: #fff;
+		padding-bottom: 20px;
+		border-radius: 10px;
 		
 	}
 	
-	header h2 {
+	#main h2 {
 		
-		display: block;
-		font-size: 2em;
 		font-family: "Roboto Slab";
-		margin: 0px;
-		text-shadow: 0px 0px 7px #fff;
-		line-height: 1.4em;
-		margin-left: 4.6em;
+		font-size: 1.4em;
+		text-shadow: 0px 0px 10px #fff;
 		
 	}
 	
+	#main h3 {
+		
+		font-family: "Roboto Slab";
+		font-size: 1.2em;
+		text-shadow: 0px 0px 10px #fff;
+		
+	}
 	
+	#main .white-box {
+		background-color: #fff;
+		padding-bottom: 20px;
+		border-radius: 10px;
+		margin-bottom: 20px;
+	}
+	
+	#main .password-progress {
+		
+		height: 14px;
+		margin: 0px 0px 3px;
+		padding: 0px;
+		height: 5px;
+		
+	}
+
+	#main fieldset {
+
+		border: 1px solid #f9f9f9;
+		border-radius: 3px;
+		padding: 10px;
+		margin-bottom: 20px;
+
+	}
+		
 footer {
 	
 	background-color: #333;
 	color: #fff;
 	margin: 0px;
-	padding: 20px 10px;
+	padding: 19px 10px;
 	line-height: 22px;
 	text-align: center;
 	
