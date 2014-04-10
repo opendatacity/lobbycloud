@@ -99,15 +99,18 @@ var _totags = function(tags) {
 var app = express();
 
 app.configure(function(){
-	app.use(express.compress());
+
+	/* user logger */
 	app.use(express.logger('dev'));
 
+	/* enable compression */
+	app.use(express.compress());
 	
-	/* */
+	/* parse json and urlencoded post data */
 	app.use(express.json());
 	app.use(express.urlencoded());
 	
-	/* multipart parser for uploads, yay! */
+	/* parse multipart post data, used for uploads */
 	app.use(multer({
 		dest: path.resolve(__dirname, config.upload.tmp),
 		limit: {
@@ -118,6 +121,7 @@ app.configure(function(){
 		}
 	}));
 
+	/* use mustache as view engine */
 	app.engine("mustache", mustache());
 	app.set("view engine", "mustache");
 	app.set("views", path.resolve(__dirname, "assets/views"));
@@ -150,7 +154,6 @@ app.configure(function(){
 	
 	/* user & session handling */
 	app.use(express.cookieParser());
-	app.use(express.json());
 	app.use(express.session({ secret: config.passport.secret, store: new express.session.MemoryStore }));
 	app.use(passport.initialize());
 	app.use(passport.session());
