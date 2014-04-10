@@ -113,6 +113,7 @@ app.configure(function(){
 /* routes */
 app.get('/', function(req, res){
 	res.render('index', {
+		"_user": req.user,
 		"url": config.url
 	});
 });
@@ -133,8 +134,10 @@ app.post('/beta', function(req, res){
 	});
 });
 
+/* upload */
 app.get('/upload', function(req, res){
 	res.render('upload', {
+		"_user": req.user,
 		"headers": {
 			"upload": true
 		},
