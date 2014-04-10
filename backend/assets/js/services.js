@@ -46,7 +46,9 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 		},
 		login: function (user, success, error) {
 			$http.post('/api/login', user).success(function (user) {
+				console.log(user.role);
 				user.role = userRoles[user.role];
+				console.log(user.role);
 				if (!user.role) {
 					console.log('Unknown user role, assuming user');
 					user.role = userRoles.user;
@@ -93,15 +95,15 @@ app.factory('AdminService', function ($resource) {
 			},
 			deleteUser: {
 				method: 'POST',
-				params: {cmd: 'deleteUser'}
+				params: {cmd: 'users.delete'}
 			},
 			addUser: {
 				method: 'POST',
-				params: {cmd: 'addUser'}
+				params: {cmd: 'users.add'}
 			},
 			editUser: {
 				method: 'POST',
-				params: {cmd: 'editUser'}
+				params: {cmd: 'users.update'}
 			}
 		}
 	);
@@ -109,10 +111,10 @@ app.factory('AdminService', function ($resource) {
 
 app.factory('DocsService', function ($resource) {
 	'use strict';
-	return $resource('/api/docs/:cmd', {}, {
+	return $resource('/api/admin/:cmd', {}, {
 			list: {
-				method: 'GET',
-				params: {cmd: 'list'},
+				method: 'POST',
+				params: {cmd: 'docs'},
 				isArray: true
 			}
 		}

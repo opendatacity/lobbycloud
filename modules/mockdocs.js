@@ -16,7 +16,7 @@ module.exports = function () {
 		);
 	}
 
-	me.getDocs = function (cb) {
+	me.listDocs = function (cb) {
 		cb(null, mockupDocs);
 	};
 

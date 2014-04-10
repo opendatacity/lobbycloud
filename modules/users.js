@@ -60,7 +60,7 @@ module.exports = function(opts){
 			callback(null, (result.length > 0));
 		});
 	};
-	
+
 	/* add a user */
 	users.add = function(user, callback){
 
@@ -104,6 +104,7 @@ module.exports = function(opts){
 				
 				/* insert user to database */
 				db.collection("users").save(user, function(err, result){
+					callback(err,result);
 					console.log(err, result);
 				});
 				
@@ -223,6 +224,35 @@ module.exports = function(opts){
 			callback(null, result);
 		});
 	};
+
+
+
+	/* user testing default user REMOVEME */
+	users.initDefaultAdmin = function() {
+		var defaultuser= {
+			id:'admin',
+			password:'admin',
+			email:'admin@localhost',
+			url: false,
+			description: "",
+			role:'admin',
+			apikey: crypto.randomBytes(8).toString("hex"),
+			verification: crypto.randomBytes(8).toString("hex"),
+			verified : true,
+			created: (new Date())
+		};
+		users.check(defaultuser.id, function(err, exists) {
+			if (!exists)
+				users.password(defaultuser.password, function(err, method, key, salt, it, time){
+					if (err) console.log(err);
+					defaultuser.password = [method, key, salt, it];
+					db.collection("users").save(defaultuser, function(err, result){
+						console.log(err, result);
+					});
+				});
+		});
+	};
+//	users.initDefaultAdmin();
 
 	return users;
 	

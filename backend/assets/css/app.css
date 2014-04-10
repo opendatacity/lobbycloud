@@ -4,6 +4,22 @@ body {
     overflow-x: hidden;
 }
 
+header #navbar .navbar-brand {
+    font-size: 1.8em;
+    color: #fff;
+    font-family: "Roboto Slab";
+    font-weight: 300;
+}
+
+header #navbar .navbar-brand i {
+    color: #fff;
+}
+
+header #navbar .navbar-brand strong {
+    color: #bd0;
+    font-weight: 500;
+}
+
 .selected {
     background-color: #d7d7d3 !important;
 }

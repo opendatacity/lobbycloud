@@ -24,8 +24,8 @@ var config = require(path.resolve(__dirname, "config.js"), 20);
 var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 
 /* require local modules */
-var users = require("./modules/users")({db: config.db});
 var invites = require("./modules/invites")(path.resolve(__dirname, config.invitedb));
+var users = require("./modules/users")({db: config.db});
 
 /* mockup docs */
 var mockupdocs = require('./modules/mockdocs')();
@@ -60,8 +60,8 @@ passport.deserializeUser(function (id, done) {
 
 passport.use(new LocalStrategy(function (username, password, done) {
 	process.nextTick(function () {
-		users.auth(username, password, function (err, user) {
-			if (err) {
+		users.auth(username, password, function (result, user) {
+			if (!result) {
 				done(err);
 			} else if (!user) {
 				done(null, false, { message: 'Invalid Credentials'});
@@ -93,7 +93,7 @@ var _totags = function(tags) {
 			return [];
 		break;
 	}
-}
+};
 
 /* launch express */
 var app = express();
@@ -322,17 +322,26 @@ app.post('/api/logout', function (req, res) {
 /* protected backend api */
 
 app.post('/api/admin/:cmd', function (req, res) {
-	if ((!req.user) || (req.user.role !== userRoles.admin)) {
+	if ((!req.user) || (req.user.role !== 'admin')) {
 		res.send(401);
 	} else {
 		switch (req.params.cmd) {
 			case 'users':
 				users.list(null, null, function (err, data) {
+					var data = data.map(function(user){
+						return {
+							id:user.id,
+							name:user.name,
+							role:user.role,
+							verified:user.verified,
+							created:user.created
+						}
+					});
 					res.json(data);
 				});
 				break;
 			case 'docs':
-				mockupdocs.list(function (err, data) {
+				mockupdocs.listDocs(function (err, data) {
 					res.json(data);
 				});
 				break;
