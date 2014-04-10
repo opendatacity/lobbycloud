@@ -23,6 +23,7 @@ var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 
 /* require local modules */
 var users = require("./modules/users")({db: config.db});
+var invites = require("./modules/invites")(path.resolve(__dirname, config.invitedb));
 
 /* configure storage */
 var storage = new filedump(path.resolve(__dirname, config.storage));
@@ -119,6 +120,20 @@ app.get('/', function(req, res){
 	res.render('index', {
 		"_user": req.user,
 		"url": config.url
+	});
+});
+
+/* sign up */
+app.all('/signup/:invite?', function(req, res){
+	var invite = (req.param("invite") || req.body.invite || req.query.invite || null)
+	res.render('signup', {
+		"_user": req.user,
+		"headers": {
+			"signup": true
+		},
+		"url": config.url,
+		"invited": invites.check(invite),
+		"invite": invite
 	});
 });
 
