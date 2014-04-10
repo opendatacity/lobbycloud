@@ -9,6 +9,6 @@ var invitekeygen = module.exports = function(len) {
 	var key = [];
 	var chrs = ["bcdfghjklmnprstvwxz","aeiou"];
 	var rnd = crypto.randomBytes(len);
-   while (key.length < len) key.push(chrs[(key.length%2)][rnd[key.length]%chrs[(key.length%2)].length]);
+	while (key.length < len) key.push(chrs[(key.length%2)][rnd[key.length]%chrs[(key.length%2)].length]);
 	return key.join("");
 };

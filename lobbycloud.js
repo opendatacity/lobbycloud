@@ -27,8 +27,8 @@ var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 var users = require("./modules/users")({db: config.db});
 var invites = require("./modules/invites")(path.resolve(__dirname, config.invitedb));
 
-/*mockup docs*/
-var mockupdocs = require('./modules/docs')();
+/* mockup docs */
+var mockupdocs = require('./modules/mockdocs')();
 
 /* configure storage */
 var storage = new filedump(path.resolve(__dirname, config.storage));
@@ -105,11 +105,11 @@ app.configure(function(){
 
 	/* enable compression */
 	app.use(express.compress());
-	
+
 	/* parse json and urlencoded post data */
 	app.use(express.json());
 	app.use(express.urlencoded());
-	
+
 	/* parse multipart post data, used for uploads */
 	app.use(multer({
 		dest: path.resolve(__dirname, config.upload.tmp),
@@ -151,7 +151,7 @@ app.configure(function(){
 		}
 		next(err);
 	});
-	
+
 	/* user & session handling */
 	app.use(express.cookieParser());
 	app.use(express.session({ secret: config.passport.secret, store: new express.session.MemoryStore }));
@@ -222,13 +222,13 @@ app.get('/api/', function(req, res){
 app.post('/api/upload', function(req, res){
 
 	if (!req.files.hasOwnProperty("_upload")) return res.json({"status":"error"});
-	
+
 	/* check client mimetype, just to sort out all the crap */
 	if (config.upload.mimetypes.indexOf(req.files._upload.mimetype) < 0 && config.upload.fileext.indexOf(req.files._upload.extension) < 0) {
 		console.log("error", "not a pdf"); // FIXME: better logging
 		return res.json({"status":"error"});
 	}
-	
+
 	/* don't take chances with data from the internet and check the mimetype for real */
 	magic.detectFile(req.files._upload.path, function(err, _mimetype) {
 
@@ -236,7 +236,7 @@ app.post('/api/upload', function(req, res){
 			console.log("error", err); // FIXME: better logging
 			return res.json({"status":"error"});
 		}
-		
+
 		if (config.upload.mimetypes.indexOf(_mimetype) < 0) {
 			console.log("error", "not a pdf, for real"); // FIXME: better logging
 			return res.json({"status":"error"});
@@ -278,16 +278,16 @@ app.post('/api/upload', function(req, res){
 					console.log("error", err); // FIXME: better logging
 					return res.json({"status":"error"});
 				}
-				
+
 				res.json({"status":"success"});
 				console.log("upload", _filename);
-				
+
 				// FIXME: trigger processing
 
 			});
-		
+
 		});
-	
+
 	});
 
 });
@@ -385,7 +385,7 @@ if (config.listen.hasOwnProperty("socket")) {
 } else if (config.listen.hasOwnProperty("host")){
 	app.listen(config.listen.port, config.listen.host, function(){
 		console.log("server listening on", [config.listen.host, config.listen.port].join(":"));
-	});	
+	});
 } else {
 	app.listen(config.listen.port, function(){
 		console.log("server listening on", ["*", config.listen.port].join(":"));
