@@ -298,9 +298,33 @@ app.get('/api/test/invites/:create?', function(req, res){
 	res.json(invites.all());
 });
 
+
+
 /* dummy api endpoint */
 app.get('/api/whatever', function(req, res){
 	res.json("not implemented");
+});
+
+/* frontend login */
+app.get('/login',function(req, res) {
+	res.render('login', {
+		"_user": req.user,
+		"url": config.url
+	});
+});
+
+app.post('/login',
+	passport.authenticate('local', {}),
+	function (req, res) {
+		res.redirect('/');
+	}
+);
+
+app.get('/logout',function(req, res) {
+	if (req.user) {
+		req.logout();
+	}
+	res.redirect('/');
 });
 
 /* login */
