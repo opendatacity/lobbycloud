@@ -61,9 +61,7 @@ passport.deserializeUser(function (id, done) {
 passport.use(new LocalStrategy(function (username, password, done) {
 	process.nextTick(function () {
 		users.auth(username, password, function (result, user) {
-			if (!result) {
-				done(err);
-			} else if (!user) {
+			if ((!result)||(!user)) {
 				done(null, false, { message: 'Invalid Credentials'});
 			} else {
 				done(null, user);
@@ -314,10 +312,10 @@ app.get('/login',function(req, res) {
 });
 
 app.post('/login',
-	passport.authenticate('local', {}),
-	function (req, res) {
-		res.redirect('/');
-	}
+	passport.authenticate('local', {
+		successRedirect: '/',
+		failureRedirect: '/login'
+	})
 );
 
 app.get('/logout',function(req, res) {
