@@ -12,7 +12,7 @@ msgstr ""
 "X-Generator: Poedit 1.6.4\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/users.html assets/partials/docs/list.html
 msgid "Actions"
 msgstr "Aktion"
 
@@ -21,43 +21,55 @@ msgstr "Aktion"
 msgid "Administration"
 msgstr "Administration"
 
-#: assets/partials/admin/users.html assets/js/directives.js
+#: assets/js/directives.js
 msgid "Apply"
 msgstr "Anwenden"
 
-#: assets/partials/admin/users.html assets/js/directives.js
+#: assets/partials/admin/user.html assets/js/directives.js
 msgid "Cancel"
 msgstr "Abbrechen"
+
+#: assets/partials/admin/user.html
+msgid "Create User"
+msgstr "Account anlegen"
 
 #: assets/partials/admin/users.html
 msgid "Created"
 msgstr "Erstellt am"
 
-#: assets/partials/admin/users.html
-msgid "Delete"
-msgstr "Löschen"
+#: assets/partials/docs/list.html
+msgid "Delete Document"
+msgstr "Dokument löschen"
 
 #: assets/partials/admin/users.html
 msgid "Delete User"
 msgstr "Account löschen"
 
-#: assets/partials/admin/users.html
-msgid "Delete User?"
-msgstr "Account löschen?"
+#: assets/partials/docs/upload.html
+msgid "Document Upload"
+msgstr "Dokument hochladen"
 
 #: assets/index.html assets/partials/start.html
 msgid "Documents"
 msgstr "Dokumente"
 
+#: assets/partials/docs/upload.html
+msgid "Drag here"
+msgstr "Datei hierher draufziehen"
+
+#: assets/partials/docs/list.html
+msgid "Edit Document"
+msgstr "Dokument bearbeiten"
+
 #: assets/partials/start.html
 msgid "Edit Documents"
 msgstr "Dokumente bearbeiten"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html assets/partials/admin/users.html
 msgid "Edit User"
 msgstr "Account bearbeiten"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Email"
 msgstr "E-Mail"
 
@@ -65,39 +77,47 @@ msgstr "E-Mail"
 msgid "English"
 msgstr "Englisch"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Enter description"
 msgstr "Beschreibung eingeben"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Enter email adress"
 msgstr "E-Mail-Adresse eingeben"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Enter login name"
 msgstr "Login-Namen eingeben"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Enter name"
 msgstr "Namen eingeben"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Enter organisation"
 msgstr "Organisation eingeben"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Enter password (leave empty for no changes)"
 msgstr "Passwort (leer lassen um es nicht zu ändern)"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Enter website url"
 msgstr "Webseite eingeben"
+
+#: assets/partials/docs/list.html
+msgid "Filter Date"
+msgstr "Datum-Filter"
+
+#: assets/partials/docs/list.html
+msgid "Filter Title"
+msgstr "Titel-Filter"
 
 #: assets/js/directives.js
 msgid "From"
 msgstr "von"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Full Name"
 msgstr "Voller Name"
 
@@ -106,11 +126,16 @@ msgid "German"
 msgstr "Deutsch"
 
 #: assets/partials/start.html
-msgid "Hello {{user.name}}!"
-msgstr "Hallo {{user.name}}!"
+msgid "Hello {{account.name||account.id}}!"
+msgstr "Hallo {{account.name||account.id}}!"
 
 #: assets/partials/admin/users.html
 msgid "Loading Data..."
+msgstr "Daten werden geladen..."
+
+#: assets/partials/docs/list.html
+#, fuzzy
+msgid "Loading..."
 msgstr "Daten werden geladen..."
 
 #: assets/partials/logout.html
@@ -121,7 +146,7 @@ msgstr "Abmeldung..."
 msgid "Login"
 msgstr "Anmelden"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html assets/partials/admin/users.html
 msgid "Login Name"
 msgstr "Login-Name"
 
@@ -129,9 +154,9 @@ msgstr "Login-Name"
 msgid "Logout"
 msgstr "Abmelden"
 
-#: assets/partials/admin/groups.html
-msgid "Manage Groups"
-msgstr "Gruppen verwalten"
+#: assets/partials/docs/list.html
+msgid "Manage Documents"
+msgstr "Dokumente verwalten"
 
 #: assets/partials/start.html assets/partials/admin/users.html
 msgid "Manage Users"
@@ -142,10 +167,24 @@ msgid "Name"
 msgstr "Name"
 
 #: assets/partials/admin/users.html
+msgid "New User"
+msgstr "Neuer Account"
+
+#: assets/partials/admin/user.html
+msgid "OK"
+msgstr "OK"
+
+#: assets/partials/docs/list.html
+msgid "One document"
+msgid_plural "{{docs.length}} documents"
+msgstr[0] "1 Dokument"
+msgstr[1] "{{docs.length}} Dokumente"
+
+#: assets/partials/admin/user.html assets/partials/admin/users.html
 msgid "Organisation"
 msgstr "Organisation"
 
-#: assets/partials/login.html assets/partials/admin/users.html
+#: assets/partials/login.html assets/partials/admin/user.html
 msgid "Password"
 msgstr "Passwort"
 
@@ -153,7 +192,7 @@ msgstr "Passwort"
 msgid "Please sign in"
 msgstr "Bitte anmelden"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html assets/partials/admin/users.html
 msgid "Role"
 msgstr "Rolle"
 
@@ -165,9 +204,13 @@ msgstr "Für diesen Bereich ist eine Anmeldung nötig"
 msgid "Sign in"
 msgstr "Anmelden"
 
-#: assets/partials/admin/users.html
-msgid "Sure to delete user {{current_user.username}}?"
-msgstr "Account {{current_user.username}} wirklich löschen?"
+#: assets/partials/docs/list.html
+msgid "Tags"
+msgstr "Tags"
+
+#: assets/partials/docs/list.html
+msgid "Title"
+msgstr "Titel"
 
 #: assets/js/directives.js
 msgid "To"
@@ -177,11 +220,15 @@ msgstr "bis"
 msgid "Upload Documents"
 msgstr "Dokumente hochladen"
 
+#: assets/partials/docs/list.html
+msgid "Uploaded"
+msgstr "Hochgeladen"
+
 #: assets/partials/login.html
 msgid "Username"
 msgstr "Name"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "Website"
 msgstr "Webseite"
 
@@ -193,51 +240,30 @@ msgstr "Abmeldung erfolgreich"
 msgid "You're not authorized to view that page!"
 msgstr "Keine Berechtigung für die Seite!"
 
-#: assets/partials/admin/users.html
+#: assets/partials/admin/user.html
 msgid "description"
 msgstr "Beschreibung"
 
-#~ msgid "Delete Document"
-#~ msgstr "Dokument löschen"
+#~ msgid "Delete"
+#~ msgstr "Löschen"
 
-#~ msgid "Edit Document"
-#~ msgstr "Dokument bearbeiten"
+#~ msgid "Delete User?"
+#~ msgstr "Account löschen?"
+
+#~ msgid "Manage Groups"
+#~ msgstr "Gruppen verwalten"
+
+#~ msgid "Sure to delete user {{current_user.username}}?"
+#~ msgstr "Account {{current_user.username}} wirklich löschen?"
 
 #~ msgid "Enter group"
 #~ msgstr "Gruppe eingeben"
 
-#~ msgid "Filter Date"
-#~ msgstr "Datum-Filter"
-
-#~ msgid "Filter Title"
-#~ msgstr "Titel-Filter"
-
 #~ msgid "Group"
 #~ msgstr "Gruppe"
 
-#, fuzzy
-#~ msgid "Loading..."
-#~ msgstr "Daten werden geladen..."
-
-#~ msgid "New User"
-#~ msgstr "Neuer Account"
-
-#~ msgid "One document"
-#~ msgid_plural "{{docs.length}} documents"
-#~ msgstr[0] "1 Dokument"
-#~ msgstr[1] "{{docs.length}} Dokumente"
-
 #~ msgid "Start"
 #~ msgstr "Start"
-
-#~ msgid "Tags"
-#~ msgstr "Tags"
-
-#~ msgid "Title"
-#~ msgstr "Titel"
-
-#~ msgid "Uploaded"
-#~ msgstr "Hochgeladen"
 
 #~ msgid "Flags"
 #~ msgstr "Tags"

@@ -44,8 +44,9 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 		.state('admin', {
 			url: '/admin',
 			abstract: true,
-			templateUrl: 'partials/admin.html',
-			controller: 'AdminController',
+			template: '<div ui-view />',
+//			templateUrl: 'partials/admin.html',
+			controller: 'UsersController',
 			data: {
 				access: access.admin
 			}
@@ -53,25 +54,17 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 		.state('admin.users', {
 			url: '/users',
 			templateUrl: 'partials/admin/users.html',
-			controller: 'AdminUsersController',
+			controller: 'UserListController',
 			data: {
 				access: access.admin
 			}
 		})
-		.state('admin.groups', {
-			url: '/groups',
-			templateUrl: 'partials/admin/groups.html',
-			controller: 'AdminGroupsController',
-			data: {
-				access: access.admin
-			}
-		})
-
 
 		.state('docs', {
 			url: '/docs',
 			abstract: true,
-			templateUrl: 'partials/docs.html',
+			template: '<div ui-view />',
+//			templateUrl: 'partials/docs.html',
 			controller: 'DocsController'
 		})
 		.state('docs.list', {

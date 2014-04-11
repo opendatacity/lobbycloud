@@ -69,20 +69,18 @@ app.controller('LoginController', function ($scope, $location, AuthenticationSer
 
 app.controller('StartController', function ($scope, AuthenticationService) {
 	'use strict';
-	$scope.user = AuthenticationService.user;
+	$scope.account = AuthenticationService.user;
 });
 
-app.controller('AdminController', function ($scope, AuthenticationService) {
+app.controller('UsersController', function ($scope, $state, AdminService, AuthenticationService) {
 	'use strict';
-	$scope.user = AuthenticationService.user;
-});
+	$scope.account = AuthenticationService.user;
 
-app.controller('AdminUsersController', function ($scope, $location, $state, AuthenticationService, AdminService) {
-	'use strict';
-	$scope.userRoles = [
-		AuthenticationService.userRoles.user,
-		AuthenticationService.userRoles.admin
-	];
+	$scope.getUserByID = function (id) {
+		return $scope.users.filter(function (user) {
+			return user.id === id;
+		})[0]
+	};
 
 	$scope.users = AdminService.users({},
 		function (data) {
@@ -93,20 +91,29 @@ app.controller('AdminUsersController', function ($scope, $location, $state, Auth
 				$state.go('login');
 			}
 		});
+});
 
-	var getUserByID = function (id) {
-		return $scope.users.filter(function (user) {
-			return user.id === id;
-		})[0]
+
+var ModalInstanceCtrl = function ($scope, $modalInstance, user) {
+
+	$scope.user = user;
+	$scope.selected = {
+		user: $scope.user
 	};
 
-	$scope.cancelDialog = function () {
-		$scope.current_user = null;
+	$scope.ok = function () {
+		$modalInstance.close($scope.selected.user);
 	};
 
-	$scope.deleteUser = function () {
-		var user = $scope.current_user;
-		$scope.current_user = null;
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+};
+
+app.controller('UserListController', function ($scope, $modal, AuthenticationService, AdminService) {
+	'use strict';
+
+	var deleteUser = function (user) {
 		user.processing = true;
 		AdminService.deleteUser({id: user.id},
 			function () {
@@ -120,11 +127,7 @@ app.controller('AdminUsersController', function ($scope, $location, $state, Auth
 		);
 	};
 
-	$scope.editUser = function () {
-		var edit_user = $scope.current_user;
-		var org_user = $scope.org_user;
-		$scope.current_user = null;
-		$scope.org_user = null;
+	var updateUser = function (edit_user, org_user) {
 		if (org_user) {
 			org_user.processing = true;
 			AdminService.editUser({user: edit_user}, function (user) {
@@ -142,18 +145,43 @@ app.controller('AdminUsersController', function ($scope, $location, $state, Auth
 		}
 	};
 
-	$scope.showUserDialog = function (rowuser) {
-		var user = rowuser ? angular.copy(rowuser) : {role: AuthenticationService.userRoles.user};
+	$scope.editUserDialog = function (org_user) {
+		var user = org_user ? angular.copy(org_user) : {role: AuthenticationService.userRoles.user, create:true};
 		user.role = AuthenticationService.userRoles[user.role.title];
-		$scope.org_user = user;
-		$scope.current_user = user;
-		$('#modal-editUser').modal();
+
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/admin/user.html',
+			controller: ModalInstanceCtrl,
+			resolve: {
+				user: function () {
+					return user;
+				}
+			}
+		});
+
+		modalInstance.result.then(function (user) {
+			updateUser(user, org_user);
+		}, function () {
+//			$log.info('Modal dismissed at: ' + new Date());
+		});
 	};
 
-	$scope.deleteUserDialog = function (rowuser) {
-		$scope.current_user = rowuser;
-		if ($scope.current_user)
-			$('#modal-deleteUser').modal();
+	$scope.deleteUserDialog = function (org_user) {
+		var modalInstance = $modal.open({
+			templateUrl: 'deleteUserDialog.html',
+			controller: ModalInstanceCtrl,
+			resolve: {
+				user: function () {
+					return org_user;
+				}
+			}
+		});
+
+		modalInstance.result.then(function () {
+			deleteUser(org_user);
+		}, function () {
+//			$log.info('Modal dismissed at: ' + new Date());
+		});
 	};
 
 });
@@ -175,7 +203,7 @@ app.controller('AdminGroupsController', function ($scope, $state, Authentication
 
 app.controller('DocsController', function ($scope, AuthenticationService) {
 	'use strict';
-	$scope.user = AuthenticationService.user;
+	$scope.account = AuthenticationService.user;
 });
 
 app.controller('DocsListController', function ($scope, $state, $filter, $templateCache, ngTableParams, gettextCatalog, AuthenticationService, DocsService) {

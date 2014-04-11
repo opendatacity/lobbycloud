@@ -5,8 +5,6 @@
   "private": true,
   "directory": "assets/libs",
   "dependencies": {
-    "jquery": "2.1.0",
-    "bootstrap": "3.1.1",
     "moment": "*",
     "angular": "1.2.16",
     "angular-cookies": "*",
@@ -17,8 +15,7 @@
     "angular-bootstrap": "*",
     "bootstrap-daterangepicker": "*",
     "ng-table": "*",
-    "angular-ui-router": "*",
-    "fontawesome": "*"
+    "angular-ui-router": "*"
   },
   "ignore": [
     "**/.*",
@@ -29,7 +26,6 @@
     "tests"
   ],
   "resolutions": {
-    "angular": "1.2.16",
-    "jquery": "2.1.0"
+    "angular": "1.2.16"
   }
 }

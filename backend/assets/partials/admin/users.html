@@ -1,117 +1,58 @@
-<div class="row">
-    <div class="col-md-12">
-        <h1 translate>Manage Users</h1>
+<h1 translate>Manage Users</h1>
 
-        <h3 ng-show="!users">
-            <div class="process-img"></div>
-            <span translate>Loading Data...</span>
-        </h3>
-        <div class="btn-group">
-            <!--<button type="button" class="btn btn-default" ng-click="showUserDialog()" translate>New User</button>-->
-        </div>
-
-        <table class="table" ng-show="users.length">
-            <thead>
-            <tr>
-                <th translate>Login Name</th>
-                <th translate>Name</th>
-                <th translate>Organisation</th>
-                <th translate>Role</th>
-                <th translate>Created</th>
-                <th translate>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="rowuser in users">
-                <td>{{rowuser.id}}</td>
-                <td>{{rowuser.name}}<i ng-show="rowuser.description" class="fa fa-info-circle" popover="{{rowuser.description}}" popover-trigger="mouseenter"></i></td>
-                <td>{{rowuser.organisation}}</td>
-                <td>{{rowuser.role}}</td>
-                <td>{{rowuser.created | amDateFormat:'LLL'}}</td>
-                <td>
-                    <div ng-show="rowuser.processing">
-                        <i class="fa fa-spinner fa-spin"></i>
-                    </div>
-                    <div ng-show="!rowuser.processing">
-                        <i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ng-click="showUserDialog(rowuser)"/>
-                        <i class="btn btn-default fa fa-trash-o fa-mouse-pointer" title="{{'Delete User'|translate}}" ng-click="deleteUserDialog(rowuser)"/>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-
-        </table>
-
-    </div>
+<h3 ng-show="!users">
+    <div class="process-img"></div>
+    <span translate>Loading Data...</span>
+</h3>
+<div class="btn-group">
+    <button type="button" class="btn btn-default" ng-click="editUserDialog()" translate>New User</button>
 </div>
 
-<div id="modal-editUser" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" translate>Edit User</h4>
+<table class="table" ng-show="users.length">
+    <thead>
+    <tr>
+        <th translate>Login Name</th>
+        <th translate>Name</th>
+        <th translate>Organisation</th>
+        <th translate>Role</th>
+        <th translate>Created</th>
+        <th translate>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="rowuser in users">
+        <td>{{rowuser.id}}</td>
+        <td>{{rowuser.name}}<i ng-show="rowuser.description" class="fa fa-info-circle" popover="{{rowuser.description}}" popover-trigger="mouseenter"></i></td>
+        <td>{{rowuser.organisation}}</td>
+        <td>{{rowuser.role}}</td>
+        <td>{{rowuser.created | amDateFormat:'LLL'}}</td>
+        <td>
+            <div ng-show="rowuser.processing">
+                <i class="fa fa-spinner fa-spin"></i>
             </div>
-            <div class="modal-body">
-                <form role="form">
-                    <div class="form-group">
-                        <label translate>Login Name</label>
-                        <input type="text" class="form-control" placeholder="{{'Enter login name'|translate}}" ng-model="current_user.id">
-                    </div>
-                    <div class="form-group">
-                        <label translate>Full Name</label>
-                        <input type="text" class="form-control" placeholder="{{'Enter name'|translate}}" ng-model="current_user.username">
-                    </div>
-                    <div class="form-group">
-                        <label translate>Email</label>
-                        <input type="text" class="form-control" placeholder="{{'Enter email adress'|translate}}" ng-model="current_user.email">
-                    </div>
-                    <div class="form-group">
-                        <label translate>Website</label>
-                        <input type="url" class="form-control" placeholder="{{'Enter website url'|translate}}" ng-model="current_user.url">
-                    </div>
-                    <div class="form-group">
-                        <label translate>Organisation</label>
-                        <input type="url" class="form-control" placeholder="{{'Enter organisation'|translate}}" ng-model="current_user.organisation">
-                    </div>
-                    <div class="form-group">
-                        <label translate>description</label>
-                        <input type="text" class="form-control" placeholder="{{'Enter description'|translate}}" ng-model="current_user.description">
-                    </div>
-                    <div class="form-group">
-                        <label translate>Password</label>
-                        <input type="text" class="form-control" placeholder="{{'Enter password (leave empty for no changes)'|translate}}" ng-model="current_user.password">
-                    </div>
-                    <div class="form-role">
-                        <label translate>Role</label>
-                        <select ng-model="current_user.role" class="form-control" ng-options="c.title for c in userRoles"></select>
-                    </div>
-                </form>
+            <div ng-show="!rowuser.processing">
+                <!--<i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ui-sref='admin.user({id: rowuser.id})'/>-->
+                <i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ng-click="editUserDialog(rowuser)"/>
+                <i class="btn btn-default fa fa-trash-o fa-mouse-pointer" title="{{'Delete User'|translate}}" ng-click="deleteUserDialog(rowuser)"/>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancelDialog();" translate>Cancel</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="editUser();" translate>Apply</button>
-            </div>
-        </div>
-    </div>
-</div>
+        </td>
+    </tr>
+    </tbody>
+
+</table>
 
 
-<div id="modal-deleteUser" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" translate>Delete User?</h4>
-            </div>
-            <div class="modal-body">
-                <p translate>Sure to delete user {{current_user.username}}?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancelDialog();" translate>Cancel</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="deleteUser();" translate>Delete</button>
-            </div>
-        </div>
+<script type="text/ng-template" id="deleteUserDialog.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" translate>Delete User?</h4>
     </div>
-</div>
+    <div class="modal-body">
+        <p translate>Sure to delete user {{user.id}}?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()" translate>OK</button>
+        <button class="btn btn-warning" ng-click="cancel()" translate>Cancel</button>
+    </div>
+</script>
 

@@ -34,7 +34,7 @@ module.exports = function (grunt) {
 		nggettext_extract: {
 			pot: {
 				files: {
-					'po/template.pot': ['assets/index.html', 'assets/partials/*.html', 'assets/partials/admin/*.html', 'assets/js/*.js']
+					'po/template.pot': ['assets/index.html', 'assets/partials/*.html', 'assets/partials/admin/*.html', 'assets/partials/docs/*.html', 'assets/js/*.js']
 				}
 			}
 		},
