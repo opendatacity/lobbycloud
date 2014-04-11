@@ -23,6 +23,10 @@ msgid "Cancel"
 msgstr ""
 
 #: assets/partials/admin/users.html
+msgid "Created"
+msgstr ""
+
+#: assets/partials/admin/users.html
 msgid "Delete"
 msgstr ""
 
@@ -47,12 +51,24 @@ msgstr ""
 msgid "Edit User"
 msgstr ""
 
+#: assets/partials/admin/users.html
+msgid "Email"
+msgstr ""
+
 #: assets/index.html
 msgid "English"
 msgstr ""
 
 #: assets/partials/admin/users.html
-msgid "Enter group"
+msgid "Enter description"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Enter email adress"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Enter login name"
 msgstr ""
 
 #: assets/partials/admin/users.html
@@ -60,27 +76,31 @@ msgid "Enter name"
 msgstr ""
 
 #: assets/partials/admin/users.html
+msgid "Enter organisation"
+msgstr ""
+
+#: assets/partials/admin/users.html
 msgid "Enter password (leave empty for no changes)"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "Enter website url"
 msgstr ""
 
 #: assets/js/directives.js
 msgid "From"
 msgstr ""
 
+#: assets/partials/admin/users.html
+msgid "Full Name"
+msgstr ""
+
 #: assets/index.html
 msgid "German"
 msgstr ""
 
-#: assets/partials/admin/users.html
-msgid "Group"
-msgstr ""
-
 #: assets/partials/start.html
-msgid "Hello {{user.username}}!"
-msgstr ""
-
-#: assets/partials/start.html
-msgid "Library of influence on public policy"
+msgid "Hello {{user.name}}!"
 msgstr ""
 
 #: assets/partials/admin/users.html
@@ -95,11 +115,14 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
+#: assets/partials/admin/users.html
+msgid "Login Name"
+msgstr ""
+
 #: assets/index.html
 msgid "Logout"
 msgstr ""
 
-#: assets/partials/start.html
 #: assets/partials/admin/groups.html
 msgid "Manage Groups"
 msgstr ""
@@ -114,7 +137,7 @@ msgid "Name"
 msgstr ""
 
 #: assets/partials/admin/users.html
-msgid "New User"
+msgid "Organisation"
 msgstr ""
 
 #: assets/partials/login.html
@@ -138,10 +161,6 @@ msgstr ""
 msgid "Sign in"
 msgstr ""
 
-#: assets/index.html
-msgid "Start"
-msgstr ""
-
 #: assets/partials/admin/users.html
 msgid "Sure to delete user {{current_user.username}}?"
 msgstr ""
@@ -158,10 +177,18 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
+#: assets/partials/admin/users.html
+msgid "Website"
+msgstr ""
+
 #: assets/partials/logout.html
 msgid "You are logged out"
 msgstr ""
 
 #: assets/partials/error.html
 msgid "You're not authorized to view that page!"
+msgstr ""
+
+#: assets/partials/admin/users.html
+msgid "description"
 msgstr ""

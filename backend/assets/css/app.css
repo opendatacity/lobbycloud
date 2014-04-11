@@ -1,23 +1,17 @@
 body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, serif;
-    padding-top: 54px;
-    overflow-x: hidden;
+    /*font-family: 'Helvetica Neue', Helvetica, Arial, serif;*/
+    /*padding-top: 54px;*/
+    /*height: auto;*/
+    /*display: block;*/
+    /*position: static;*/
+    /*overflow-x: hidden;*/
+    background-color: #fff;
+    background-image: none;
+    box-shadow: none;
 }
 
-header #navbar .navbar-brand {
-    font-size: 1.8em;
-    color: #fff;
-    font-family: "Roboto Slab";
-    font-weight: 300;
-}
-
-header #navbar .navbar-brand i {
-    color: #fff;
-}
-
-header #navbar .navbar-brand strong {
-    color: #bd0;
-    font-weight: 500;
+.fa-mouse-pointer {
+    cursor: pointer;
 }
 
 .selected {

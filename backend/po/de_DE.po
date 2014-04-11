@@ -12,7 +12,7 @@ msgstr ""
 "X-Generator: Poedit 1.6.4\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: assets/partials/docs.html assets/partials/admin/users.html
+#: assets/partials/admin/users.html
 msgid "Actions"
 msgstr "Aktion"
 
@@ -30,12 +30,12 @@ msgid "Cancel"
 msgstr "Abbrechen"
 
 #: assets/partials/admin/users.html
+msgid "Created"
+msgstr "Erstellt am"
+
+#: assets/partials/admin/users.html
 msgid "Delete"
 msgstr "Löschen"
-
-#: assets/partials/docs.html
-msgid "Delete Document"
-msgstr "Dokument löschen"
 
 #: assets/partials/admin/users.html
 msgid "Delete User"
@@ -49,70 +49,68 @@ msgstr "Account löschen?"
 msgid "Documents"
 msgstr "Dokumente"
 
-#: assets/partials/docs.html
-msgid "Edit Document"
-msgstr "Dokument bearbeiten"
-
 #: assets/partials/start.html
-#, fuzzy
 msgid "Edit Documents"
-msgstr "Dokument bearbeiten"
+msgstr "Dokumente bearbeiten"
 
 #: assets/partials/admin/users.html
 msgid "Edit User"
 msgstr "Account bearbeiten"
+
+#: assets/partials/admin/users.html
+msgid "Email"
+msgstr "E-Mail"
 
 #: assets/index.html
 msgid "English"
 msgstr "Englisch"
 
 #: assets/partials/admin/users.html
-msgid "Enter group"
-msgstr "Gruppe eingeben"
+msgid "Enter description"
+msgstr "Beschreibung eingeben"
+
+#: assets/partials/admin/users.html
+msgid "Enter email adress"
+msgstr "E-Mail-Adresse eingeben"
+
+#: assets/partials/admin/users.html
+msgid "Enter login name"
+msgstr "Login-Namen eingeben"
 
 #: assets/partials/admin/users.html
 msgid "Enter name"
 msgstr "Namen eingeben"
 
 #: assets/partials/admin/users.html
+msgid "Enter organisation"
+msgstr "Organisation eingeben"
+
+#: assets/partials/admin/users.html
 msgid "Enter password (leave empty for no changes)"
 msgstr "Passwort (leer lassen um es nicht zu ändern)"
 
-#: assets/partials/docs.html
-msgid "Filter Date"
-msgstr "Datum-Filter"
-
-#: assets/partials/docs.html
-msgid "Filter Title"
-msgstr "Titel-Filter"
+#: assets/partials/admin/users.html
+msgid "Enter website url"
+msgstr "Webseite eingeben"
 
 #: assets/js/directives.js
 msgid "From"
 msgstr "von"
 
+#: assets/partials/admin/users.html
+msgid "Full Name"
+msgstr "Voller Name"
+
 #: assets/index.html
 msgid "German"
 msgstr "Deutsch"
 
-#: assets/partials/admin/users.html
-msgid "Group"
-msgstr "Gruppe"
-
 #: assets/partials/start.html
-msgid "Hello {{user.username}}!"
-msgstr "Hallo {{user.username}}!"
-
-#: assets/partials/start.html
-msgid "Library of influence on public policy"
-msgstr ""
+msgid "Hello {{user.name}}!"
+msgstr "Hallo {{user.name}}!"
 
 #: assets/partials/admin/users.html
 msgid "Loading Data..."
-msgstr "Daten werden geladen..."
-
-#: assets/partials/docs.html
-#, fuzzy
-msgid "Loading..."
 msgstr "Daten werden geladen..."
 
 #: assets/partials/logout.html
@@ -123,11 +121,15 @@ msgstr "Abmeldung..."
 msgid "Login"
 msgstr "Anmelden"
 
+#: assets/partials/admin/users.html
+msgid "Login Name"
+msgstr "Login-Name"
+
 #: assets/index.html
 msgid "Logout"
 msgstr "Abmelden"
 
-#: assets/partials/start.html assets/partials/admin/groups.html
+#: assets/partials/admin/groups.html
 msgid "Manage Groups"
 msgstr "Gruppen verwalten"
 
@@ -140,14 +142,8 @@ msgid "Name"
 msgstr "Name"
 
 #: assets/partials/admin/users.html
-msgid "New User"
-msgstr "Neuer Account"
-
-#: assets/partials/docs.html
-msgid "One document"
-msgid_plural "{{docs.length}} documents"
-msgstr[0] "1 Dokument"
-msgstr[1] "{{docs.length}} Dokumente"
+msgid "Organisation"
+msgstr "Organisation"
 
 #: assets/partials/login.html assets/partials/admin/users.html
 msgid "Password"
@@ -169,33 +165,25 @@ msgstr "Für diesen Bereich ist eine Anmeldung nötig"
 msgid "Sign in"
 msgstr "Anmelden"
 
-#: assets/index.html
-msgid "Start"
-msgstr "Start"
-
 #: assets/partials/admin/users.html
 msgid "Sure to delete user {{current_user.username}}?"
 msgstr "Account {{current_user.username}} wirklich löschen?"
-
-#: assets/partials/docs.html
-msgid "Tags"
-msgstr "Tags"
-
-#: assets/partials/docs.html
-msgid "Title"
-msgstr "Titel"
 
 #: assets/js/directives.js
 msgid "To"
 msgstr "bis"
 
-#: assets/partials/docs.html
-msgid "Uploaded"
-msgstr "Hochgeladen"
+#: assets/partials/start.html
+msgid "Upload Documents"
+msgstr "Dokumente hochladen"
 
 #: assets/partials/login.html
 msgid "Username"
 msgstr "Name"
+
+#: assets/partials/admin/users.html
+msgid "Website"
+msgstr "Webseite"
 
 #: assets/partials/logout.html
 msgid "You are logged out"
@@ -204,6 +192,52 @@ msgstr "Abmeldung erfolgreich"
 #: assets/partials/error.html
 msgid "You're not authorized to view that page!"
 msgstr "Keine Berechtigung für die Seite!"
+
+#: assets/partials/admin/users.html
+msgid "description"
+msgstr "Beschreibung"
+
+#~ msgid "Delete Document"
+#~ msgstr "Dokument löschen"
+
+#~ msgid "Edit Document"
+#~ msgstr "Dokument bearbeiten"
+
+#~ msgid "Enter group"
+#~ msgstr "Gruppe eingeben"
+
+#~ msgid "Filter Date"
+#~ msgstr "Datum-Filter"
+
+#~ msgid "Filter Title"
+#~ msgstr "Titel-Filter"
+
+#~ msgid "Group"
+#~ msgstr "Gruppe"
+
+#, fuzzy
+#~ msgid "Loading..."
+#~ msgstr "Daten werden geladen..."
+
+#~ msgid "New User"
+#~ msgstr "Neuer Account"
+
+#~ msgid "One document"
+#~ msgid_plural "{{docs.length}} documents"
+#~ msgstr[0] "1 Dokument"
+#~ msgstr[1] "{{docs.length}} Dokumente"
+
+#~ msgid "Start"
+#~ msgstr "Start"
+
+#~ msgid "Tags"
+#~ msgstr "Tags"
+
+#~ msgid "Title"
+#~ msgstr "Titel"
+
+#~ msgid "Uploaded"
+#~ msgstr "Hochgeladen"
 
 #~ msgid "Flags"
 #~ msgstr "Tags"

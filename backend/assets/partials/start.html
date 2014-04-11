@@ -1,32 +1,20 @@
-<div class="container">
-    <br/>
+<div id="headline">
+    <h1>LobbyCloudCentral</h1>
 
-    <div class="jumbotron">
-        <h1>LobbyCloudCentral</h1>
+    <h2 translate>Hello {{user.name}}!</h2>
+</div>
 
-        <p class="lead" translate>Library of influence on public policy</p>
+
+<div class="row well">
+    <div class="col-md-6">
+        <h3 translate>Documents</h3>
+        <a class="btn btn-default" href="#/docs/list" translate>Edit Documents</a>
+        <a class="btn btn-default" href="#/docs/upload" translate>Upload Documents</a>
     </div>
-    <div class="row">
-        <div class="col-md-4">
-            <h2 translate>Hello {{user.username}}!</h2>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="well">
-                <h3 translate>Documents</h3>
-                <a class="btn btn-default" href="#/docs/list" translate>Edit Documents</a>
-                <a class="btn btn-default" href="#/docs/upload" translate>Upload Documents</a>
-            </div>
-        </div>
-
-        <div ng-show="user.isAdmin" class="col-md-6">
-            <div class="well">
-                <h3 translate>Administration</h3>
-                <a class="btn btn-default" href="#/admin/users" translate>Manage Users</a>
-                <!--<a class="btn btn-default" href="#/admin/groups" translate>Manage Groups</a>-->
-            </div>
-        </div>
+    <div ng-show="user.isAdmin" class="col-md-6">
+        <h3 translate>Administration</h3>
+        <a class="btn btn-default" href="#/admin/users" translate>Manage Users</a>
+        <!--<a class="btn btn-default" href="#/admin/groups" translate>Manage Groups</a>-->
     </div>
 </div>

@@ -5,6 +5,7 @@ var app = angular
 	[
 		'ngCookies',
 		'ui.router',
+		'ui.bootstrap',
 		'gettext',
 		'ngResource',
 		'ngTable',

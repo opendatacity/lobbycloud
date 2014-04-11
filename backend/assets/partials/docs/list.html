@@ -9,7 +9,9 @@
 
 <!--<p><strong>Count per page:</strong> {{tableParams.count()}}</p>-->
 <!--</div>-->
+<h1 translate>Manage Documents</h1>
 
+<br />
 <div class="row" ng-show="loading">
     <div class="col-md-9">
         <div>
@@ -20,8 +22,8 @@
 
 <div class="row" ng-show="!loading">
     <div class="col-md-9">
-        <div class="well">
-            <form class="form-inline pull-right" role="form">
+        <div>
+            <form class="form-inline" role="form">
                 <div class="form-group">
                     <label translate>Filter Title</label>
                     <input type="text" ng-model="search.title" placeholder="{{'Filter Title' | translate}}">
@@ -34,6 +36,7 @@
 
             <h3 translate translate-n="count" translate-plural="{{docs.length}} documents">One document</h3>
         </div>
+        <hr />
 
         <table class="table table-responsive table-docs ng-table-rowselected" ng-table="tableParams" show-filter="true">
             <thead>

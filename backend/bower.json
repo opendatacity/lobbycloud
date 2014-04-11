@@ -14,6 +14,7 @@
     "angular-moment": "*",
     "angular-resource": "*",
     "angular-sanitize": "*",
+    "angular-bootstrap": "*",
     "bootstrap-daterangepicker": "*",
     "ng-table": "*",
     "angular-ui-router": "*",

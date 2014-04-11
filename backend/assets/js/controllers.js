@@ -122,35 +122,36 @@ app.controller('AdminUsersController', function ($scope, $location, $state, Auth
 
 	$scope.editUser = function () {
 		var edit_user = $scope.current_user;
+		var org_user = $scope.org_user;
 		$scope.current_user = null;
-		edit_user.processing = true;
-		if (edit_user.id) {
-			var org_user = getUserByID(edit_user.id);
+		$scope.org_user = null;
+		if (org_user) {
+			org_user.processing = true;
 			AdminService.editUser({user: edit_user}, function (user) {
 				$scope.users[$scope.users.indexOf(org_user)] = user;
+			}, function (err) {
+				org_user.processing = false;
+				alert(err.data);
 			})
 		} else {
 			AdminService.addUser({user: edit_user}, function (user) {
 				$scope.users.push(user);
+			}, function (err) {
+				alert(err.data);
 			})
 		}
 	};
 
-	$scope.showUserDialog = function () {
-		var user;
-		if (this.rowuser == null) // new User
-			user = {role: AuthenticationService.userRoles.user};
-		else
-			user = angular.copy(this.rowuser);
-		if (user) {
-			user.role = AuthenticationService.userRoles[user.role.title];
-			$scope.current_user = user;
-			$('#modal-editUser').modal();
-		}
+	$scope.showUserDialog = function (rowuser) {
+		var user = rowuser ? angular.copy(rowuser) : {role: AuthenticationService.userRoles.user};
+		user.role = AuthenticationService.userRoles[user.role.title];
+		$scope.org_user = user;
+		$scope.current_user = user;
+		$('#modal-editUser').modal();
 	};
 
-	$scope.deleteUserDialog = function () {
-		$scope.current_user = this.rowuser;
+	$scope.deleteUserDialog = function (rowuser) {
+		$scope.current_user = rowuser;
 		if ($scope.current_user)
 			$('#modal-deleteUser').modal();
 	};

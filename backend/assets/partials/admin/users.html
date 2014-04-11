@@ -13,8 +13,9 @@
         <table class="table" ng-show="users.length">
             <thead>
             <tr>
-                <th translate>ID</th>
+                <th translate>Login Name</th>
                 <th translate>Name</th>
+                <th translate>Organisation</th>
                 <th translate>Role</th>
                 <th translate>Created</th>
                 <th translate>Actions</th>
@@ -23,16 +24,17 @@
             <tbody>
             <tr ng-repeat="rowuser in users">
                 <td>{{rowuser.id}}</td>
-                <td>{{rowuser.name}}</td>
+                <td>{{rowuser.name}}<i ng-show="rowuser.description" class="fa fa-info-circle" popover="{{rowuser.description}}" popover-trigger="mouseenter"></i></td>
+                <td>{{rowuser.organisation}}</td>
                 <td>{{rowuser.role}}</td>
-                <td>{{rowuser.created}}</td>
+                <td>{{rowuser.created | amDateFormat:'LLL'}}</td>
                 <td>
                     <div ng-show="rowuser.processing">
                         <i class="fa fa-spinner fa-spin"></i>
                     </div>
                     <div ng-show="!rowuser.processing">
-                        <!--<a href="javascript:;" title="{{'Edit User'|translate}}" ng-click="showUserDialog()"><i class="glyphicon glyphicon-edit"/></a>-->
-                        <a href="javascript:;" title="{{'Delete User'|translate}}" ng-click="deleteUserDialog()"><i class="glyphicon glyphicon-trash"/></a>
+                        <i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ng-click="showUserDialog(rowuser)"/>
+                        <i class="btn btn-default fa fa-trash-o fa-mouse-pointer" title="{{'Delete User'|translate}}" ng-click="deleteUserDialog(rowuser)"/>
                     </div>
                 </td>
             </tr>
@@ -42,7 +44,6 @@
 
     </div>
 </div>
-
 
 <div id="modal-editUser" class="modal fade">
     <div class="modal-dialog">
@@ -54,12 +55,28 @@
             <div class="modal-body">
                 <form role="form">
                     <div class="form-group">
-                        <label translate>Name</label>
+                        <label translate>Login Name</label>
+                        <input type="text" class="form-control" placeholder="{{'Enter login name'|translate}}" ng-model="current_user.id">
+                    </div>
+                    <div class="form-group">
+                        <label translate>Full Name</label>
                         <input type="text" class="form-control" placeholder="{{'Enter name'|translate}}" ng-model="current_user.username">
                     </div>
                     <div class="form-group">
-                        <label translate>Group</label>
-                        <input type="text" class="form-control" placeholder="{{'Enter group'|translate}}" ng-model="current_user.group">
+                        <label translate>Email</label>
+                        <input type="text" class="form-control" placeholder="{{'Enter email adress'|translate}}" ng-model="current_user.email">
+                    </div>
+                    <div class="form-group">
+                        <label translate>Website</label>
+                        <input type="url" class="form-control" placeholder="{{'Enter website url'|translate}}" ng-model="current_user.url">
+                    </div>
+                    <div class="form-group">
+                        <label translate>Organisation</label>
+                        <input type="url" class="form-control" placeholder="{{'Enter organisation'|translate}}" ng-model="current_user.organisation">
+                    </div>
+                    <div class="form-group">
+                        <label translate>description</label>
+                        <input type="text" class="form-control" placeholder="{{'Enter description'|translate}}" ng-model="current_user.description">
                     </div>
                     <div class="form-group">
                         <label translate>Password</label>
