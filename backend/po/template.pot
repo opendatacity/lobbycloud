@@ -3,12 +3,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: assets/index.html
+msgid "Accounts"
+msgstr ""
+
 #: assets/partials/admin/users.html
 #: assets/partials/docs/list.html
 msgid "Actions"
 msgstr ""
 
-#: assets/index.html
 #: assets/partials/start.html
 msgid "Administration"
 msgstr ""
@@ -20,6 +23,14 @@ msgstr ""
 #: assets/partials/admin/user.html
 #: assets/js/directives.js
 msgid "Cancel"
+msgstr ""
+
+#: assets/partials/docs/upload.html
+msgid "Choose files"
+msgstr ""
+
+#: assets/partials/docs/upload.html
+msgid "Comment for the review"
 msgstr ""
 
 #: assets/partials/admin/user.html
@@ -38,17 +49,13 @@ msgstr ""
 msgid "Delete User"
 msgstr ""
 
-#: assets/partials/docs/upload.html
-msgid "Document Upload"
-msgstr ""
-
 #: assets/index.html
 #: assets/partials/start.html
 msgid "Documents"
 msgstr ""
 
 #: assets/partials/docs/upload.html
-msgid "Drag here"
+msgid "Drop files here"
 msgstr ""
 
 #: assets/partials/docs/list.html
@@ -204,7 +211,12 @@ msgid "Sign in"
 msgstr ""
 
 #: assets/partials/docs/list.html
+#: assets/partials/docs/upload.html
 msgid "Tags"
+msgstr ""
+
+#: assets/partials/docs/upload.html
+msgid "Tags, separated by comma"
 msgstr ""
 
 #: assets/partials/docs/list.html
@@ -213,6 +225,14 @@ msgstr ""
 
 #: assets/js/directives.js
 msgid "To"
+msgstr ""
+
+#: assets/partials/docs/upload.html
+msgid "Topic"
+msgstr ""
+
+#: assets/index.html
+msgid "Upload"
 msgstr ""
 
 #: assets/partials/start.html

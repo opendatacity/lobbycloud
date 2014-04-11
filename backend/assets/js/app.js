@@ -10,8 +10,7 @@ var app = angular
 		'ngResource',
 		'ngTable',
 		'ngSanitize',
-		'angularMoment',
-		'angularFileUpload'
+		'angularMoment'
 	]);
 
 
@@ -24,8 +23,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 
 	$urlRouterProvider.otherwise('/start');
 
-	$urlRouterProvider.when('/admin', '/admin/users');
-	$urlRouterProvider.when('/docs', '/docs/list');
+//	$urlRouterProvider.when('/docs', '/docs/list');
 
 	$stateProvider
 		.state('login', {
@@ -41,44 +39,24 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 			templateUrl: 'partials/start.html',
 			controller: 'StartController'
 		})
-		.state('admin', {
-			url: '/admin',
-			abstract: true,
-			template: '<div ui-view />',
-//			templateUrl: 'partials/admin.html',
-			controller: 'UsersController',
-			data: {
-				access: access.admin
-			}
-		})
-		.state('admin.users', {
+		.state('users', {
 			url: '/users',
-			templateUrl: 'partials/admin/users.html',
+			templateUrl: 'partials/users.html',
 			controller: 'UserListController',
 			data: {
 				access: access.admin
 			}
 		})
-
 		.state('docs', {
 			url: '/docs',
-			abstract: true,
-			template: '<div ui-view />',
-//			templateUrl: 'partials/docs.html',
-			controller: 'DocsController'
-		})
-		.state('docs.list', {
-			url: '/list',
-			templateUrl: 'partials/docs/list.html',
+			templateUrl: 'partials/docs.html',
 			controller: 'DocsListController'
 		})
-		.state('docs.upload', {
+		.state('upload', {
 			url: '/upload',
-			templateUrl: 'partials/docs/upload.html',
+			templateUrl: 'partials/upload.html',
 			controller: 'DocsUploadController'
 		})
-
-
 		.state('logout', {
 			url: '/logout',
 			templateUrl: 'partials/logout.html',
@@ -87,7 +65,10 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 		.state('error', {
 			url: '/error',
 			templateUrl: 'partials/error.html',
-			controller: 'AppController'
+			controller: 'AppController',
+			data: {
+				access: access.public
+			}
 		});
 });
 
@@ -100,11 +81,19 @@ app.run(function ($window, $rootScope, $location, $state, gettextCatalog, Authen
 	$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 		var state_access = toState.data ? toState.data.access : access.user;
 		if (!AuthenticationService.authorize(state_access)) {
-			$rootScope.accessdenied = true;
 			event.preventDefault();
-			$state.go('login');
+			//see if logged in through frontend
+			AuthenticationService.check(
+				function (user) {
+					$state.go(toState.name);
+				}, function (err) {
+					$rootScope.accessdenied = true;
+					$state.go('login');
+				}
+			);
 		}
 	});
 
-});
+})
+;
 

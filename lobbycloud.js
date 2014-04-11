@@ -371,6 +371,9 @@ app.post('/api/admin/:cmd', function (req, res) {
 					res.json(data);
 				});
 				break;
+			case 'user':
+				res.json(prepareClientUser(req.user));
+				break;
 			case 'docs':
 				mockupdocs.listDocs(function (err, data) {
 					res.json(data);

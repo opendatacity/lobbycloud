@@ -72,28 +72,6 @@ app.controller('StartController', function ($scope, AuthenticationService) {
 	$scope.account = AuthenticationService.user;
 });
 
-app.controller('UsersController', function ($scope, $state, AdminService, AuthenticationService) {
-	'use strict';
-	$scope.account = AuthenticationService.user;
-
-	$scope.getUserByID = function (id) {
-		return $scope.users.filter(function (user) {
-			return user.id === id;
-		})[0]
-	};
-
-	$scope.users = AdminService.users({},
-		function (data) {
-		},
-		function (err) {
-			if (err.status == 401) {
-				AuthenticationService.reset();
-				$state.go('login');
-			}
-		});
-});
-
-
 var ModalInstanceCtrl = function ($scope, $modalInstance, user) {
 
 	$scope.user = user;
@@ -110,12 +88,29 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, user) {
 	};
 };
 
-app.controller('UserListController', function ($scope, $modal, AuthenticationService, AdminService) {
+app.controller('UserListController', function ($scope, $modal, AuthenticationService, UsersService) {
 	'use strict';
+	$scope.account = AuthenticationService.user;
+
+	$scope.getUserByID = function (id) {
+		return $scope.users.filter(function (user) {
+			return user.id === id;
+		})[0]
+	};
+
+	$scope.users = UsersService.users({},
+		function (data) {
+		},
+		function (err) {
+			if (err.status == 401) {
+				AuthenticationService.reset();
+				$state.go('login');
+			}
+		});
 
 	var deleteUser = function (user) {
 		user.processing = true;
-		AdminService.deleteUser({id: user.id},
+		UsersService.delete({id: user.id},
 			function () {
 				$scope.users = $scope.users.filter(function (u) {
 					return u.id !== user.id;
@@ -130,14 +125,14 @@ app.controller('UserListController', function ($scope, $modal, AuthenticationSer
 	var updateUser = function (edit_user, org_user) {
 		if (org_user) {
 			org_user.processing = true;
-			AdminService.editUser({user: edit_user}, function (user) {
+			UsersService.edit({user: edit_user}, function (user) {
 				$scope.users[$scope.users.indexOf(org_user)] = user;
 			}, function (err) {
 				org_user.processing = false;
 				alert(err.data);
 			})
 		} else {
-			AdminService.addUser({user: edit_user}, function (user) {
+			UsersService.add({user: edit_user}, function (user) {
 				$scope.users.push(user);
 			}, function (err) {
 				alert(err.data);
@@ -184,20 +179,6 @@ app.controller('UserListController', function ($scope, $modal, AuthenticationSer
 		});
 	};
 
-});
-
-app.controller('AdminGroupsController', function ($scope, $state, AuthenticationService, AdminService) {
-	'use strict';
-
-	$scope.groups = AdminService.groups({},
-		function (data) {
-		},
-		function (err) {
-			if (err.status == 401) {
-				AuthenticationService.reset();
-				$state.go('login');
-			}
-		});
 });
 
 
@@ -302,47 +283,7 @@ app.controller('DocsListController', function ($scope, $state, $filter, $templat
 });
 
 
-app.controller('DocsUploadController', function ($scope, $upload) {
+app.controller('DocsUploadController', function ($scope) {
 	'use strict';
-
-	$scope.uploads = [];
-
-	$scope.onFileSelect = function ($files) {
-
-		for (var i = 0; i < $files.length; i++) {
-			var up = {
-				file: $files[i],
-				progress: 0,
-				uploading: true
-			};
-			up.upload = $upload.upload({
-				url: 'server/upload/url', //upload.php script, node.js route, or servlet url
-				// method: POST or PUT,
-				// headers: {'header-key': 'header-value'},
-				// withCredentials: true,
-//				data: {myObj: $scope.myModelObj},
-				file: up.file // or list of files: $files for html5 only
-				/* set the file formData name ('Content-Desposition'). Default is 'file' */
-				//fileFormDataName: myFile, //or a list of names for multiple files (html5).
-				/* customize how data is added to formData. See #40#issuecomment-28612000 for sample code */
-				//formDataAppender: function(formData, key, val){}
-			}).progress(function (evt) {
-				up.progress = parseInt(100.0 * evt.loaded / evt.total);
-			}).success(function (data, status, headers, config) {
-				up.progress = 100;
-				up.success = true;
-				up.uploading = false;
-			});
-			$scope.uploads.push(up);
-			//.error(...)
-			//.then(success, error, progress);
-			//.xhr(function(xhr){xhr.upload.addEventListener(...)})// access and attach any event listener to XMLHttpRequest.
-		}
-
-//		/* alternative way of uploading, send the file binary with the file's content-type.
-//		 Could be used to upload files to CouchDB, imgur, etc... html5 FileReader is needed.
-//		 It could also be used to monitor the progress of a normal http post/put request with large data*/
-//		// $scope.upload = $upload.http({...})  see 88#issuecomment-31366487 for sample code.
-	};
-})
-;
+	//we use the components from the front end
+});

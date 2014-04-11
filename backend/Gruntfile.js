@@ -6,6 +6,11 @@ module.exports = function (grunt) {
 			my_target: {
 				files: {
 					'assets/libs/components.min.js': [
+						'../assets/js/jquery.knob.js',
+						'../assets/js/jquery.ui.widget.js',
+						'../assets/js/jquery.iframe-transport.js',
+						'../assets/js/jquery.fileupload.js',
+
 						'assets/libs/moment/min/moment.min.js',
 						'assets/libs/moment/lang/de.js',
 						'assets/libs/bootstrap-daterangepicker/daterangepicker.js',

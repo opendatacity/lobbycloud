@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>LobbyCloudCentral</title>
+    <link rel="shortcut icon" href="../assets/img/favicon.ico?v=1"/>
 
     <!-- fonts -->
     <link href="../assets/fonts/roboto-slab/roboto-slab.css" rel="stylesheet" type="text/css">
@@ -14,6 +15,7 @@
     <link href="../assets/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
     <link href="../assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="../assets/css/lobbycloud.css" rel="stylesheet" type="text/css">
+    <link href="../assets/css/upload.css" rel="stylesheet" type="text/css">
 
     <!-- app css -->
     <link type="text/css" href="libs/ng-table/ng-table.css" rel="stylesheet">
@@ -55,16 +57,17 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul id="nav-site" class="nav navbar-nav" ng-class="{ hidden: !isLoggedIn()}">
+                    <li ng-class="{ active: isActive('/upload')}"><a href="#/upload" translate>Upload</a></li>
                     <li ng-class="{ active: isActive('/docs')}"><a href="#/docs" translate>Documents</a></li>
-                    <li ng-show="isAdmin()" ng-class="{ active: isActive('/admin')}"><a href="#/admin" translate>Administration</a></li>
-                    <li><a href="#/logout" title="{{'Logout'|translate}}"><i class="glyphicon glyphicon-log-out"></i> <span translate>Logout</span></a></li>
+                    <li ng-show="isAdmin()" ng-class="{ active: isActive('/users')}"><a href="#/users" translate>Accounts</a></li>
                 </ul>
                 <ul id="nav-login" class="nav navbar-nav" ng-class="{ hidden: isLoggedIn()}">
                     <li ng-class="{ active: isActive('/login')}"><a href="#/login" title="{{'Login'|translate}}"><i class="glyphicon glyphicon-log-in"></i> <span translate>Login</span></a></li>
                 </ul>
-                <ul id="nav-lang" class="nav navbar-nav pull-right">
+                <ul id="nav-lang" class="nav navbar-nav navbar-right navbar-user">
                     <li ng-class="{ active: isActiveLang('de_DE')}"><a href="javascript:;" title="{{'German'|translate}}" ng-click="setLang('de_DE');"><img src="img/de.png"></a></li>
                     <li ng-class="{ active: isActiveLang('en')}"><a href="javascript:;" title="{{'English'|translate}}" ng-click="setLang('en');"><img src="img/en.png"></a></li>
+                    <li><a href="#/logout" title="{{'Logout'|translate}}"><i class="glyphicon glyphicon-log-out"></i> <span translate>Logout</span></a></li>
                 </ul>
             </div>
         </div>
