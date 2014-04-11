@@ -67,7 +67,7 @@
                 <ul id="nav-lang" class="nav navbar-nav navbar-right navbar-user">
                     <li ng-class="{ active: isActiveLang('de_DE')}"><a href="javascript:;" title="{{'German'|translate}}" ng-click="setLang('de_DE');"><img src="img/de.png"></a></li>
                     <li ng-class="{ active: isActiveLang('en')}"><a href="javascript:;" title="{{'English'|translate}}" ng-click="setLang('en');"><img src="img/en.png"></a></li>
-                    <li><a href="#/logout" title="{{'Logout'|translate}}"><i class="glyphicon glyphicon-log-out"></i> <span translate>Logout</span></a></li>
+                    <li ng-show="isLoggedIn()"><a href="#/logout" title="{{'Logout'|translate}}"><i class="glyphicon glyphicon-log-out"></i> <span translate>Logout</span></a></li>
                 </ul>
             </div>
         </div>

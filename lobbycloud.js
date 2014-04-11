@@ -325,11 +325,25 @@ app.get('/logout',function(req, res) {
 	res.redirect('/');
 });
 
+var prepareClientUser=function(user){
+	return {
+		id:user.id,
+		name:user.name,
+		role:user.role,
+		email:user.email,
+		url:user.url,
+		description:user.description,
+		organisation:user.organisation,
+		verified:user.verified,
+		created:user.created
+	}
+};
+
 /* login */
 app.post('/api/login',
 	passport.authenticate('local', {}),
 	function (req, res) {
-		res.json(req.user);
+		res.json(prepareClientUser(req.user));
 	}
 );
 
@@ -348,19 +362,6 @@ app.post('/api/admin/:cmd', function (req, res) {
 		res.send(401);
 	} else {
 
-		var prepareClientUser=function(user){
-			return {
-				id:user.id,
-				name:user.name,
-				role:user.role,
-				email:user.email,
-				url:user.url,
-				description:user.description,
-				organisation:user.organisation,
-				verified:user.verified,
-				created:user.created
-			}
-		};
 
 		switch (req.params.cmd) {
 			case 'users':
