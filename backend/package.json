@@ -1,0 +1,16 @@
+{
+	"private": true,
+	"name": "lobbycloudcentral",
+	"version": "0.0.3",
+	"description": "all the source for lobbycloud.eu",
+	"dependencies": {
+	},
+	"engines": {
+		"node": "0.10.26"
+	},
+	"devDependencies": {
+		"grunt": "*",
+		"grunt-angular-gettext": "*",
+		"grunt-contrib-uglify": "*"
+	}
+}

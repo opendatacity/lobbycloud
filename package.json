@@ -23,10 +23,5 @@
 	},
 	"engines": {
 		"node": "0.10.26"
-	},
-	"devDependencies": {
-		"grunt": "*",
-		"grunt-angular-gettext": "*",
-		"grunt-contrib-uglify": "*"
 	}
 }
