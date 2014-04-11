@@ -325,17 +325,26 @@ app.post('/api/admin/:cmd', function (req, res) {
 	if ((!req.user) || (req.user.role !== 'admin')) {
 		res.send(401);
 	} else {
+
+		var prepareClientUser=function(user){
+			return {
+				id:user.id,
+				name:user.name,
+				role:user.role,
+				email:user.email,
+				url:user.url,
+				description:user.description,
+				organisation:user.organisation,
+				verified:user.verified,
+				created:user.created
+			}
+		};
+
 		switch (req.params.cmd) {
 			case 'users':
 				users.list(null, null, function (err, data) {
 					var data = data.map(function(user){
-						return {
-							id:user.id,
-							name:user.name,
-							role:user.role,
-							verified:user.verified,
-							created:user.created
-						}
+						return prepareClientUser(user);
 					});
 					res.json(data);
 				});
@@ -355,7 +364,7 @@ app.post('/api/admin/:cmd', function (req, res) {
 					if (err)
 						res.send(400, err);
 					else
-						res.json(user);
+						res.json(prepareClientUser(user));
 				});
 				break;
 			case 'users.update':
@@ -363,7 +372,7 @@ app.post('/api/admin/:cmd', function (req, res) {
 					if (err)
 						res.send(400, err);
 					else
-						res.json(user);
+						res.json(prepareClientUser(user));
 				});
 				break;
 			default :
