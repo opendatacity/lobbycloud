@@ -42,3 +42,11 @@ body {
     text-align: left;
 }
 
+.modal-dialog {
+    width: 900px;
+}
+
+.modal-dialog .modal-body {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}

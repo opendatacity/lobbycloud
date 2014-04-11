@@ -72,23 +72,7 @@ app.controller('StartController', function ($scope, AuthenticationService) {
 	$scope.account = AuthenticationService.user;
 });
 
-var ModalInstanceCtrl = function ($scope, $modalInstance, user) {
-
-	$scope.user = user;
-	$scope.selected = {
-		user: $scope.user
-	};
-
-	$scope.ok = function () {
-		$modalInstance.close($scope.selected.user);
-	};
-
-	$scope.cancel = function () {
-		$modalInstance.dismiss('cancel');
-	};
-};
-
-app.controller('UserListController', function ($scope, $modal, AuthenticationService, UsersService) {
+app.controller('UserListController', function ($scope, $state, $modal, AuthenticationService, UsersService) {
 	'use strict';
 	$scope.account = AuthenticationService.user;
 
@@ -125,7 +109,7 @@ app.controller('UserListController', function ($scope, $modal, AuthenticationSer
 	var updateUser = function (edit_user, org_user) {
 		if (org_user) {
 			org_user.processing = true;
-			UsersService.edit({user: edit_user}, function (user) {
+			UsersService.edit({id: org_user.id, user: edit_user}, function (user) {
 				$scope.users[$scope.users.indexOf(org_user)] = user;
 			}, function (err) {
 				org_user.processing = false;
@@ -141,12 +125,26 @@ app.controller('UserListController', function ($scope, $modal, AuthenticationSer
 	};
 
 	$scope.editUserDialog = function (org_user) {
-		var user = org_user ? angular.copy(org_user) : {role: AuthenticationService.userRoles.user, create:true};
-		user.role = AuthenticationService.userRoles[user.role.title];
-
+		var user = org_user ? angular.copy(org_user) : {role: AuthenticationService.userRoles.user.title, create: true};
+		user.role = AuthenticationService.userRoles[user.role];
+		if (!user.url)
+			user.url = null;
 		var modalInstance = $modal.open({
-			templateUrl: 'partials/admin/user.html',
-			controller: ModalInstanceCtrl,
+			templateUrl: 'partials/user.html',
+			controller: function ($scope, $modalInstance, user, AuthenticationService) {
+
+				$scope.user = user;
+				$scope.userRoles = [AuthenticationService.userRoles.user, AuthenticationService.userRoles.admin];
+
+				$scope.ok = function (form) {
+					if (form.$valid)
+						$modalInstance.close($scope.user);
+				};
+
+				$scope.cancel = function () {
+					$modalInstance.dismiss('cancel');
+				};
+			},
 			resolve: {
 				user: function () {
 					return user;
@@ -155,6 +153,7 @@ app.controller('UserListController', function ($scope, $modal, AuthenticationSer
 		});
 
 		modalInstance.result.then(function (user) {
+			user.role = user.role.title;
 			updateUser(user, org_user);
 		}, function () {
 //			$log.info('Modal dismissed at: ' + new Date());
@@ -164,7 +163,15 @@ app.controller('UserListController', function ($scope, $modal, AuthenticationSer
 	$scope.deleteUserDialog = function (org_user) {
 		var modalInstance = $modal.open({
 			templateUrl: 'deleteUserDialog.html',
-			controller: ModalInstanceCtrl,
+			controller: function ($scope, $modalInstance, user, AuthenticationService) {
+				$scope.user = user;
+				$scope.ok = function () {
+					$modalInstance.close($scope.user);
+				};
+				$scope.cancel = function () {
+					$modalInstance.dismiss('cancel');
+				};
+			},
 			resolve: {
 				user: function () {
 					return org_user;

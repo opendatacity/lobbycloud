@@ -1,6 +1,6 @@
 <h1 translate>Manage Users</h1>
 
-<h3 ng-show="!users">
+<h3 ng-if="!users">
     <div class="process-img"></div>
     <span translate>Loading Data...</span>
 </h3>
@@ -27,10 +27,10 @@
         <td>{{rowuser.role}}</td>
         <td>{{rowuser.created | amDateFormat:'LLL'}}</td>
         <td>
-            <div ng-show="rowuser.processing">
+            <div ng-if="rowuser.processing">
                 <i class="fa fa-spinner fa-spin"></i>
             </div>
-            <div ng-show="!rowuser.processing">
+            <div ng-if="!rowuser.processing">
                 <!--<i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ui-sref='admin.user({id: rowuser.id})'/>-->
                 <i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ng-click="editUserDialog(rowuser)"/>
                 <i class="btn btn-default fa fa-trash-o fa-mouse-pointer" title="{{'Delete User'|translate}}" ng-click="deleteUserDialog(rowuser)"/>
