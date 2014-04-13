@@ -9,13 +9,13 @@ var path = require("path");
 var passportlocal = require("passport-local");
 var mustache = require("mustache-express");
 var filedump = require("filedump");
+var passport = require("passport");
 var sqlite3 = require("sqlite3");
 var mmmagic = require("mmmagic");
 var mongojs = require("mongojs");
 var express = require("express");
 var multer = require("multer");
 var i18n = require("i18n");
-var passport = require('passport');
 
 /* require config */
 var config = require(path.resolve(__dirname, "config.js"), 20);
