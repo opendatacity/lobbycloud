@@ -7,6 +7,7 @@ var path = require("path");
 
 /* require npm modules */
 var passportlocal = require("passport-local");
+var connectmongo = require("connect-mongo");
 var mustache = require("mustache-express");
 var filedump = require("filedump");
 var passport = require("passport");
@@ -153,7 +154,7 @@ app.configure(function(){
 
 	/* user & session handling */
 	app.use(express.cookieParser());
-	app.use(express.session({ secret: config.passport.secret, store: new express.session.MemoryStore }));
+	app.use(express.session({ secret: config.passport.secret, store: new (connectmongo(express))({ db: config.db }) }));
 	app.use(passport.initialize());
 	app.use(passport.session());
 
