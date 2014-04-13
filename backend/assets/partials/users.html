@@ -1,0 +1,58 @@
+<h1 translate>Manage Users</h1>
+
+<h3 ng-if="!users">
+    <div class="process-img"></div>
+    <span translate>Loading Data...</span>
+</h3>
+<div class="btn-group">
+    <button type="button" class="btn btn-default" ng-click="editUserDialog()" translate>New User</button>
+</div>
+
+<table class="table" ng-show="users.length">
+    <thead>
+    <tr>
+        <th translate>Login Name</th>
+        <th translate>Name</th>
+        <th translate>Organisation</th>
+        <th translate>Role</th>
+        <th translate>Created</th>
+        <th translate>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="rowuser in users">
+        <td>{{rowuser.id}}</td>
+        <td>{{rowuser.name}}<i ng-show="rowuser.description" class="fa fa-info-circle" popover="{{rowuser.description}}" popover-trigger="mouseenter"></i></td>
+        <td>{{rowuser.organisation}}</td>
+        <td>{{rowuser.role}}</td>
+        <td>{{rowuser.created | amDateFormat:'LLL'}}</td>
+        <td>
+            <div ng-if="rowuser.processing">
+                <i class="fa fa-spinner fa-spin"></i>
+            </div>
+            <div ng-if="!rowuser.processing">
+                <!--<i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ui-sref='admin.user({id: rowuser.id})'/>-->
+                <i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ng-click="editUserDialog(rowuser)"/>
+                <i class="btn btn-default fa fa-trash-o fa-mouse-pointer" title="{{'Delete User'|translate}}" ng-click="deleteUserDialog(rowuser)"/>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+
+</table>
+
+
+<script type="text/ng-template" id="deleteUserDialog.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" translate>Delete User?</h4>
+    </div>
+    <div class="modal-body">
+        <p translate>Sure to delete user {{user.id}}?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()" translate>OK</button>
+        <button class="btn btn-warning" ng-click="cancel()" translate>Cancel</button>
+    </div>
+</script>
+

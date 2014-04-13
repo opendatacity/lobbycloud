@@ -12,19 +12,19 @@ var _ = require("underscore");
 /* prepare regexp */
 
 module.exports = function(opts){
-	
+
 	var users = this;
 	var db = new mongojs(opts.db);
 	var cache = {};
-	
+
 	/* make sure indexes are there */
 	db.collection("users").ensureIndex("id", {"unique": true, "background": true});
 	db.collection("users").ensureIndex("apikey", {"unique": true, "background": true});
 	db.collection("users").ensureIndex("created", {"background": true});
-	
+
 	/* generate password hash */
 	users.password = function(password, opts, callback){
-		
+
 		/* opts is optional */
 		if (typeof callback === "undefined" && typeof opts === "function") {
 			var callback = opts;
@@ -48,9 +48,9 @@ module.exports = function(opts){
 			if (err) return callback(err);
 			callback(null, "pbkdf2", key.toString("hex"), opts.salt, opts.iterations, (new Date().getTime())-starttime);
 		});
-		
-	}
-	
+
+	};
+
 	/* check if user exists */
 	users.check = function(id, callback){
 		id = slugmaker(id);
@@ -78,38 +78,38 @@ module.exports = function(opts){
 
 		/* unify user id */
 		user.id = slugmaker(user.id);
-		
+
 		/* check email */
 		if (!validator.isEmail(user.email)) return callback(new Error("Email address is invalid"));
-		
+
 		// FIXME: check mx for email domain
 
 		/* check url */
 		if (user.url && !validator.isURL(user.url, {
-			protocols: ['http','https','gopher'], 
-			require_tld: true, 
+			protocols: ['http','https','gopher'],
+			require_tld: true,
 			require_protocol: true
 		})) user.url = false;
 
 		users.check(user.id, function(err, exists){
 			if (err) return callback(err);
 			if (exists) return callback(new Error("User already exists"));
-			
+
 			/* replace password */
 			users.password(user.password, function(err, method, key, salt, it, time){
-				
+
 				if (err) return callback(err);
 
 				user.password = [method, key, salt, it];
-				
+
 				/* insert user to database */
 				db.collection("users").save(user, function(err, result){
 					callback(err,result);
 					console.log(err, result);
 				});
-				
+
 			});
-			
+
 		});
 	};
 
@@ -141,7 +141,7 @@ module.exports = function(opts){
 			});
 		});
 	};
-	
+
 	/* delete user */
 	users.delete = function(id, callback) {
 		id = slugmaker(id);
@@ -151,35 +151,37 @@ module.exports = function(opts){
 			/* remove from cache */
 			if (cache.hasOwnProperty(id)) delete cache[id];
 			Object.keys(cache).forEach(function(k){
-				if (k.test(/^apikey:/) && cache[k] === id) delete cache[k];
+				if ((k.test) && k.test(/^apikey:/) && cache[k] === id) delete cache[k];
 			});
-			
+
 			callback(null);
 		});
 	};
-	
+
 	/* update user */
 	users.update = function(id, user, callback) {
 		id = slugmaker(id);
-		
+
 		var update = {};
-		if (user.hasOwnPropery("name")) update.name = user.name;
-		if (user.hasOwnPropery("email") && validator.isEmail(user.email)) update.email = user.email;
-		if (user.hasOwnPropery("url") && validator.isURL(user.url, {protocols: ['http','https','gopher'], require_tld: true, require_protocol: true})) update.url = user.url;
-		if (user.hasOwnPropery("description")) update.description = user.description;
-		if (user.hasOwnPropery("organisation")) update.organisation = user.organisation;
+		if (user.hasOwnProperty("name")) update.name = user.name;
+		if (user.hasOwnProperty("email") && validator.isEmail(user.email)) update.email = user.email;
+		if (user.hasOwnProperty("url") && validator.isURL(user.url, {protocols: ['http','https','gopher'], require_tld: true, require_protocol: true})) update.url = user.url;
+		if (user.hasOwnProperty("description")) update.description = user.description;
+		if (user.hasOwnProperty("organisation")) update.organisation = user.organisation;
 
 		/* check if nothing to update */
 		if (Object.keys(update).length === 0) return callback(null);
-		
-		db.collection("users").update({id: id}, update, function(err, doc){
+
+		console.log(update);
+		db.collection("users").findAndModify({query:{id: id}, update:{$set:update}, new:true}, function(err, doc){
 			if (err) return callback(err);
+			console.log(doc);
 			cache[id] = doc;
-			callback(null, doc);
+			callback(err, doc);
 		});
-		
+
 	};
-	
+
 	/* get all users, probably rather not use this */
 	users.list = function(limit, skip, callback) {
 		/* FIXME: limit and skip are not used */
@@ -191,7 +193,7 @@ module.exports = function(opts){
 			callback(null, results);
 		});
 	};
-	
+
 	/* change password */
 	users.changepass = function(id, password, oldpassword, callback) {
 		if (typeof oldpassword === "function") {
@@ -211,7 +213,7 @@ module.exports = function(opts){
 			});
 		}
 	};
-	
+
 	/* get user by apikey */
 	users.apikey = function(apikey, callback) {
 		var cacheid = "apikey:"+apikey;
@@ -224,8 +226,6 @@ module.exports = function(opts){
 			callback(null, result);
 		});
 	};
-
-
 
 	/* user testing default user REMOVEME */
 	users.initDefaultAdmin = function() {
@@ -252,8 +252,9 @@ module.exports = function(opts){
 				});
 		});
 	};
+//	db.collection("users").remove();
 //	users.initDefaultAdmin();
 
 	return users;
-	
+
 };

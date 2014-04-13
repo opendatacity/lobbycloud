@@ -69,22 +69,20 @@ app.controller('LoginController', function ($scope, $location, AuthenticationSer
 
 app.controller('StartController', function ($scope, AuthenticationService) {
 	'use strict';
-	$scope.user = AuthenticationService.user;
+	$scope.account = AuthenticationService.user;
 });
 
-app.controller('AdminController', function ($scope, AuthenticationService) {
+app.controller('UserListController', function ($scope, $state, $modal, AuthenticationService, UsersService) {
 	'use strict';
-	$scope.user = AuthenticationService.user;
-});
+	$scope.account = AuthenticationService.user;
 
-app.controller('AdminUsersController', function ($scope, $location, $state, AuthenticationService, AdminService) {
-	'use strict';
-	$scope.userRoles = [
-		AuthenticationService.userRoles.user,
-		AuthenticationService.userRoles.admin
-	];
+	$scope.getUserByID = function (id) {
+		return $scope.users.filter(function (user) {
+			return user.id === id;
+		})[0]
+	};
 
-	$scope.users = AdminService.users({},
+	$scope.users = UsersService.users({},
 		function (data) {
 		},
 		function (err) {
@@ -94,21 +92,9 @@ app.controller('AdminUsersController', function ($scope, $location, $state, Auth
 			}
 		});
 
-	var getUserByID = function (id) {
-		return $scope.users.filter(function (user) {
-			return user.id === id;
-		})[0]
-	};
-
-	$scope.cancelDialog = function () {
-		$scope.current_user = null;
-	};
-
-	$scope.deleteUser = function () {
-		var user = $scope.current_user;
-		$scope.current_user = null;
+	var deleteUser = function (user) {
 		user.processing = true;
-		AdminService.deleteUser({id: user.id},
+		UsersService.delete({id: user.id},
 			function () {
 				$scope.users = $scope.users.filter(function (u) {
 					return u.id !== user.id;
@@ -120,61 +106,92 @@ app.controller('AdminUsersController', function ($scope, $location, $state, Auth
 		);
 	};
 
-	$scope.editUser = function () {
-		var edit_user = $scope.current_user;
-		$scope.current_user = null;
-		edit_user.processing = true;
-		if (edit_user.id) {
-			var org_user = getUserByID(edit_user.id);
-			AdminService.editUser({user: edit_user}, function (user) {
+	var updateUser = function (edit_user, org_user) {
+		if (org_user) {
+			org_user.processing = true;
+			UsersService.edit({id: org_user.id, user: edit_user}, function (user) {
 				$scope.users[$scope.users.indexOf(org_user)] = user;
+			}, function (err) {
+				org_user.processing = false;
+				alert(err.data);
 			})
 		} else {
-			AdminService.addUser({user: edit_user}, function (user) {
+			UsersService.add({user: edit_user}, function (user) {
 				$scope.users.push(user);
+			}, function (err) {
+				alert(err.data);
 			})
 		}
 	};
 
-	$scope.showUserDialog = function () {
-		var user;
-		if (this.rowuser == null) // new User
-			user = {role: AuthenticationService.userRoles.user};
-		else
-			user = angular.copy(this.rowuser);
-		if (user) {
-			user.role = AuthenticationService.userRoles[user.role.title];
-			$scope.current_user = user;
-			$('#modal-editUser').modal();
-		}
-	};
+	$scope.editUserDialog = function (org_user) {
+		var user = org_user ? angular.copy(org_user) : {role: AuthenticationService.userRoles.user.title, create: true};
+		user.role = AuthenticationService.userRoles[user.role];
+		if (!user.url)
+			user.url = null;
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/user.html',
+			controller: function ($scope, $modalInstance, user, AuthenticationService) {
 
-	$scope.deleteUserDialog = function () {
-		$scope.current_user = this.rowuser;
-		if ($scope.current_user)
-			$('#modal-deleteUser').modal();
-	};
+				$scope.user = user;
+				$scope.userRoles = [AuthenticationService.userRoles.user, AuthenticationService.userRoles.admin];
 
-});
+				$scope.ok = function (form) {
+					if (form.$valid)
+						$modalInstance.close($scope.user);
+				};
 
-app.controller('AdminGroupsController', function ($scope, $state, AuthenticationService, AdminService) {
-	'use strict';
-
-	$scope.groups = AdminService.groups({},
-		function (data) {
-		},
-		function (err) {
-			if (err.status == 401) {
-				AuthenticationService.reset();
-				$state.go('login');
+				$scope.cancel = function () {
+					$modalInstance.dismiss('cancel');
+				};
+			},
+			resolve: {
+				user: function () {
+					return user;
+				}
 			}
 		});
+
+		modalInstance.result.then(function (user) {
+			user.role = user.role.title;
+			updateUser(user, org_user);
+		}, function () {
+//			$log.info('Modal dismissed at: ' + new Date());
+		});
+	};
+
+	$scope.deleteUserDialog = function (org_user) {
+		var modalInstance = $modal.open({
+			templateUrl: 'deleteUserDialog.html',
+			controller: function ($scope, $modalInstance, user, AuthenticationService) {
+				$scope.user = user;
+				$scope.ok = function () {
+					$modalInstance.close($scope.user);
+				};
+				$scope.cancel = function () {
+					$modalInstance.dismiss('cancel');
+				};
+			},
+			resolve: {
+				user: function () {
+					return org_user;
+				}
+			}
+		});
+
+		modalInstance.result.then(function () {
+			deleteUser(org_user);
+		}, function () {
+//			$log.info('Modal dismissed at: ' + new Date());
+		});
+	};
+
 });
 
 
 app.controller('DocsController', function ($scope, AuthenticationService) {
 	'use strict';
-	$scope.user = AuthenticationService.user;
+	$scope.account = AuthenticationService.user;
 });
 
 app.controller('DocsListController', function ($scope, $state, $filter, $templateCache, ngTableParams, gettextCatalog, AuthenticationService, DocsService) {
@@ -273,47 +290,7 @@ app.controller('DocsListController', function ($scope, $state, $filter, $templat
 });
 
 
-app.controller('DocsUploadController', function ($scope, $upload) {
+app.controller('DocsUploadController', function ($scope) {
 	'use strict';
-
-	$scope.uploads = [];
-
-	$scope.onFileSelect = function ($files) {
-
-		for (var i = 0; i < $files.length; i++) {
-			var up = {
-				file: $files[i],
-				progress: 0,
-				uploading: true
-			};
-			up.upload = $upload.upload({
-				url: 'server/upload/url', //upload.php script, node.js route, or servlet url
-				// method: POST or PUT,
-				// headers: {'header-key': 'header-value'},
-				// withCredentials: true,
-//				data: {myObj: $scope.myModelObj},
-				file: up.file // or list of files: $files for html5 only
-				/* set the file formData name ('Content-Desposition'). Default is 'file' */
-				//fileFormDataName: myFile, //or a list of names for multiple files (html5).
-				/* customize how data is added to formData. See #40#issuecomment-28612000 for sample code */
-				//formDataAppender: function(formData, key, val){}
-			}).progress(function (evt) {
-				up.progress = parseInt(100.0 * evt.loaded / evt.total);
-			}).success(function (data, status, headers, config) {
-				up.progress = 100;
-				up.success = true;
-				up.uploading = false;
-			});
-			$scope.uploads.push(up);
-			//.error(...)
-			//.then(success, error, progress);
-			//.xhr(function(xhr){xhr.upload.addEventListener(...)})// access and attach any event listener to XMLHttpRequest.
-		}
-
-//		/* alternative way of uploading, send the file binary with the file's content-type.
-//		 Could be used to upload files to CouchDB, imgur, etc... html5 FileReader is needed.
-//		 It could also be used to monitor the progress of a normal http post/put request with large data*/
-//		// $scope.upload = $upload.http({...})  see 88#issuecomment-31366487 for sample code.
-	};
-})
-;
+	//we use the components from the front end
+});

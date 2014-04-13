@@ -1,0 +1,28 @@
+
+
+<form id="upload" method="post" action="/api/upload" enctype="multipart/form-data" role="form">
+    <div id="meta">
+        <div class="form-group">
+            <label for="document-topic" translate>Topic</label>
+            <input type="text" class="form-control" id="document-topic" name="topic" placeholder="{{'Topic'|translate}}">
+        </div>
+        <div class="form-group">
+            <label for="document-tags" translate>Tags, separated by comma</label>
+            <input type="text" class="form-control" id="document-tags" name="tags" placeholder="{{'Tags'|translate}}">
+        </div>
+        <div class="form-group">
+            <label for="document-comment" translate>Comment for the review</label>
+            <textarea id="document-comment" name="comment" class="form-control" rows="3"></textarea>
+        </div>
+    </div>
+    <div id="drop">
+        <span translate>Drop files here</span>
+        <label class="upload-button">
+            <div translate>Choose files</div>
+            <input type="file" name="_upload" multiple/>
+        </label>
+    </div>
+    <ul>
+    </ul>
+</form>
+<script type="text/javascript" src="../assets/js/jquery.upload.js"></script>

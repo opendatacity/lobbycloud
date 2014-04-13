@@ -11,12 +11,20 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 		userRoles = routingConfig.userRoles,
 		currentUser = cookieUser || { username: '', role: userRoles.public };
 
-	console.log(currentUser);
 
 	function changeUser(user) {
 		user.isAdmin = user.role.title === userRoles.admin.title;
 		$cookieStore.put(cookieName, user);
 		angular.extend(currentUser, user);
+	}
+
+	function setCurrentUser(user) {
+		user.role = userRoles[user.role];
+		if (!user.role) {
+			console.log('Unknown user role, assuming user');
+			user.role = userRoles.user;
+		}
+		changeUser(user);
 	}
 
 	return {
@@ -44,18 +52,23 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 				success();
 			}).error(error);
 		},
+		check: function (success, error) {
+			$http.post('/api/admin/user')
+				.success(function (user) {
+					setCurrentUser(user);
+					success(user);
+				}).error(function (err) {
+					if (error) error(err);
+				});
+		},
 		login: function (user, success, error) {
-			$http.post('/api/login', user).success(function (user) {
-				console.log(user.role);
-				user.role = userRoles[user.role];
-				console.log(user.role);
-				if (!user.role) {
-					console.log('Unknown user role, assuming user');
-					user.role = userRoles.user;
-				}
-				changeUser(user);
-				success(user);
-			}).error(error);
+			$http.post('/api/login', user)
+				.success(function (user) {
+					setCurrentUser(user);
+					success(user);
+				}).error(function (err) {
+					if (error) error(err);
+				});
 		},
 		logout: function (success, error) {
 			$http.post('/api/logout').success(function () {
@@ -65,7 +78,10 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 				});
 				$cookieStore.remove(cookieName);
 				success();
-			}).error(error);
+			}).error(function (err) {
+				if (error) error(err);
+			});
+
 		},
 		reset: function () {
 			changeUser({
@@ -80,7 +96,7 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 	};
 });
 
-app.factory('AdminService', function ($resource) {
+app.factory('UsersService', function ($resource) {
 	'use strict';
 	return $resource('/api/admin/:cmd', {}, {
 			users: {
@@ -88,20 +104,15 @@ app.factory('AdminService', function ($resource) {
 				params: {cmd: 'users'},
 				isArray: true
 			},
-			groups: {
-				method: 'POST',
-				params: {cmd: 'groups'},
-				isArray: true
-			},
-			deleteUser: {
+			delete: {
 				method: 'POST',
 				params: {cmd: 'users.delete'}
 			},
-			addUser: {
+			add: {
 				method: 'POST',
 				params: {cmd: 'users.add'}
 			},
-			editUser: {
+			edit: {
 				method: 'POST',
 				params: {cmd: 'users.update'}
 			}

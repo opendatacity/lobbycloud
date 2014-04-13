@@ -6,10 +6,13 @@ module.exports = function (grunt) {
 			my_target: {
 				files: {
 					'assets/libs/components.min.js': [
-						'assets/libs/jquery/dist/jquery.min.js',
+						'../assets/js/jquery.knob.js',
+						'../assets/js/jquery.ui.widget.js',
+						'../assets/js/jquery.iframe-transport.js',
+						'../assets/js/jquery.fileupload.js',
+
 						'assets/libs/moment/min/moment.min.js',
 						'assets/libs/moment/lang/de.js',
-						'assets/libs/bootstrap/dist/js/bootstrap.min.js',
 						'assets/libs/bootstrap-daterangepicker/daterangepicker.js',
 						'assets/libs/ng-file-upload/angular-file-upload-shim.min.js', //must be included BEFOR angular.js
 						'assets/libs/angular/angular.min.js',
@@ -17,6 +20,7 @@ module.exports = function (grunt) {
 						'assets/libs/angular-gettext/dist/angular-gettext.min.js',
 						'assets/libs/angular-sanitize/angular-sanitize.min.js',
 						'assets/libs/angular-ui-router/release/angular-ui-router.min.js',
+						'assets/libs/angular-bootstrap/ui-bootstrap-tpls.min.js',
 						'assets/libs/angular-resource/angular-resource.min.js',
 						'assets/libs/angular-moment/angular-moment.min.js',
 						'assets/libs/ng-table/ng-table.js',
@@ -25,6 +29,7 @@ module.exports = function (grunt) {
 				}
 			},
 			options: {
+				mangle: false,
 				compress: {
 					drop_console: true
 				}
@@ -34,7 +39,7 @@ module.exports = function (grunt) {
 		nggettext_extract: {
 			pot: {
 				files: {
-					'po/template.pot': ['assets/index.html', 'assets/partials/*.html', 'assets/partials/admin/*.html', 'assets/js/*.js']
+					'po/template.pot': ['assets/index.html', 'assets/partials/*.html', 'assets/partials/admin/*.html', 'assets/partials/docs/*.html', 'assets/js/*.js']
 				}
 			}
 		},

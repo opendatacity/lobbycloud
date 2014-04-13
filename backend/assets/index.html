@@ -3,17 +3,37 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link type="text/css" href="../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link type="text/css" href="../assets/css/bootstrap.theme.min.css" rel="stylesheet">
-    <link type="text/css" href="../assets/css/font-awesome.min.css" rel="stylesheet">
+    <title>LobbyCloudCentral</title>
+    <link rel="shortcut icon" href="../assets/img/favicon.ico?v=1"/>
 
+    <!-- fonts -->
+    <link href="../assets/fonts/roboto-slab/roboto-slab.css" rel="stylesheet" type="text/css">
+    <link href="../assets/fonts/roboto/roboto.css" rel="stylesheet" type="text/css">
+
+    <!-- css -->
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="../assets/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+    <link href="../assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="../assets/css/lobbycloud.css" rel="stylesheet" type="text/css">
+    <link href="../assets/css/upload.css" rel="stylesheet" type="text/css">
+
+    <!-- app css -->
     <link type="text/css" href="libs/ng-table/ng-table.css" rel="stylesheet">
     <link type="text/css" href="libs/bootstrap-daterangepicker/daterangepicker-bs3.css" rel="stylesheet">
-
     <link type="text/css" href="css/app.css" rel="stylesheet">
 
-    <title>LobbyCloudCentral</title>
+    <!-- javascript -->
+    <script type="text/javascript" src="../assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../assets/js/bootstrap.min.js"></script>
+
+    <!-- polyfills -->
+    <!--[if lt IE 9]><script type="text/javascript" src="../assets/js/html5shiv.min.js"></script><![endif]-->
+    <!--[if lt IE 9]><script type="text/javascript" src="../assets/js/respond.min.js"></script><![endif]-->
+
+    <!-- app components -->
     <script src="libs/components.min.js"></script>
+
+    <!-- app js -->
     <script src="js/app.js"></script>
     <script src="js/translations.js"></script>
     <script src="js/directives.js"></script>
@@ -21,32 +41,35 @@
     <script src="js/services.js"></script>
     <script src="js/controllers.js"></script>
 </head>
+
 <body ng-controller="BodyController">
 
-<header class="navbar navbar-default navbar-inverse navbar-fixed-top">
-    <div class="container" id="navbar">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-top-content">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand logo"><i class="fa fa-cloud"></i> Lobby<strong>Cloud</strong>Central</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul id="nav-site" class="nav navbar-nav" ng-class="{ hidden: !isLoggedIn()}">
-                <li ng-class="{ active: isActive('/start')}"><a href="#/start" translate>Start</a></li>
-                <li ng-class="{ active: isActive('/docs')}"><a href="#/docs" translate>Documents</a></li>
-                <li ng-show="isAdmin()" ng-class="{ active: isActive('/admin')}"><a href="#/admin" translate>Administration</a></li>
-                <li><a href="#/logout" title="{{'Logout'|translate}}"><i class="glyphicon glyphicon-log-out"></i> <span translate>Logout</span></a></li>
-            </ul>
-            <ul id="nav-login" class="nav navbar-nav" ng-class="{ hidden: isLoggedIn()}">
-                <li ng-class="{ active: isActive('/login')}"><a href="#/login" title="{{'Login'|translate}}"><i class="glyphicon glyphicon-log-in"></i> <span translate>Login</span></a></li>
-            </ul>
-            <ul id="nav-lang" class="nav navbar-nav pull-right">
-                <li ng-class="{ active: isActiveLang('de_DE')}"><a href="javascript:;" title="{{'German'|translate}}" ng-click="setLang('de_DE');"><img src="img/de.png"></a></li>
-                <li ng-class="{ active: isActiveLang('en')}"><a href="javascript:;" title="{{'English'|translate}}" ng-click="setLang('en');"><img src="img/en.png"></a></li>
-            </ul>
+<header>
+    <div id="navbar" class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-top-content">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand logo" href="#/start"><i class="fa fa-cloud"></i> Lobby<strong>Cloud</strong>Central</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul id="nav-site" class="nav navbar-nav" ng-class="{ hidden: !isLoggedIn()}">
+                    <li ng-class="{ active: isActive('/upload')}"><a href="#/upload" translate>Upload</a></li>
+                    <li ng-class="{ active: isActive('/docs')}"><a href="#/docs" translate>Documents</a></li>
+                    <li ng-show="isAdmin()" ng-class="{ active: isActive('/users')}"><a href="#/users" translate>Accounts</a></li>
+                </ul>
+                <ul id="nav-login" class="nav navbar-nav" ng-class="{ hidden: isLoggedIn()}">
+                    <li ng-class="{ active: isActive('/login')}"><a href="#/login" title="{{'Login'|translate}}"><i class="glyphicon glyphicon-log-in"></i> <span translate>Login</span></a></li>
+                </ul>
+                <ul id="nav-lang" class="nav navbar-nav navbar-right navbar-user">
+                    <li ng-class="{ active: isActiveLang('de_DE')}"><a href="javascript:;" title="{{'German'|translate}}" ng-click="setLang('de_DE');"><img src="img/de.png"></a></li>
+                    <li ng-class="{ active: isActiveLang('en')}"><a href="javascript:;" title="{{'English'|translate}}" ng-click="setLang('en');"><img src="img/en.png"></a></li>
+                    <li ng-show="isLoggedIn()"><a href="#/logout" title="{{'Logout'|translate}}"><i class="glyphicon glyphicon-log-out"></i> <span translate>Logout</span></a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </header>
@@ -61,7 +84,7 @@
     $('#jswarning').remove();
 </script>
 
-<div ui-view></div>
+<div ui-view id="main" role="main" class="container"></div>
 
 </body>
 </html>
