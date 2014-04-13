@@ -168,6 +168,22 @@ app.get('/', function(req, res){
 	});
 });
 
+/* log in */
+app.get('/login', function(req, res){
+	res.render('login', {
+		"_user": req.user,
+		"url": config.url
+	});
+});
+
+/* log in */
+app.post('/login',
+	passport.authenticate('local', {}),
+	function (req, res) {
+		res.json(req.user);
+	}
+);
+
 /* sign up */
 app.all('/signup/:invite?', function(req, res){
 	var invite = (req.param("invite") || req.body.invite || req.query.invite || null)
