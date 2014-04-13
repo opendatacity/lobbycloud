@@ -6,6 +6,7 @@ var url = require("url");
 var path = require("path");
 
 /* require npm modules */
+var passportlocal = require("passport-local");
 var mustache = require("mustache-express");
 var filedump = require("filedump");
 var sqlite3 = require("sqlite3");
@@ -15,7 +16,6 @@ var express = require("express");
 var multer = require("multer");
 var i18n = require("i18n");
 var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
 
 /* require config */
 var config = require(path.resolve(__dirname, "config.js"), 20);
@@ -47,7 +47,6 @@ i18n.configure({
 });
 
 /* configure passport */
-
 passport.serializeUser(function (user, done) {
 	done(null, user.id);
 });
@@ -58,7 +57,7 @@ passport.deserializeUser(function (id, done) {
 	});
 });
 
-passport.use(new LocalStrategy(function (username, password, done) {
+passport.use(new passportlocal.Strategy(function (username, password, done) {
 	process.nextTick(function () {
 		users.auth(username, password, function (result, user) {
 			if (!result) {
