@@ -166,34 +166,76 @@ app.get('/', function (req, res) {
 	});
 });
 
-/* log in */
-app.get('/login', function(req, res){
+/* frontend login & logout */
+app.get('/login', function (req, res) {
 	res.render('login', {
-		"_user": req.user,
+		"_user": prepareClientUser(req.user),
 		"url": config.url
 	});
 });
 
-/* log in */
-app.post('/login',
-	passport.authenticate('local', {}),
-	function (req, res) {
-		res.json(req.user);
-	}
-);
+app.post('/login', passport.authenticate('local', {
+	successRedirect: '/',
+	failureRedirect: '/login'
+}));
+
+app.get('/logout', function (req, res) {
+	if (req.user) req.logout();
+	res.redirect('/');
+});
 
 /* sign up */
 app.all('/signup/:invite?', function (req, res) {
+
+	/* logged in users dont need to sign up */
+	if (req.user) return res.redirect("/");
+
 	var invite = (req.param("invite") || req.body.invite || req.query.invite || null)
-	res.render('signup', {
-		"_user": req.user,
-		"headers": {
-			"signup": true
-		},
-		"url": config.url,
-		"invited": invites.check(invite),
-		"invite": invite
+
+	var _form = function(message){
+		res.render('signup', {
+			"_user": prepareClientUser(req.user),
+			"headers": {
+				"signup": true
+			},
+			"url": config.url,
+			"invited": ((invite) ? invites.check(invite) : false),
+			"invite": invite,
+			"message": message,
+			"form": req.body
+		});
+	};
+	
+	if (!req.body || req.body.submit !== "1") return _form();
+	if (!req.body.hasOwnProperty("username") || req.body.username === "") return _form(i18n.__("Please pick a username"));
+	if (!req.body.hasOwnProperty("password") || req.body.password === "") return _form(i18n.__("Please pick a password"));
+	if (req.body["password"] !== req.body["password-verify"]) return _form(i18n.__("Your passwords don't match"));
+
+	users.add({
+		id: req.body.username,
+		password: req.body.password,
+		email: req.body.email,
+		name: req.body.name,
+		organisation: req.body.organisation,
+		description: req.body.description,
+		location: req.body.location,
+		url: req.body.website
+	}, function(err, data){
+		if (err) return _form(err.message);
+
+		/* invalidate invite */
+		invites.spend(invite);
+
+		/* FIXME: send verification email */
+
+		/* show login form */
+		res.render('login', {
+			"_user": false,
+			"url": config.url
+		});
+
 	});
+
 });
 
 /* beta sign up */
@@ -336,28 +378,6 @@ app.get('/api/test/invites/:create?', function (req, res) {
 /* dummy api endpoint */
 app.get('/api/whatever', function (req, res) {
 	res.json("not implemented");
-});
-
-/* frontend login */
-app.get('/login', function (req, res) {
-	res.render('login', {
-		"_user": req.user,
-		"url": config.url
-	});
-});
-
-app.post('/login',
-	passport.authenticate('local', {
-		successRedirect: '/',
-		failureRedirect: '/login'
-	})
-);
-
-app.get('/logout', function (req, res) {
-	if (req.user) {
-		req.logout();
-	}
-	res.redirect('/');
 });
 
 var prepareClientUser = function (user) {
