@@ -70,6 +70,8 @@ module.exports = function(opts){
 			url: false,
 			role: "user",
 			description: "",
+			location: "",
+			organisation: "",
 			apikey: crypto.randomBytes(8).toString("hex"),
 			verification: crypto.randomBytes(8).toString("hex"),
 			verified: false,
@@ -78,13 +80,17 @@ module.exports = function(opts){
 
 		/* unify user id */
 		user.id = slugmaker(user.id);
-
+		
 		/* check email */
 		if (!validator.isEmail(user.email)) return callback(new Error("Email address is invalid"));
 
+		/* generate gravatar hash for email */
+		user.gravatar = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
+		
 		// FIXME: check mx for email domain
 
 		/* check url */
+		if (user.url && !user.url.match(/^(http|https|gopher):\/\//)) user.url = "http://"+user.url;
 		if (user.url && !validator.isURL(user.url, {
 			protocols: ['http','https','gopher'],
 			require_tld: true,
@@ -105,7 +111,6 @@ module.exports = function(opts){
 				/* insert user to database */
 				db.collection("users").save(user, function(err, result){
 					callback(err,result);
-					console.log(err, result);
 				});
 
 			});
@@ -122,6 +127,13 @@ module.exports = function(opts){
 			if (result === null) return callback(new Error("user does not exist"));
 			cache[id] = result;
 			cache["apikey:"+result.apikey] = id;
+			/* fix missing gravatar */
+			if (!result.hasOwnProperty("gravatar")){
+				result.gravatar = crypto.createHash('md5').update(result.email.toLowerCase()).digest('hex');
+				users.update(id, { "email": result.email }, function(err,res){
+					console.log("HERE!!!", err, res)
+				});
+			}
 			callback(null, result);
 		});
 	};
@@ -160,6 +172,7 @@ module.exports = function(opts){
 
 	/* update user */
 	users.update = function(id, user, callback) {
+
 		id = slugmaker(id);
 
 		var update = {};
@@ -168,14 +181,13 @@ module.exports = function(opts){
 		if (user.hasOwnProperty("url") && validator.isURL(user.url, {protocols: ['http','https','gopher'], require_tld: true, require_protocol: true})) update.url = user.url;
 		if (user.hasOwnProperty("description")) update.description = user.description;
 		if (user.hasOwnProperty("organisation")) update.organisation = user.organisation;
+		if (user.hasOwnProperty("email")) update.gravatar = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
 
 		/* check if nothing to update */
 		if (Object.keys(update).length === 0) return callback(null);
 
-		console.log(update);
 		db.collection("users").findAndModify({query:{id: id}, update:{$set:update}, new:true}, function(err, doc){
 			if (err) return callback(err);
-			console.log(doc);
 			cache[id] = doc;
 			callback(err, doc);
 		});
