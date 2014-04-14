@@ -44,6 +44,24 @@ module.exports = {
 	signupdb: "data/signup.sqlite",
 	
 	/* json with invite keys */
-	invitedb: "data/invites.json"
-	
+	invitedb: "data/invites.json",
+
+	/* validation e-mails tasks */
+	registration: {
+		dbfile: "data/registration.json",
+		from: "LobbyCloud <lobbycloud@gmail.com>",
+		waitperiod: 5 * 60 * 1000,
+		expiredperiod: 24 * 60 * 60 * 60 * 1000,
+		maxqueueworker: 3,
+//		transport: {name: "sendmail"},
+		transport: {
+			name: "SMTP",
+			service: "Gmail",
+			auth: {
+				user: "lobbycloud@gmail.com",
+				pass: ""
+			}
+		}
+	}
+
 };

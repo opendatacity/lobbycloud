@@ -21,8 +21,12 @@
     </thead>
     <tbody>
     <tr ng-repeat="rowuser in users">
-        <td>{{rowuser.id}}</td>
-        <td>{{rowuser.name}}<i ng-show="rowuser.description" class="fa fa-info-circle" popover="{{rowuser.description}}" popover-trigger="mouseenter"></i></td>
+        <td>{{rowuser.id}}<br />
+            <i ng-if="rowuser.email" class="fa fa-envelope-o" popover="{{rowuser.email}}" popover-trigger="mouseenter"></i>
+            <i ng-if="rowuser.verified" class="fa fa-check-circle" title="{{'Verified'|translate}}"></i>
+            <i ng-if="rowuser.description" class="fa fa-info-circle" popover="{{rowuser.description}}" popover-trigger="mouseenter"></i>
+        </td>
+        <td>{{rowuser.name}}</td>
         <td>{{rowuser.organisation}}</td>
         <td>{{rowuser.role}}</td>
         <td>{{rowuser.created | amDateFormat:'LLL'}}</td>

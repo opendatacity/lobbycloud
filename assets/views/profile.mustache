@@ -21,7 +21,15 @@
 			</div>
 		</div>
 		<div class="col-md-9">
-			Whatever. 
+			<p>Whatever.</p>
+			<p>{{#verified}}
+				<i class="fa fa-check">Verified email</i>
+			{{/verified}}
+			{{^verified}}
+				<button id="btn-request-validation" class="btn btn-default">Request Validation Email <i class="fa fa-spinner fa-spin hidden"></i></button>
+				<div id="div-request-validation"></div>
+			{{/verified}}
+            </p>
 			<strong>FIXME: make this look nice and add infos</strong>
 		</div>
 	</div>

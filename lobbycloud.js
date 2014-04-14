@@ -27,6 +27,7 @@ var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 /* require local modules */
 var invites = new (require("./modules/invites"))(path.resolve(__dirname, config.invitedb));
 var users = new (require("./modules/users"))({db: config.db});
+var registration = new (require("./modules/registration"))(users, config.registration);
 
 /* mockup docs */
 var mockupdocs = require('./modules/mockdocs')();
@@ -192,7 +193,7 @@ app.all('/signup/:invite?', function (req, res) {
 
 	var invite = (req.param("invite") || req.body.invite || req.query.invite || null)
 
-	var _form = function(message){
+	var _form = function (message) {
 		res.render('signup', {
 			"_user": prepareClientUser(req.user),
 			"headers": {
@@ -205,7 +206,7 @@ app.all('/signup/:invite?', function (req, res) {
 			"form": req.body
 		});
 	};
-	
+
 	if (!req.body || req.body.submit !== "1") return _form();
 	if (!req.body.hasOwnProperty("username") || req.body.username === "") return _form(i18n.__("Please pick a username"));
 	if (!req.body.hasOwnProperty("password") || req.body.password === "") return _form(i18n.__("Please pick a password"));
@@ -220,13 +221,14 @@ app.all('/signup/:invite?', function (req, res) {
 		description: req.body.description,
 		location: req.body.location,
 		url: req.body.website
-	}, function(err, data){
+	}, function (err, user) {
 		if (err) return _form(err.message);
 
 		/* invalidate invite */
 		invites.spend(invite);
 
-		/* FIXME: send verification email */
+		/* send validation email */
+		registration.send(user);
 
 		/* show login form */
 		res.render('login', {
@@ -259,17 +261,23 @@ app.get('/profile', function (req, res) {
 	res.render('profile', {
 		"_user": prepareClientUser(req.user),
 		"url": config.url,
-		"profile": prepareClientUser(req.user)
+		"profile": prepareClientUser(req.user),
+		"headers": {
+			"profile": true
+		}
 	});
 });
 
 /* user profile */
 app.get('/profile/:user', function (req, res) {
-	users.get(req.param("user"), function(err, profile){
+	users.get(req.param("user"), function (err, profile) {
 		res.render('profile', {
 			"_user": prepareClientUser(req.user),
 			"url": config.url,
-			"profile": ((profile) ? prepareClientUser(profile) : null)
+			"profile": ((profile) ? prepareClientUser(profile) : null),
+			"headers": {
+				"profile": true
+			}
 		});
 	});
 });
@@ -374,6 +382,15 @@ app.get('/api/test/invites/:create?', function (req, res) {
 	res.json(invites.all());
 });
 
+app.post('/api/registration/request', function (req, res) {
+	// only logged-in users may request a confirmation mail
+	if (!req.user) return res.send(401);
+	/* send validation email */
+	registration.send(req.user, function(err,result){
+		if (err) res.send(400,err);
+		else res.send(result);
+	});
+});
 
 /* dummy api endpoint */
 app.get('/api/whatever', function (req, res) {
@@ -400,7 +417,7 @@ var prepareClientUser = function (user) {
 
 /* login */
 app.post('/api/login', passport.authenticate('local', {}), function (req, res) {
-		res.json(prepareClientUser(req.user));
+	res.json(prepareClientUser(req.user));
 });
 
 /* logout */
@@ -424,6 +441,9 @@ app.post('/api/admin/:cmd', function (req, res) {
 					});
 					res.json(data);
 				});
+				break;
+			case 'invite.create':
+				res.json({invite: invites.create(1)[0]});
 				break;
 			case 'user':
 				res.json(prepareClientUser(req.user));

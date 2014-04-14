@@ -120,6 +120,17 @@ app.factory('UsersService', function ($resource) {
 	);
 });
 
+app.factory('InvitesService', function ($resource) {
+	'use strict';
+	return $resource('/api/admin/:cmd', {}, {
+			create: {
+				method: 'POST',
+				params: {cmd: 'invite.create'}
+			}
+		}
+	);
+});
+
 app.factory('DocsService', function ($resource) {
 	'use strict';
 	return $resource('/api/admin/:cmd', {}, {

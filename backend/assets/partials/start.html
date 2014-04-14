@@ -15,6 +15,11 @@
     <div ng-show="account.isAdmin" class="col-md-6">
         <h3 translate>Administration</h3>
         <a class="btn btn-default" href="#/users" translate>Manage Users</a>
+        <a class="btn btn-default" href="javascript:;" ng-click="genInvite()" translate>Generate Invite</a>
         <!--<a class="btn btn-default" href="#/admin/groups" translate>Manage Groups</a>-->
     </div>
+</div>
+
+<div ng-if="invite">
+{{invite.invite}}
 </div>

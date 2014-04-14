@@ -67,9 +67,12 @@ app.controller('LoginController', function ($scope, $location, AuthenticationSer
 
 });
 
-app.controller('StartController', function ($scope, AuthenticationService) {
+app.controller('StartController', function ($scope, InvitesService, AuthenticationService) {
 	'use strict';
 	$scope.account = AuthenticationService.user;
+	$scope.genInvite = function() {
+		$scope.invite = InvitesService.create();
+	};
 });
 
 app.controller('UserListController', function ($scope, $state, $modal, AuthenticationService, UsersService) {
@@ -189,14 +192,17 @@ app.controller('UserListController', function ($scope, $state, $modal, Authentic
 });
 
 
-app.controller('DocsController', function ($scope, AuthenticationService) {
+app.controller('InvitesController', function ($scope, InvitesService, AuthenticationService) {
 	'use strict';
 	$scope.account = AuthenticationService.user;
+	$scope.loading = true;
+	$scope.invites = InvitesService.list();
 });
 
 app.controller('DocsListController', function ($scope, $state, $filter, $templateCache, ngTableParams, gettextCatalog, AuthenticationService, DocsService) {
 	'use strict';
 
+	$scope.account = AuthenticationService.user;
 	$scope.loading = true;
 	var data = [];
 	$scope.docs = [];

@@ -11,7 +11,7 @@ var _ = require("underscore");
 
 /* prepare regexp */
 
-module.exports = function(opts){
+module.exports = function (opts) {
 
 	var users = this;
 	var db = new mongojs(opts.db);
@@ -23,7 +23,7 @@ module.exports = function(opts){
 	db.collection("users").ensureIndex("created", {"background": true});
 
 	/* generate password hash */
-	users.password = function(password, opts, callback){
+	users.password = function (password, opts, callback) {
 
 		/* opts is optional */
 		if (typeof callback === "undefined" && typeof opts === "function") {
@@ -41,28 +41,28 @@ module.exports = function(opts){
 		if (!opts.hasOwnProperty("salt")) opts.salt = crypto.randomBytes(128).toString("hex");
 
 		/* set number of iterations to somthing between 10000 and 10999 if none given */
-		if (!opts.hasOwnProperty("iterations")) opts.iterations = (10000+parseInt(crypto.randomBytes(2).toString("hex"),16)%1000);
+		if (!opts.hasOwnProperty("iterations")) opts.iterations = (10000 + parseInt(crypto.randomBytes(2).toString("hex"), 16) % 1000);
 
 		/* derive hash */
-		crypto.pbkdf2(password, opts.salt, opts.iterations, 128, function(err, key){
+		crypto.pbkdf2(password, opts.salt, opts.iterations, 128, function (err, key) {
 			if (err) return callback(err);
-			callback(null, "pbkdf2", key.toString("hex"), opts.salt, opts.iterations, (new Date().getTime())-starttime);
+			callback(null, "pbkdf2", key.toString("hex"), opts.salt, opts.iterations, (new Date().getTime()) - starttime);
 		});
 
 	};
 
 	/* check if user exists */
-	users.check = function(id, callback){
+	users.check = function (id, callback) {
 		id = slugmaker(id);
 		if (cache.hasOwnProperty(id)) return callback(null, true);
-		db.collection("users").find({id: id}, {_id: 1}).limit(1, function(err, result){
+		db.collection("users").find({id: id}, {_id: 1}).limit(1, function (err, result) {
 			if (err) return callback(err);
 			callback(null, (result.length > 0));
 		});
 	};
 
 	/* add a user */
-	users.add = function(user, callback){
+	users.add = function (user, callback) {
 
 		/* set defaults */
 		_.defaults(user, {
@@ -80,37 +80,37 @@ module.exports = function(opts){
 
 		/* unify user id */
 		user.id = slugmaker(user.id);
-		
+
 		/* check email */
 		if (!validator.isEmail(user.email)) return callback(new Error("Email address is invalid"));
 
 		/* generate gravatar hash for email */
 		user.gravatar = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
-		
+
 		// FIXME: check mx for email domain
 
 		/* check url */
-		if (user.url && !user.url.match(/^(http|https|gopher):\/\//)) user.url = "http://"+user.url;
+		if (user.url && !user.url.match(/^(http|https|gopher):\/\//)) user.url = "http://" + user.url;
 		if (user.url && !validator.isURL(user.url, {
-			protocols: ['http','https','gopher'],
+			protocols: ['http', 'https', 'gopher'],
 			require_tld: true,
 			require_protocol: true
 		})) user.url = false;
 
-		users.check(user.id, function(err, exists){
+		users.check(user.id, function (err, exists) {
 			if (err) return callback(err);
 			if (exists) return callback(new Error("User already exists"));
 
 			/* replace password */
-			users.password(user.password, function(err, method, key, salt, it, time){
+			users.password(user.password, function (err, method, key, salt, it, time) {
 
 				if (err) return callback(err);
 
 				user.password = [method, key, salt, it];
 
 				/* insert user to database */
-				db.collection("users").save(user, function(err, result){
-					callback(err,result);
+				db.collection("users").save(user, function (err, result) {
+					callback(err, result);
 				});
 
 			});
@@ -119,18 +119,18 @@ module.exports = function(opts){
 	};
 
 	/* get a user */
-	users.get = function(id, callback){
+	users.get = function (id, callback) {
 		id = slugmaker(id);
 		if (cache.hasOwnProperty(id)) return callback(null, cache[id]);
-		db.collection("users").findOne({id: id}, function(err, result){
+		db.collection("users").findOne({id: id}, function (err, result) {
 			if (err) return callback(err);
 			if (result === null) return callback(new Error("user does not exist"));
 			cache[id] = result;
-			cache["apikey:"+result.apikey] = id;
+			cache["apikey:" + result.apikey] = id;
 			/* fix missing gravatar */
-			if (!result.hasOwnProperty("gravatar")){
+			if (!result.hasOwnProperty("gravatar")) {
 				result.gravatar = crypto.createHash('md5').update(result.email.toLowerCase()).digest('hex');
-				users.update(id, { "email": result.email }, function(err,res){
+				users.update(id, { "email": result.email }, function (err, res) {
 					console.log("HERE!!!", err, res)
 				});
 			}
@@ -139,14 +139,14 @@ module.exports = function(opts){
 	};
 
 	/* check password */
-	users.auth = function(id, pass, callback) {
-		users.get(id, function(err, user){
+	users.auth = function (id, pass, callback) {
+		users.get(id, function (err, user) {
 			if (err) return callback(false);
 			users.password(pass, {
 				method: user.password[0],
 				salt: user.password[2],
 				iterations: user.password[3]
-			}, function(err, method, hash, salt, iterations, time){
+			}, function (err, method, hash, salt, iterations, time) {
 				if (err) return callback(false);
 				if (hash !== user.password[1]) return callback(false);
 				callback(true, user);
@@ -155,14 +155,14 @@ module.exports = function(opts){
 	};
 
 	/* delete user */
-	users.delete = function(id, callback) {
+	users.delete = function (id, callback) {
 		id = slugmaker(id);
-		db.collection("users").remove({id: id}, true, function(err, res){
+		db.collection("users").remove({id: id}, true, function (err, res) {
 			if (err) return callback(err);
 
 			/* remove from cache */
 			if (cache.hasOwnProperty(id)) delete cache[id];
-			Object.keys(cache).forEach(function(k){
+			Object.keys(cache).forEach(function (k) {
 				if ((k.test) && k.test(/^apikey:/) && cache[k] === id) delete cache[k];
 			});
 
@@ -171,14 +171,14 @@ module.exports = function(opts){
 	};
 
 	/* update user */
-	users.update = function(id, user, callback) {
+	users.update = function (id, user, callback) {
 
 		id = slugmaker(id);
 
 		var update = {};
 		if (user.hasOwnProperty("name")) update.name = user.name;
 		if (user.hasOwnProperty("email") && validator.isEmail(user.email)) update.email = user.email;
-		if (user.hasOwnProperty("url") && validator.isURL(user.url, {protocols: ['http','https','gopher'], require_tld: true, require_protocol: true})) update.url = user.url;
+		if (user.hasOwnProperty("url") && validator.isURL(user.url, {protocols: ['http', 'https', 'gopher'], require_tld: true, require_protocol: true})) update.url = user.url;
 		if (user.hasOwnProperty("description")) update.description = user.description;
 		if (user.hasOwnProperty("organisation")) update.organisation = user.organisation;
 		if (user.hasOwnProperty("email")) update.gravatar = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
@@ -186,7 +186,7 @@ module.exports = function(opts){
 		/* check if nothing to update */
 		if (Object.keys(update).length === 0) return callback(null);
 
-		db.collection("users").findAndModify({query:{id: id}, update:{$set:update}, new:true}, function(err, doc){
+		db.collection("users").findAndModify({query: {id: id}, update: {$set: update}, new: true}, function (err, doc) {
 			if (err) return callback(err);
 			cache[id] = doc;
 			callback(err, doc);
@@ -195,11 +195,11 @@ module.exports = function(opts){
 	};
 
 	/* get all users, probably rather not use this */
-	users.list = function(limit, skip, callback) {
+	users.list = function (limit, skip, callback) {
 		/* FIXME: limit and skip are not used */
-		db.collection("users").find(function(err,results){
+		db.collection("users").find(function (err, results) {
 			if (err) return callback(err);
-			results.forEach(function(user){
+			results.forEach(function (user) {
 				cache[user.id] = user;
 			});
 			callback(null, results);
@@ -207,11 +207,11 @@ module.exports = function(opts){
 	};
 
 	/* change password */
-	users.changepass = function(id, password, oldpassword, callback) {
+	users.changepass = function (id, password, oldpassword, callback) {
 		if (typeof oldpassword === "function") {
 			/* just update the password */
-			users.password(password, function(err, method, key, salt, it, time){
-				db.collection("users").update({id: id}, {password: [method, key, salt, it]}, function(err, doc){
+			users.password(password, function (err, method, key, salt, it, time) {
+				db.collection("users").update({id: id}, {password: [method, key, salt, it]}, function (err, doc) {
 					if (err) return callback(err);
 					cache[id] = doc;
 					callback(null);
@@ -219,46 +219,51 @@ module.exports = function(opts){
 			});
 		} else {
 			/* check password first */
-			users.auth(id, password, function(auth){
+			users.auth(id, password, function (auth) {
 				if (!auth) return callback(new Error("could not change password"));
 				users.changepass(id, password, callback);
 			});
 		}
 	};
 
-	/* get user by apikey */
-	users.apikey = function(apikey, callback) {
-		var cacheid = "apikey:"+apikey;
-		if (cache.hasOwnProperty(cacheid)) return users.get(cache[cacheid], callback)
-		db.collection("users").findOne({apikey: apikey}, function(err, result){
+	/* get user by email */
+	users.email = function (email, callback) {
+		db.collection("users").findOne({email: email}, function (err, result) {
 			if (err) return callback(err);
-			if (result === null) return callback(new Error("apikey not exist"));
+			if (result === null) return callback(new Error("email not exist"));
 			cache[result.id] = result;
-			cache[cacheid] = result.id;
 			callback(null, result);
 		});
 	};
 
+	/* set user validated */
+	users.verified = function (user, callback) {
+		db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
+			if (err) return callback(err);
+			callback(err, doc);
+		});
+	};
+
 	/* user testing default user REMOVEME */
-	users.initDefaultAdmin = function() {
-		var defaultuser= {
-			id:'admin',
-			password:'admin',
-			email:'admin@localhost',
+	users.initDefaultAdmin = function () {
+		var defaultuser = {
+			id: 'admin',
+			password: 'admin',
+			email: 'admin@localhost',
 			url: false,
 			description: "",
-			role:'admin',
+			role: 'admin',
 			apikey: crypto.randomBytes(8).toString("hex"),
 			verification: crypto.randomBytes(8).toString("hex"),
-			verified : true,
+			verified: true,
 			created: (new Date())
 		};
-		users.check(defaultuser.id, function(err, exists) {
+		users.check(defaultuser.id, function (err, exists) {
 			if (!exists)
-				users.password(defaultuser.password, function(err, method, key, salt, it, time){
+				users.password(defaultuser.password, function (err, method, key, salt, it, time) {
 					if (err) console.log(err);
 					defaultuser.password = [method, key, salt, it];
-					db.collection("users").save(defaultuser, function(err, result){
+					db.collection("users").save(defaultuser, function (err, result) {
 						console.log(err, result);
 					});
 				});
