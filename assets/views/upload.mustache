@@ -1,28 +1,36 @@
 {{>header}}
-<h1>{{#__}}Upload{{/__}}</h1>
-<p>
-	{{#__}}Lorem Ipsum{{/__}}
-</p>
-<form id="upload" method="post" action="{{{url}}}/api/upload" enctype="multipart/form-data" role="form">
-	<div id="meta">
-		<div class="form-group">
-			<label for="document-topic">{{#__}}Topic{{/__}}</label>
-			<input type="text" class="form-control" id="document-topic" name="topic" placeholder="{{#__}}Topic{{/__}}">
-		</div>
-		<div class="form-group">
-			<label for="document-tags">{{#__}}Tags, separated by comma{{/__}}</label>
-			<input type="text" class="form-control" id="document-tags" name="tags" placeholder="{{#__}}Tags{{/__}}">
-		</div>
-		<div class="form-group">
-			<label for="document-comment">{{#__}}Comment for the review{{/__}}</label>
-			<textarea id="document-comment" name="comment" class="form-control" rows="3"></textarea>
-		</div>
+<div class="container">
+	<div id="headline">
+		<h1>{{#__}}Upload{{/__}}</h1>
 	</div>
-	<div id="drop">
-		<span>{{#__}}Drop files here{{/__}}</span>
-		<a>{{#__}}Choose files{{/__}}</a>
-		<input type="file" name="_upload" multiple />
-	</div>
-	<ul></ul>
-</form>
+	<p>
+		{{#__}}Lorem Ipsum{{/__}}
+	</p>
+	<form id="upload" method="post" action="{{{url}}}/api/upload" enctype="multipart/form-data" role="form">
+		<div class="row">
+			<div id="meta" class="col-md-6">
+				<div class="form-group">
+					<label for="document-topic">{{#__}}Topic{{/__}}</label>
+					<input type="text" class="form-control" id="document-topic" name="topic" placeholder="{{#__}}Topic{{/__}}">
+				</div>
+				<div class="form-group">
+					<label for="document-tags">{{#__}}Tags, separated by comma{{/__}}</label>
+					<input type="text" class="form-control" id="document-tags" name="tags" placeholder="{{#__}}Tags{{/__}}">
+				</div>
+				<div class="form-group">
+					<label for="document-comment">{{#__}}Comment for the review{{/__}}</label>
+					<textarea id="document-comment" name="comment" class="form-control" rows="3"></textarea>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div id="drop">
+					<span>{{#__}}Drop files here{{/__}}</span>
+					<a>{{#__}}Choose files{{/__}}</a>
+					<input type="file" name="_upload" multiple />
+				</div>
+				<ul></ul>
+			</div>
+		</div>
+	</form>
+</div>
 {{>footer}}
