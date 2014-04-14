@@ -6,8 +6,8 @@ var fs = require("fs");
 /* get local modules */
 var keygen = require("./invitekeygen");
 
-module.exports = function(invitefile) {
-	
+module.exports = invites = function(invitefile) {
+		
 	var invites = this;
 	var codes = {};
 	
