@@ -1,0 +1,30 @@
+{{>header}}
+<div class="container">
+	{{#profile}}
+	<div class="row">
+		<div class="col-md-3">
+			<div itemtype="http://schema.org/Person" itemscope="" class="vcard">
+				<img src="//www.gravatar.com/avatar/{{gravatar}}.png?s=460&amp;d=mm&amp;r=pg" width="230" height="230">
+				
+				<h1 class="vcard-names">
+					<span itemprop="name" class="vcard-fullname">{{name}}</span>
+					<span itemprop="additionalName" class="vcard-username">{{id}}</span>
+				</h1>
+				
+				<p>{{description}}</p>
+
+				<ul class="vcard-details">
+					<li itemprop="worksFor">{{location}}</li>
+					<li itemprop="worksFor">{{organisation}}</li>
+					<li itemprop="url"><a rel="nofollow" href="{{url}}">{{url}}</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-md-9">
+			Whatever. 
+			<strong>FIXME: make this look nice and add infos</strong>
+		</div>
+	</div>
+	{{/profile}}
+</div>
+{{>footer}}

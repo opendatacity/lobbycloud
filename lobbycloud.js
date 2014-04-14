@@ -212,6 +212,26 @@ app.post('/beta', function (req, res) {
 	});
 });
 
+/* profile */
+app.get('/profile', function (req, res) {
+	res.render('profile', {
+		"_user": prepareClientUser(req.user),
+		"url": config.url,
+		"profile": prepareClientUser(req.user)
+	});
+});
+
+/* user profile */
+app.get('/profile/:user', function (req, res) {
+	users.get(req.param("user"), function(err, profile){
+		res.render('profile', {
+			"_user": prepareClientUser(req.user),
+			"url": config.url,
+			"profile": ((profile) ? prepareClientUser(profile) : null)
+		});
+	});
+});
+
 /* upload */
 app.get('/upload', function (req, res) {
 	res.render('upload', {
