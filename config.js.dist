@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 module.exports = {
 
+	/* be verbose about stuff */
+	debug: false,
+
 	/* mongodb config */
 	db: "lobbycloud",
 	
