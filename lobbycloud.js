@@ -99,7 +99,7 @@ var app = express();
 app.configure(function () {
 
 	/* user logger */
-	app.use(express.logger('dev'));
+	// app.use(express.logger("dev"));
 
 	/* enable compression */
 	app.use(express.compress());
