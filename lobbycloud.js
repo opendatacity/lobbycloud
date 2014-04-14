@@ -161,7 +161,7 @@ app.configure(function () {
 /* routes */
 app.get('/', function (req, res) {
 	res.render('index', {
-		"_user": req.user,
+		"_user": prepareClientUser(req.user),
 		"url": config.url
 	});
 });
@@ -215,7 +215,7 @@ app.post('/beta', function (req, res) {
 /* upload */
 app.get('/upload', function (req, res) {
 	res.render('upload', {
-		"_user": req.user,
+		"_user": prepareClientUser(req.user),
 		"headers": {
 			"upload": true
 		},
@@ -341,14 +341,18 @@ app.get('/logout', function (req, res) {
 });
 
 var prepareClientUser = function (user) {
+	/* FIXME: put this into modules/users.js */
+	if (!user) return null;
 	return {
 		id: user.id,
 		name: user.name,
 		role: user.role,
 		email: user.email,
+		gravatar: user.gravatar,
 		url: user.url,
 		description: user.description,
 		organisation: user.organisation,
+		location: user.location,
 		verified: user.verified,
 		created: user.created
 	}
