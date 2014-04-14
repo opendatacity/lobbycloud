@@ -438,8 +438,7 @@ if (config.listen.hasOwnProperty("socket")) {
 		console.log("unlinking old socket");
 		fs.unlinkSync(config.listen.socket);
 	}
-	;
-	app.listen(config.listen.socket, function () {
+	app.__server = app.listen(config.listen.socket, function () {
 		if (mask) {
 			process.umask(mask);
 			mask = null;
@@ -447,11 +446,11 @@ if (config.listen.hasOwnProperty("socket")) {
 		console.log("server listening on socket", config.listen.socket);
 	});
 } else if (config.listen.hasOwnProperty("host")) {
-	app.listen(config.listen.port, config.listen.host, function () {
+	app.__server = app.listen(config.listen.port, config.listen.host, function () {
 		console.log("server listening on", [config.listen.host, config.listen.port].join(":"));
 	});
 } else {
-	app.listen(config.listen.port, function () {
+	app.__server = app.listen(config.listen.port, function () {
 		console.log("server listening on", ["*", config.listen.port].join(":"));
 	});
 }
@@ -461,7 +460,7 @@ process.on("exit", function () {
 	db.close(function () {
 		console.log("database connection closed.")
 	});
-	app.close(function () {
+	app.__server.close(function () {
 		console.log("socket closed.")
 	});
 });
