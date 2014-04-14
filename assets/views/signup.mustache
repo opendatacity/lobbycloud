@@ -84,6 +84,9 @@
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3 white-box">
 			<h2>{{#__}}Ready to sign you up!{{/__}}</h2>
+			{{#message}}
+			<div class="alert alert-danger">{{message}}</div>
+			{{/message}}
 			<form action="{{{url}}}/signup" method="post" role="form">
 				<fieldset>
 					<div class="form-group">
@@ -91,38 +94,49 @@
 						<input type="text" name="invite" class="form-control" id="invite" value="{{invite}}" placeholder="{{#__}}Your beta invite key{{/__}}">
 					</div>
 				</fieldset>
+				{{#form}}
 				<fieldset>
 					<div class="form-group">
-						<label for="id">{{#__}}Username{{/__}}</label>
-						<input type="text" name="id" class="form-control" id="id" placeholder="{{#__}}Username{{/__}}">
+						<label for="username">{{#__}}Username{{/__}}</label>
+						<input type="text" name="username" class="form-control" id="username" value="{{username}}" placeholder="{{#__}}Username{{/__}}">
 					</div>
 					<div class="form-group">
 						<label for="email">{{#__}}Email address{{/__}}</label>
-						<input type="email" name="email" class="form-control" id="email" placeholder="{{#__}}Enter your email address{{/__}}">
+						<input type="email" name="email" class="form-control" id="email" value="{{email}}" placeholder="{{#__}}Enter your email address{{/__}}">
 					</div>
 					<div class="form-group">
-						<label for="pass">{{#__}}Pick a strong password{{/__}}</label>
-						<input type="password" name="pass" class="form-control strengthometer" id="pass" placeholder="">
+						<label for="password">{{#__}}Pick a strong password{{/__}}</label>
+						<input type="password" name="password" class="form-control strengthometer" id="password" placeholder="{{#__}}Password{{/__}}">
 					</div>
 					<div class="form-group">
-						<label for="pass2">{{#__}}Repeat your chosen password for verification{{/__}}</label>
-						<input type="password" name="pass2" class="form-control" id="pass2" placeholder="">
+						<label for="password-verify">{{#__}}Repeat your chosen password for verification{{/__}}</label>
+						<input type="password" name="password-verify" class="form-control" id="password-verify" placeholder="{{#__}}Retype Password{{/__}}">
 					</div>
 				</fieldset>
 				<fieldset>
 					<div class="form-group">
 						<label for="name">{{#__}}Your name{{/__}}</label>
-						<input type="text" name="name" class="form-control" id="name" placeholder="{{#__}}Enter your name{{/__}}">
+						<input type="text" name="name" class="form-control" id="name" value="{{name}}" placeholder="{{#__}}Enter your name{{/__}}">
 					</div>
 					<div class="form-group">
-						<label for="organization">{{#__}}Your organization{{/__}} ({{#__}}optional{{/__}})</label>
-						<input type="text" name="organization" class="form-control" id="organization" placeholder="{{#__}}Your organization{{/__}}">
+						<label for="location">{{#__}}Your location{{/__}} ({{#__}}optional{{/__}})</label>
+						<input type="text" name="location" class="form-control" id="location" value="{{location}}" placeholder="{{#__}}Your location{{/__}}">
+					</div>
+					<div class="form-group">
+						<label for="organisation">{{#__}}Your organisation{{/__}} ({{#__}}optional{{/__}})</label>
+						<input type="text" name="organisation" class="form-control" id="organisation" value="{{organisation}}" placeholder="{{#__}}Your organisation{{/__}}">
 					</div>
 					<div class="form-group">
 						<label for="description">{{#__}}Description{{/__}} ({{#__}}optional{{/__}})</label>
-						<textarea class="form-control" rows="3" name="description" id="description" placeholder="{{#__}}Description{{/__}}"></textarea>
+						<textarea class="form-control" rows="3" name="description" id="description" placeholder="{{#__}}Description{{/__}}">{{description}}</textarea>
+					</div>
+					<div class="form-group">
+						<label for="website">{{#__}}Website{{/__}} ({{#__}}optional{{/__}})</label>
+						<input type="text" name="website" class="form-control" id="website" value="{{website}}" placeholder="{{#__}}Your website{{/__}}">
 					</div>
 				</fieldset>
+				{{/form}}
+				<input type="hidden" name="submit" value="1">
 				<button type="submit" class="btn btn-primary">{{#__}}Sign up!{{/__}}</button>
 			</form>
 		</div>
