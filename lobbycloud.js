@@ -25,8 +25,8 @@ var config = require(path.resolve(__dirname, "config.js"), 20);
 var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 
 /* require local modules */
-var invites = require("./modules/invites")(path.resolve(__dirname, config.invitedb));
-var users = require("./modules/users")({db: config.db});
+var invites = new (require("./modules/invites"))(path.resolve(__dirname, config.invitedb));
+var users = new (require("./modules/users"))({db: config.db});
 
 /* mockup docs */
 var mockupdocs = require('./modules/mockdocs')();
