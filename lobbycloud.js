@@ -359,12 +359,9 @@ var prepareClientUser = function (user) {
 };
 
 /* login */
-app.post('/api/login',
-	passport.authenticate('local', {}),
-	function (req, res) {
+app.post('/api/login', passport.authenticate('local', {}), function (req, res) {
 		res.json(prepareClientUser(req.user));
-	}
-);
+});
 
 /* logout */
 app.post('/api/logout', function (req, res) {
@@ -375,7 +372,6 @@ app.post('/api/logout', function (req, res) {
 });
 
 /* protected backend api */
-
 app.post('/api/admin/:cmd', function (req, res) {
 	if ((!req.user) || (req.user.role !== 'admin')) {
 		res.send(401);
@@ -428,7 +424,6 @@ app.post('/api/admin/:cmd', function (req, res) {
 		}
 	}
 });
-
 
 /* default */
 app.all('*', function (req, res) {
