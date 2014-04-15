@@ -68,5 +68,8 @@
 	"Website": "Website",
 	"Your website": "Your website",
 	"Mail queued. Please wait a moment and check your e-mail inbox.": "Mail wird versandt. Bitte einen Moment warten und das E-Mail-Konto prüfen.",
-	"[LobbyCloud] Please verify your email '%s'": "[LobbyCloud] Bitte bestätige die E-Mail-Adresse '%s'"
+	"[LobbyCloud] Please verify your email '%s'": "[LobbyCloud] Bitte bestätige die E-Mail-Adresse '%s'",
+	"Last validation Mail sent too soon, please wait.": "Die letzte Bestätigungsmail wurde gerade erst versandt. Bitte einen Augenblick warten.",
+	"Link expired, invalid or does not exists.": "Link ist abgelaufen, ungültig oder existiert nicht.",
+	"Internal Error :(": "Interner Fehler :("
 }

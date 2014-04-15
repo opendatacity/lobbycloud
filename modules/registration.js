@@ -7,9 +7,8 @@ var async = require("async");
 var fs = require("fs");
 var crypto = require("crypto");
 var mustache = require("mustache");
-var i18n = require("i18n");
 
-module.exports = registration = function (users, config, url) {
+module.exports = registration = function (users, config, url, i18n) {
 
 	var transport = nodemailer.createTransport(config.transport.name, config.transport);
 
@@ -17,7 +16,7 @@ module.exports = registration = function (users, config, url) {
 	var tasks = [];
 
 	fs.exists(config.dbfile, function (ex) {
-		if (ex) codes = JSON.parse(fs.readFileSync(config.dbfile));
+		if (ex) tasks = JSON.parse(fs.readFileSync(config.dbfile));
 	});
 
 	var emailbodies = {
@@ -99,7 +98,7 @@ module.exports = registration = function (users, config, url) {
 		cb(null, i18n.__("Mail queued. Please wait a moment and check your e-mail inbox."));
 	};
 
-	registration.pull = function (linkkey, cb) {
+	registration.verify = function (linkkey, cb) {
 		registration.cleanup();
 		var task = tasks.filter(function (t) {
 			return t.linkkey === linkkey;
@@ -107,11 +106,13 @@ module.exports = registration = function (users, config, url) {
 		if (!task) {
 			return cb(new Error(i18n.__("Link expired, invalid or does not exists.")));
 		}
-		tasks.remove(tasks.indexOf(task));
 		users.get(task.id, function (err, user) {
 			if (err || (!user)) return cb(new Error(i18n.__("Link invalid, did you change your email adress?")));
-			users.verified(user, function (err) {
-				cb(new Error(i18n.__("Internal Error")));
+			users.verified(user, function (err, user) {
+				if (err) return cb(new Error(i18n.__("Internal Error :(")));
+				tasks.splice(tasks.indexOf(task), 1);
+				registration.save();
+				cb(null, user);
 			});
 		});
 	};

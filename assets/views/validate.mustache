@@ -1,14 +1,19 @@
 {{>header}}
 <div class="container">
-	{{#err}}
-        <div class="alert alert-danger">
-			{{err}}
+    <div class="row">
+        <div class="col-md-12">
+			<br />
+			{{#err}}
+                <div class="alert alert-danger">
+					{{err}}
+                </div>
+			{{/err}}
+			{{#user}}
+                <div class="alert alert-success">
+                    Thank you. Your email adress is now validated.
+                </div>
+			{{/user}}
         </div>
-	{{/err}}
-	{{#result}}
-        <div class="alert alert-success">
-            Thank you. Your email adress is now validated.
-        </div>
-	{{/result}}
+    </div>
 </div>
 {{>footer}}

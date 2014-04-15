@@ -230,10 +230,10 @@ module.exports = function (opts) {
 	};
 
 	/* get user by apikey */
-	users.apikey = function(apikey, callback) {
-		var cacheid = "apikey:"+apikey;
+	users.apikey = function (apikey, callback) {
+		var cacheid = "apikey:" + apikey;
 		if (cache.hasOwnProperty(cacheid)) return users.get(cache[cacheid], callback)
-		db.collection("users").findOne({apikey: apikey}, function(err, result){
+		db.collection("users").findOne({apikey: apikey}, function (err, result) {
 			if (err) return callback(err);
 			if (result === null) return callback(new Error("apikey not exist"));
 			cache[result.id] = result;
@@ -258,6 +258,14 @@ module.exports = function (opts) {
 			verified: user.verified,
 			created: user.created
 		}
+	};
+
+	/* set user validated */
+	users.verified = function (user, callback) {
+		db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
+			if (err) return callback(err);
+			callback(err, doc);
+		});
 	};
 
 	/* user testing default user REMOVEME */

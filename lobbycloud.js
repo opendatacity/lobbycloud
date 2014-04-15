@@ -27,7 +27,7 @@ var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 /* require local modules */
 var invites = new (require("./modules/invites"))(path.resolve(__dirname, config.invitedb));
 var users = new (require("./modules/users"))({db: config.db});
-var registration = new (require("./modules/registration"))(users, config.registration, config.url);
+var registration = new (require("./modules/registration"))(users, config.registration, config.url, i18n);
 
 /* mockup docs */
 var mockupdocs = require('./modules/mockdocs')();
@@ -387,7 +387,7 @@ app.post('/api/registration/request', function (req, res) {
 	// only logged-in users may request a confirmation mail
 	if (!req.user) return res.send(401);
 	/* send validation email */
-	registration.send(req.user, function(err,result){
+	registration.send(req.user, function (err, result) {
 		if (err) res.send(400, err);
 		else res.send(result);
 	});
@@ -396,7 +396,7 @@ app.post('/api/registration/request', function (req, res) {
 /* check validation e-mail key */
 app.get('/users/emails/confirm_verification/:key', function (req, res) {
 	if (!req.param("key")) return res.send(400);
-	registration.verify(req.param.key, function(err,user){
+	registration.verify(req.params.key, function (err, user) {
 		res.render('validate', {
 			"headers": {
 				"validate": true
