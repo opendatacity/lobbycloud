@@ -6,7 +6,6 @@
 	"dependencies": {
 		"express": ">= 3.5.1",
 		"sqlite3": ">= 2.2.0",
-		"mustache": ">= 0.8.1",
 		"mustache-express": ">= 1.0.1",
 		"filedump": ">= 0.0.3",
 		"pdfinfojs": ">= 0.3.5",
@@ -21,9 +20,9 @@
 		"underscore": ">= 1.6.0",
 		"passport": ">= 0.2.0",
 		"passport-local": ">= 1.0.0",
-		"connect-mongo": ">= 0.4.0",
 		"nodemailer": ">= 0.6.2",
-		"async":">= 0.7.0"
+		"async":">= 0.7.0",
+		"connect-mongo": ">= 0.4.0"
 	},
 	"engines": {
 		"node": "0.10.26"
