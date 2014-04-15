@@ -7,6 +7,15 @@ module.exports = {
 	/* mongodb config */
 	db: "lobbycloud",
 	
+	/* elasticsearch config */
+	elasticsearch: {
+		index: "lobbycloud",
+		connect: {
+			log: "trace",
+			host: "localhost:9200"
+		}
+	},
+	
 	/* folder where document files are stored */
 	storage: "storage",
 
