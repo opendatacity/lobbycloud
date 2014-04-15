@@ -1,0 +1,14 @@
+{{>header}}
+<div class="container">
+	{{#err}}
+        <div class="alert alert-danger">
+			{{err}}
+        </div>
+	{{/err}}
+	{{#result}}
+        <div class="alert alert-success">
+            Thank you. Your email adress is now validated.
+        </div>
+	{{/result}}
+</div>
+{{>footer}}

@@ -27,7 +27,7 @@ var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 /* require local modules */
 var invites = new (require("./modules/invites"))(path.resolve(__dirname, config.invitedb));
 var users = new (require("./modules/users"))({db: config.db});
-var registration = new (require("./modules/registration"))(users, config.registration);
+var registration = new (require("./modules/registration"))(users, config.registration, config.url);
 
 /* mockup docs */
 var mockupdocs = require('./modules/mockdocs')();
@@ -162,7 +162,7 @@ app.configure(function () {
 /* routes */
 app.get('/', function (req, res) {
 	res.render('index', {
-		"_user": prepareClientUser(req.user),
+		"_user": users.prepareClientUser(req.user),
 		"url": config.url
 	});
 });
@@ -170,7 +170,7 @@ app.get('/', function (req, res) {
 /* frontend login & logout */
 app.get('/login', function (req, res) {
 	res.render('login', {
-		"_user": prepareClientUser(req.user),
+		"_user": users.prepareClientUser(req.user),
 		"url": config.url
 	});
 });
@@ -195,7 +195,7 @@ app.all('/signup/:invite?', function (req, res) {
 
 	var _form = function (message) {
 		res.render('signup', {
-			"_user": prepareClientUser(req.user),
+			"_user": users.prepareClientUser(req.user),
 			"headers": {
 				"signup": true
 			},
@@ -259,9 +259,9 @@ app.post('/beta', function (req, res) {
 /* profile */
 app.get('/profile', function (req, res) {
 	res.render('profile', {
-		"_user": prepareClientUser(req.user),
+		"_user": users.prepareClientUser(req.user),
 		"url": config.url,
-		"profile": prepareClientUser(req.user),
+		"profile": users.prepareClientUser(req.user),
 		"headers": {
 			"profile": true
 		}
@@ -272,9 +272,9 @@ app.get('/profile', function (req, res) {
 app.get('/profile/:user', function (req, res) {
 	users.get(req.param("user"), function (err, profile) {
 		res.render('profile', {
-			"_user": prepareClientUser(req.user),
+			"_user": users.prepareClientUser(req.user),
 			"url": config.url,
-			"profile": ((profile) ? prepareClientUser(profile) : null),
+			"profile": ((profile) ? users.prepareClientUser(profile) : null),
 			"headers": {
 				"profile": true
 			}
@@ -285,7 +285,7 @@ app.get('/profile/:user', function (req, res) {
 /* upload */
 app.get('/upload', function (req, res) {
 	res.render('upload', {
-		"_user": prepareClientUser(req.user),
+		"_user": users.prepareClientUser(req.user),
 		"headers": {
 			"upload": true
 		},
@@ -382,13 +382,29 @@ app.get('/api/test/invites/:create?', function (req, res) {
 	res.json(invites.all());
 });
 
+/* manual validation e-mail request */
 app.post('/api/registration/request', function (req, res) {
 	// only logged-in users may request a confirmation mail
 	if (!req.user) return res.send(401);
 	/* send validation email */
 	registration.send(req.user, function(err,result){
-		if (err) res.send(400,err);
+		if (err) res.send(400, err);
 		else res.send(result);
+	});
+});
+
+/* check validation e-mail key */
+app.get('/users/emails/confirm_verification/:key', function (req, res) {
+	if (!req.param("key")) return res.send(400);
+	registration.verify(req.param.key, function(err,user){
+		res.render('validate', {
+			"headers": {
+				"validate": true
+			},
+			"url": config.url,
+			"err": err,
+			"user": user
+		});
 	});
 });
 
@@ -397,27 +413,10 @@ app.get('/api/whatever', function (req, res) {
 	res.json("not implemented");
 });
 
-var prepareClientUser = function (user) {
-	/* FIXME: put this into modules/users.js */
-	if (!user) return null;
-	return {
-		id: user.id,
-		name: user.name,
-		role: user.role,
-		email: user.email,
-		gravatar: user.gravatar,
-		url: user.url,
-		description: user.description,
-		organisation: user.organisation,
-		location: user.location,
-		verified: user.verified,
-		created: user.created
-	}
-};
 
 /* login */
 app.post('/api/login', passport.authenticate('local', {}), function (req, res) {
-	res.json(prepareClientUser(req.user));
+	res.json(users.prepareClientUser(req.user));
 });
 
 /* logout */
@@ -437,7 +436,7 @@ app.post('/api/admin/:cmd', function (req, res) {
 			case 'users':
 				users.list(null, null, function (err, data) {
 					var data = data.map(function (user) {
-						return prepareClientUser(user);
+						return users.prepareClientUser(user);
 					});
 					res.json(data);
 				});
@@ -446,7 +445,7 @@ app.post('/api/admin/:cmd', function (req, res) {
 				res.json({invite: invites.create(1)[0]});
 				break;
 			case 'user':
-				res.json(prepareClientUser(req.user));
+				res.json(users.prepareClientUser(req.user));
 				break;
 			case 'docs':
 				mockupdocs.listDocs(function (err, data) {
@@ -462,7 +461,7 @@ app.post('/api/admin/:cmd', function (req, res) {
 				users.add(req.body.user, function (err, user) {
 					if ((!user) && (!err)) err = 'Unknown Error';
 					if (err || (!user)) return res.send(400, err.toString());
-					res.json(prepareClientUser(user));
+					res.json(users.prepareClientUser(user));
 				});
 				break;
 			case 'users.update':
@@ -474,7 +473,7 @@ app.post('/api/admin/:cmd', function (req, res) {
 					users.update(req.body.id, req.body.user, function (err, user) {
 						if ((!user) && (!err)) err = 'Unknown Error';
 						if (err || (!user)) return res.send(400, err.toString());
-						res.json(prepareClientUser(user));
+						res.json(users.prepareClientUser(user));
 					});
 				});
 				break;

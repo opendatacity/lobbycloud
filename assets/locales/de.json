@@ -66,5 +66,7 @@
 	"Retype Password": "Retype Password",
 	"Your location": "Your location",
 	"Website": "Website",
-	"Your website": "Your website"
+	"Your website": "Your website",
+	"Mail queued. Please wait a moment and check your e-mail inbox.": "Mail wird versandt. Bitte einen Moment warten und das E-Mail-Konto prüfen.",
+	"[LobbyCloud] Please verify your email '%s'": "[LobbyCloud] Bitte bestätige die E-Mail-Adresse '%s'"
 }

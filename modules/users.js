@@ -181,7 +181,10 @@ module.exports = function (opts) {
 		if (user.hasOwnProperty("url") && validator.isURL(user.url, {protocols: ['http', 'https', 'gopher'], require_tld: true, require_protocol: true})) update.url = user.url;
 		if (user.hasOwnProperty("description")) update.description = user.description;
 		if (user.hasOwnProperty("organisation")) update.organisation = user.organisation;
-		if (user.hasOwnProperty("email")) update.gravatar = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
+		if (user.hasOwnProperty("email")) {
+			update.gravatar = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
+			update.verified = false;
+		}
 
 		/* check if nothing to update */
 		if (Object.keys(update).length === 0) return callback(null);
@@ -213,7 +216,7 @@ module.exports = function (opts) {
 			users.password(password, function (err, method, key, salt, it, time) {
 				db.collection("users").update({id: id}, {password: [method, key, salt, it]}, function (err, doc) {
 					if (err) return callback(err);
-					cache[id] = doc;
+					cache[id] = doc; //FIXME: ACHTUNG, ACHTUNG, ACHTUNG: collection.update does NOT return the changed doc
 					callback(null);
 				});
 			});
@@ -226,22 +229,35 @@ module.exports = function (opts) {
 		}
 	};
 
-	/* get user by email */
-	users.email = function (email, callback) {
-		db.collection("users").findOne({email: email}, function (err, result) {
+	/* get user by apikey */
+	users.apikey = function(apikey, callback) {
+		var cacheid = "apikey:"+apikey;
+		if (cache.hasOwnProperty(cacheid)) return users.get(cache[cacheid], callback)
+		db.collection("users").findOne({apikey: apikey}, function(err, result){
 			if (err) return callback(err);
-			if (result === null) return callback(new Error("email not exist"));
+			if (result === null) return callback(new Error("apikey not exist"));
 			cache[result.id] = result;
+			cache[cacheid] = result.id;
 			callback(null, result);
 		});
 	};
 
-	/* set user validated */
-	users.verified = function (user, callback) {
-		db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
-			if (err) return callback(err);
-			callback(err, doc);
-		});
+	/* strips down user obj to values needed by ui */
+	users.prepareClientUser = function (user) {
+		if (!user) return null;
+		return {
+			id: user.id,
+			name: user.name,
+			role: user.role,
+			email: user.email,
+			gravatar: user.gravatar,
+			url: user.url,
+			description: user.description,
+			organisation: user.organisation,
+			location: user.location,
+			verified: user.verified,
+			created: user.created
+		}
 	};
 
 	/* user testing default user REMOVEME */
