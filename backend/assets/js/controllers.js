@@ -7,6 +7,7 @@ app.controller('BodyController', function ($scope, $state, $location, $window, A
 
 	gettextCatalog.debug = false;
 
+	$scope.accessLevels = routingConfig.accessLevels;
 	$scope.setLang = function (lng, noreload) {
 		$window.moment.lang(lng.substr(0, 2));
 		gettextCatalog.currentLanguage = lng;
@@ -24,8 +25,8 @@ app.controller('BodyController', function ($scope, $state, $location, $window, A
 		return AuthenticationService.isLoggedIn();
 	};
 
-	$scope.isAdmin = function () {
-		return AuthenticationService.isAdmin();
+	$scope.access = function (level) {
+		return AuthenticationService.authorize(level);
 	};
 
 	$scope.isActive = function (viewLocation) {
@@ -129,7 +130,6 @@ app.controller('UserListController', function ($scope, $state, $modal, Authentic
 
 	$scope.editUserDialog = function (org_user) {
 		var user = org_user ? angular.copy(org_user) : {role: AuthenticationService.userRoles.user.title, create: true};
-		user.role = AuthenticationService.userRoles[user.role];
 		if (!user.url)
 			user.url = null;
 		var modalInstance = $modal.open({
@@ -137,8 +137,9 @@ app.controller('UserListController', function ($scope, $state, $modal, Authentic
 			controller: function ($scope, $modalInstance, user, AuthenticationService) {
 
 				$scope.user = user;
-				$scope.userRoles = [AuthenticationService.userRoles.user, AuthenticationService.userRoles.admin];
-
+				$scope.userRoles = AuthenticationService.userRolesList;
+				console.log(AuthenticationService.userRoles);
+				console.log(AuthenticationService.userRolesList);
 				$scope.ok = function (form) {
 					if (form.$valid)
 						$modalInstance.close($scope.user);
@@ -156,7 +157,6 @@ app.controller('UserListController', function ($scope, $state, $modal, Authentic
 		});
 
 		modalInstance.result.then(function (user) {
-			user.role = user.role.title;
 			updateUser(user, org_user);
 		}, function () {
 //			$log.info('Modal dismissed at: ' + new Date());

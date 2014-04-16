@@ -1,1 +1,11 @@
-{}
+{
+	"Mail queued. Please wait a moment and check your e-mail inbox": "Mail queued. Please wait a moment and check your e-mail inbox",
+	"[LobbyCloud] Please verify your email '%s'": "[LobbyCloud] Please verify your email '%s'",
+	"Link expired, invalid or does not exists": "Link expired, invalid or does not exists",
+	"[LobbyCloud] Password reset": "[LobbyCloud] Password reset",
+	"Last mail sent too soon, please wait": "Last mail sent too soon, please wait",
+	"Please pick a password": "Please pick a password",
+	"Your passwords don't match": "Your passwords don't match",
+	"Your passwords has been changed": "Your passwords has been changed",
+	"Password successfully changed.": "Password successfully changed."
+}

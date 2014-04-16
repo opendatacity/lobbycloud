@@ -20,29 +20,36 @@
             </div>
             <div class="form-group col-sm-2">
                 <label translate>Role</label>
-                <select ng-model="user.role" class="form-control" ng-options="c.title for c in userRoles" required></select>
+                <select ng-model="user.role" class="form-control" ng-options="c for c in userRoles" required></select>
             </div>
         </div>
 
         <div class="row">
             <div class="form-group col-sm-6">
                 <label translate>Full Name</label>
-                <input type="text" class="form-control" placeholder="{{'Enter name'|translate}}" ng-model="user.name">
+                <input type="text" class="form-control" placeholder="{{'Name'|translate}}" ng-model="user.name">
             </div>
             <div class="form-group col-sm-6">
                 <label translate>Organisation</label>
-                <input type="text" class="form-control" placeholder="{{'Enter organisation'|translate}}" ng-model="user.organisation">
+                <input type="text" class="form-control" placeholder="{{'Organisation'|translate}}" ng-model="user.organisation">
             </div>
         </div>
 
         <div class="row">
             <div class="form-group col-sm-6">
                 <label translate>Email</label>
-                <input type="email" class="form-control" placeholder="{{'Enter email adress'|translate}}" ng-model="user.email" required>
+                <input type="email" class="form-control" placeholder="{{'Email adress'|translate}}" ng-model="user.email" required>
             </div>
             <div class="form-group col-sm-6">
                 <label translate>Website</label>
-                <input type="url" class="form-control" placeholder="{{'Enter website url'|translate}}" ng-model="user.url">
+                <input type="url" class="form-control" placeholder="{{'Website URL'|translate}}" ng-model="user.url">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-sm-6">
+                <label translate>Location</label>
+                <input type="url" class="form-control" placeholder="{{'Location'|translate}}" ng-model="user.url">
             </div>
         </div>
 

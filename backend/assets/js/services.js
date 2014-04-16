@@ -9,11 +9,10 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 		cookieUser = $cookieStore.get(cookieName),
 		accessLevels = routingConfig.accessLevels,
 		userRoles = routingConfig.userRoles,
+		userRoleList = routingConfig.userRoleList,
 		currentUser = cookieUser || { username: '', role: userRoles.public };
 
-
 	function changeUser(user) {
-		user.isAdmin = user.role.title === userRoles.admin.title;
 		$cookieStore.put(cookieName, user);
 		angular.extend(currentUser, user);
 	}
@@ -40,20 +39,8 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 			}
 			return user.role.title === userRoles.user.title || user.role.title === userRoles.admin.title;
 		},
-		isAdmin: function (user) {
-			if (user === undefined) {
-				user = currentUser;
-			}
-			return user.role.title === userRoles.admin.title;
-		},
-		register: function (user, success, error) {
-			$http.post('/api/register', user).success(function (res) {
-				changeUser(res);
-				success();
-			}).error(error);
-		},
 		check: function (success, error) {
-			$http.post('/api/admin/user')
+			$http.post('/api/backend/user')
 				.success(function (user) {
 					setCurrentUser(user);
 					success(user);
@@ -62,7 +49,7 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 				});
 		},
 		login: function (user, success, error) {
-			$http.post('/api/login', user)
+			$http.post('/api/backend/login', user)
 				.success(function (user) {
 					setCurrentUser(user);
 					success(user);
@@ -71,7 +58,7 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 				});
 		},
 		logout: function (success, error) {
-			$http.post('/api/logout').success(function () {
+			$http.post('/api/backend/logout').success(function () {
 				changeUser({
 					username: '',
 					role: userRoles.public
@@ -92,13 +79,14 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 		},
 		accessLevels: accessLevels,
 		userRoles: userRoles,
+		userRolesList: userRoleList,
 		user: currentUser
 	};
 });
 
 app.factory('UsersService', function ($resource) {
 	'use strict';
-	return $resource('/api/admin/:cmd', {}, {
+	return $resource('/api/backend/:cmd', {}, {
 			users: {
 				method: 'POST',
 				params: {cmd: 'users'},
@@ -122,7 +110,7 @@ app.factory('UsersService', function ($resource) {
 
 app.factory('InvitesService', function ($resource) {
 	'use strict';
-	return $resource('/api/admin/:cmd', {}, {
+	return $resource('/api/backend/:cmd', {}, {
 			create: {
 				method: 'POST',
 				params: {cmd: 'invite.create'}
@@ -133,7 +121,7 @@ app.factory('InvitesService', function ($resource) {
 
 app.factory('DocsService', function ($resource) {
 	'use strict';
-	return $resource('/api/admin/:cmd', {}, {
+	return $resource('/api/backend/:cmd', {}, {
 			list: {
 				method: 'POST',
 				params: {cmd: 'docs'},

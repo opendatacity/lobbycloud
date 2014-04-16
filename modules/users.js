@@ -22,6 +22,12 @@ module.exports = function (opts, mailqueue, i18n) {
 	db.collection("users").ensureIndex("apikey", {"unique": true, "background": true});
 	db.collection("users").ensureIndex("created", {"background": true});
 
+	users.roles = {
+		admin:"admin",
+		user:"user",
+		editor:"editor"
+	};
+
 	/* generate password hash */
 	users.password = function (password, opts, callback) {
 
@@ -67,7 +73,7 @@ module.exports = function (opts, mailqueue, i18n) {
 		/* set defaults */
 		_.defaults(user, {
 			name: user.id,
-			url: false,
+			url: null,
 			role: "user",
 			description: "",
 			location: "",
@@ -171,30 +177,42 @@ module.exports = function (opts, mailqueue, i18n) {
 	};
 
 	/* update user */
-	users.update = function (id, user, callback) {
+	users.update = function (id, user, accessrole, callback) {
 
-		id = slugmaker(id);
+		var id = slugmaker(id);
 
 		var update = {};
 		if (user.hasOwnProperty("name")) update.name = user.name;
 		if (user.hasOwnProperty("email") && validator.isEmail(user.email)) update.email = user.email;
 		if (user.hasOwnProperty("url") && validator.isURL(user.url, {protocols: ['http', 'https', 'gopher'], require_tld: true, require_protocol: true})) update.url = user.url;
 		if (user.hasOwnProperty("description")) update.description = user.description;
+		if (user.hasOwnProperty("location")) update.organisation = user.location;
 		if (user.hasOwnProperty("organisation")) update.organisation = user.organisation;
 		if (user.hasOwnProperty("email")) {
 			update.gravatar = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
 			update.verified = false;
 		}
 
-		/* check if nothing to update */
-		if (Object.keys(update).length === 0) return callback(null);
+		var _updateUser = function () {
+			/* check if nothing to update */
+			if (Object.keys(update).length === 0) return callback(null);
+			db.collection("users").findAndModify({query: {id: id}, update: {$set: update}, new: true}, function (err, doc) {
+				if (err) return callback(err);
+				cache[id] = doc;
+				callback(err, doc);
+			});
+		};
 
-		db.collection("users").findAndModify({query: {id: id}, update: {$set: update}, new: true}, function (err, doc) {
-			if (err) return callback(err);
-			cache[id] = doc;
-			callback(err, doc);
-		});
-
+		if (user.hasOwnProperty("password") && (accessrole === users.roles.admin)) {
+			/* replace password */
+			users.password(user.password, function (err, method, key, salt, it, time) {
+				if (err) return callback(err);
+				update.password = [method, key, salt, it];
+				_updateUser();
+			});
+		} else {
+			_updateUser();
+		}
 	};
 
 	/* get all users, probably rather not use this */

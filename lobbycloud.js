@@ -56,9 +56,11 @@ var emails = {
 var invites = new (require("./modules/invites"))(path.resolve(__dirname, config.invitedb));
 var mailqueue = new (require("./modules/mailqueue"))(config.mails, config.url, emails);
 var users = new (require("./modules/users"))({db: config.db}, mailqueue, i18n);
-
 /* mockup docs */
 var mockupdocs = require('./modules/mockdocs')();
+
+/* backendapi */
+var backendapi = new (require("./modules/backendapi"))(users, mockupdocs, invites, i18n);
 
 /* configure storage */
 var storage = new filedump(path.resolve(__dirname, config.storage));
@@ -450,6 +452,7 @@ app.post('/users/reset/request', function (req, res) {
 	});
 });
 
+/* passwort reset site */
 app.get('/users/reset/:key', function (req, res) {
 	if (!req.param("key")) return res.send(400);
 	res.render('reset', {
@@ -462,6 +465,7 @@ app.get('/users/reset/:key', function (req, res) {
 	});
 });
 
+/* passwort reset */
 app.post('/users/reset/:key', function (req, res) {
 	if ((!req.body) || (!req.param("key"))) return res.send(400);
 	var _form = function (message) {
@@ -487,80 +491,23 @@ app.post('/users/reset/:key', function (req, res) {
 	});
 });
 
+/* backend api login */
+app.post('/api/backend/login', passport.authenticate('local', {}), function (req, res) {
+	res.json(users.prepareClientUser(req.user));
+});
+
+/* backend api */
+app.post('/api/backend/:cmd', function (req, res) {
+	if (!req.user) {
+		res.send(401);
+	} else {
+		backendapi.request(req,res);
+	}
+});
 
 /* dummy api endpoint */
 app.get('/api/whatever', function (req, res) {
 	res.json("not implemented");
-});
-
-/* login */
-app.post('/api/login', passport.authenticate('local', {}), function (req, res) {
-	res.json(users.prepareClientUser(req.user));
-});
-
-/* logout */
-app.post('/api/logout', function (req, res) {
-	if (req.user) {
-		req.logout();
-	}
-	res.send(200);
-});
-
-/* protected backend api */
-app.post('/api/admin/:cmd', function (req, res) {
-	if ((!req.user) || (req.user.role !== 'admin')) {
-		res.send(401);
-	} else {
-		switch (req.params.cmd) {
-			case 'users':
-				users.list(null, null, function (err, data) {
-					var data = data.map(function (user) {
-						return users.prepareClientUser(user);
-					});
-					res.json(data);
-				});
-				break;
-			case 'invite.create':
-				res.json({invite: invites.create(1)[0]});
-				break;
-			case 'user':
-				res.json(users.prepareClientUser(req.user));
-				break;
-			case 'docs':
-				mockupdocs.listDocs(function (err, data) {
-					res.json(data);
-				});
-				break;
-			case 'users.delete':
-				users.delete(req.body.id, function (err) {
-					res.json(err ? 400 : 200, err);
-				});
-				break;
-			case 'users.add':
-				users.add(req.body.user, function (err, user) {
-					if ((!user) && (!err)) err = 'Unknown Error';
-					if (err || (!user)) return res.send(400, err.toString());
-					res.json(users.prepareClientUser(user));
-				});
-				break;
-			case 'users.update':
-				if ((typeof req.body.id != 'string') || (!req.body.user))
-					return res.send(400);
-				users.get(req.body.id, function (err, user) {
-					if ((!user) && (!err)) err = 'Unknown Error';
-					if (err || (!user)) return res.send(400, err.toString());
-					users.update(req.body.id, req.body.user, function (err, user) {
-						if ((!user) && (!err)) err = 'Unknown Error';
-						if (err || (!user)) return res.send(400, err.toString());
-						res.json(users.prepareClientUser(user));
-					});
-				});
-				break;
-			default :
-				res.send(404);
-				break;
-		}
-	}
 });
 
 /* default */

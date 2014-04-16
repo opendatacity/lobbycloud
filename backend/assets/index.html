@@ -59,7 +59,7 @@
                 <ul id="nav-site" class="nav navbar-nav" ng-class="{ hidden: !isLoggedIn()}">
                     <li ng-class="{ active: isActive('/upload')}"><a href="#/upload" translate>Upload</a></li>
                     <li ng-class="{ active: isActive('/docs')}"><a href="#/docs" translate>Documents</a></li>
-                    <li ng-show="isAdmin()" ng-class="{ active: isActive('/users')}"><a href="#/users" translate>Accounts</a></li>
+                    <li ng-show="access(accessLevels.editor)" ng-class="{ active: isActive('/users')}"><a href="#/users" translate>Accounts</a></li>
                 </ul>
                 <ul id="nav-login" class="nav navbar-nav" ng-class="{ hidden: isLoggedIn()}">
                     <li ng-class="{ active: isActive('/login')}"><a href="#/login" title="{{'Login'|translate}}"><i class="glyphicon glyphicon-log-in"></i> <span translate>Login</span></a></li>
