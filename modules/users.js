@@ -11,7 +11,7 @@ var _ = require("underscore");
 
 /* prepare regexp */
 
-module.exports = function (opts) {
+module.exports = function (opts, mailqueue, i18n) {
 
 	var users = this;
 	var db = new mongojs(opts.db);
@@ -242,6 +242,14 @@ module.exports = function (opts) {
 		});
 	};
 
+	/* get user by email */
+	users.email = function (email, callback) {
+		db.collection("users").findOne({email: email}, function (err, result) {
+			if (err) return callback(err);
+			callback(null, result);
+		});
+	};
+
 	/* strips down user obj to values needed by ui */
 	users.prepareClientUser = function (user) {
 		if (!user) return null;
@@ -260,11 +268,41 @@ module.exports = function (opts) {
 		}
 	};
 
-	/* set user validated */
-	users.verified = function (user, callback) {
-		db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
-			if (err) return callback(err);
-			callback(err, doc);
+	/* send user e-mail  */
+	users.send_mail = function (user, type, cb) {
+		mailqueue.send(user, type, function (err, success) {
+			if (err) return cb(new Error(i18n.__("Error occured. mail not sent")));
+			cb(null,
+				(success ?
+					i18n.__("Mail queued. Please wait a moment and check your e-mail inbox") :
+					i18n.__("Last mail sent too soon, please wait")))
+		})
+	};
+
+	/* check user e-mail validation */
+	users.verify_email = function (linkkey, cb) {
+		var task = mailqueue.pop(linkkey);
+		if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
+		users.get(task.id, function (err, user) {
+			if (err || (!user) || (task.email !== user.email))
+				return cb(new Error(i18n.__("Link is invalid")));
+			db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
+				if (err) return cb(new Error(i18n.__("Internal Error :(")));
+				callback(null, i18n.__("Thank you. Your email adress is now validated."));
+			});
+		});
+	};
+
+	/* check new passwort request */
+	users.password_reset = function (linkkey, password, cb) {
+		var task = mailqueue.pop(linkkey);
+		if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
+		users.get(task.id, function (err, user) {
+			if (err || (!user))
+				return cb(new Error(i18n.__("Link is invalid")));
+			users.changepass(user.id, password, user.password, function (err, result) {
+				cb(err, result ? i18n.__("Password successfully changed.") : i18n.__("Internal Error :("));
+			})
 		});
 	};
 

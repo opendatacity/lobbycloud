@@ -25,9 +25,37 @@ var config = require(path.resolve(__dirname, "config.js"), 20);
 var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 
 /* require local modules */
+var emails = {
+	"verify": {
+		urlpath: "/users/verification/",
+		emailbodies: {
+			en: fs.readFileSync(path.resolve(__dirname, './assets/mails/verification.mustache')).toString(),
+			de: fs.readFileSync(path.resolve(__dirname, './assets/mails/verification-de.mustache')).toString()
+		},
+		body: function () {
+			return emails.verify.emailbodies[i18n.getLocale()];
+		},
+		title: function (task) {
+			return i18n.__("[LobbyCloud] Please verify your email '%s'", task.email);
+		}
+	},
+	"reset": {
+		urlpath: "/users/reset/",
+		emailbodies: {
+			en: fs.readFileSync(path.resolve(__dirname, './assets/mails/reset.mustache')).toString(),
+			de: fs.readFileSync(path.resolve(__dirname, './assets/mails/reset-de.mustache')).toString()
+		},
+		body: function () {
+			return emails.reset.emailbodies[i18n.getLocale()];
+		},
+		title: function (task) {
+			return i18n.__("[LobbyCloud] Password reset");
+		}
+	}
+};
 var invites = new (require("./modules/invites"))(path.resolve(__dirname, config.invitedb));
-var users = new (require("./modules/users"))({db: config.db});
-var registration = new (require("./modules/registration"))(users, config.registration, config.url, i18n);
+var mailqueue = new (require("./modules/mailqueue"))(config.mails, config.url, emails);
+var users = new (require("./modules/users"))({db: config.db}, mailqueue, i18n);
 
 /* mockup docs */
 var mockupdocs = require('./modules/mockdocs')();
@@ -228,7 +256,7 @@ app.all('/signup/:invite?', function (req, res) {
 		invites.spend(invite);
 
 		/* send validation email */
-		registration.send(user);
+		users.send_verify_email(user);
 
 		/* show login form */
 		res.render('login', {
@@ -383,36 +411,87 @@ app.get('/api/test/invites/:create?', function (req, res) {
 });
 
 /* manual validation e-mail request */
-app.post('/api/registration/request', function (req, res) {
+app.post('/users/verification/request', function (req, res) {
 	// only logged-in users may request a confirmation mail
 	if (!req.user) return res.send(401);
 	/* send validation email */
-	registration.send(req.user, function (err, result) {
+	users.send_mail(req.user, 'verify', function (err, result) {
 		if (err) res.send(400, err);
 		else res.send(result);
 	});
 });
 
 /* check validation e-mail key */
-app.get('/users/emails/confirm_verification/:key', function (req, res) {
+app.get('/users/verification/:key', function (req, res) {
 	if (!req.param("key")) return res.send(400);
-	registration.verify(req.params.key, function (err, user) {
-		res.render('validate', {
-			"headers": {
-				"validate": true
-			},
+	users.verify_email(req.params.key, function (err, result) {
+		res.render('generic', {
+			"_user": req.user,
 			"url": config.url,
 			"err": err,
-			"user": user
+			"result": result
 		});
 	});
 });
+
+/* passwort reset request */
+app.post('/users/reset/request', function (req, res) {
+	if ((!req.body) || (!req.body.email)) return res.send(400);
+	users.email(req.body.email, function (err, user) {
+		if (err || (!user)) return res.send(400);
+		users.send_mail(user, 'reset', function (err, result) {
+			res.render('generic', {
+				"_user": req.user,
+				"url": config.url,
+				"err": err,
+				"result": result
+			});
+		});
+	});
+});
+
+app.get('/users/reset/:key', function (req, res) {
+	if (!req.param("key")) return res.send(400);
+	res.render('reset', {
+		"_user": req.user,
+		"url": config.url,
+		"headers": {
+			"signup": true
+		},
+		"key": req.params.key
+	});
+});
+
+app.post('/users/reset/:key', function (req, res) {
+	if ((!req.body) || (!req.param("key"))) return res.send(400);
+	var _form = function (message) {
+		res.render('reset', {
+			"_user": req.user,
+			"url": config.url,
+			"headers": {
+				"signup": true
+			},
+			message: message,
+			"key": req.params.key
+		});
+	};
+	if (!req.body.hasOwnProperty("password") || req.body.password === "") return _form(i18n.__("Please pick a password"));
+	if (req.body["password"] !== req.body["password-verify"]) return _form(i18n.__("Your passwords don't match"));
+	users.password_reset(req.params.key, req.body.password, function (err, result) {
+		res.render('generic', {
+			"_user": req.user,
+			"url": config.url,
+			"err": err,
+			"result": result
+		});
+	});
+});
+
 
 /* dummy api endpoint */
 app.get('/api/whatever', function (req, res) {
 	res.json("not implemented");
 });
-
 
 /* login */
 app.post('/api/login', passport.authenticate('local', {}), function (req, res) {

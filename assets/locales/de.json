@@ -71,5 +71,13 @@
 	"[LobbyCloud] Please verify your email '%s'": "[LobbyCloud] Bitte bestätige die E-Mail-Adresse '%s'",
 	"Last validation Mail sent too soon, please wait.": "Die letzte Bestätigungsmail wurde gerade erst versandt. Bitte einen Augenblick warten.",
 	"Link expired, invalid or does not exists.": "Link ist abgelaufen, ungültig oder existiert nicht.",
-	"Internal Error :(": "Interner Fehler :("
+	"Internal Error :(": "Interner Fehler :(",
+	"Can't remember the password": "Can't remember the password",
+	"Request Password Reset": "Request Password Reset",
+	"Request": "Request",
+	"Nevermind, now I remember.": "Nevermind, now I remember.",
+	"Password Reset": "Password Reset",
+	"Mail adress": "Mail adress",
+	"Reset Password": "Reset Password",
+	"Change Password!": "Change Password!"
 }

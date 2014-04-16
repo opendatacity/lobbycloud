@@ -10,7 +10,7 @@ $(document).ready(function (e) {
 		if (reqmail) return;
 		setActiveRequesting(true);
 
-		$.post("/api/registration/request", function (data) {
+		$.post("/users/verification/request", function (data) {
 			setActiveRequesting(false);
 			$("#div-request-validation").html(data);
 		})

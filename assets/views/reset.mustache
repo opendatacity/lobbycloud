@@ -1,0 +1,28 @@
+{{>header}}
+<div class="container">
+    <div id="headline">
+        <h1>{{#__}}Reset Password{{/__}}</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 white-box">
+ 			{{#message}}
+                <div class="alert alert-danger">{{message}}</div>
+			{{/message}}
+            <form action="{{{url}}}/users/reset/{{key}}" method="post" role="form">
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="password">{{#__}}Pick a strong password{{/__}}</label>
+                            <input type="password" name="password" class="form-control strengthometer" id="password" placeholder="{{#__}}Password{{/__}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="password-verify">{{#__}}Repeat your chosen password for verification{{/__}}</label>
+                            <input type="password" name="password-verify" class="form-control" id="password-verify" placeholder="{{#__}}Retype Password{{/__}}">
+                        </div>
+                    </fieldset>
+                <input type="hidden" name="submit" value="1">
+                <button type="submit" class="btn btn-primary">{{#__}}Change Password!{{/__}}</button>
+            </form>
+        </div>
+    </div>
+</div>
+{{>footer}}

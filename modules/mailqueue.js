@@ -8,21 +8,16 @@ var fs = require("fs");
 var crypto = require("crypto");
 var mustache = require("mustache");
 
-module.exports = registration = function (users, config, url, i18n) {
+module.exports = mailqueue = function (config, url, emails) {
 
 	var transport = nodemailer.createTransport(config.transport.name, config.transport);
 
-	var registration = this;
+	var mailqueue = this;
 	var tasks = [];
 
 	fs.exists(config.dbfile, function (ex) {
 		if (ex) tasks = JSON.parse(fs.readFileSync(config.dbfile));
 	});
-
-	var emailbodies = {
-		en: fs.readFileSync(path.resolve(__dirname, '../assets/views/validationmail.mustache')).toString(),
-		de: fs.readFileSync(path.resolve(__dirname, '../assets/views/validationmail-de.mustache')).toString()
-	};
 
 	//TODO: start all not sent email tasks
 
@@ -31,14 +26,14 @@ module.exports = registration = function (users, config, url, i18n) {
 		return ((new Date()) - date > period);
 	};
 
-	var sendmail = function (task, cb) {
-		var linkurl = url + "/users/emails/confirm_verification/" + task.linkkey;
-		var emailbody = emailbodies[i18n.getLocale()] || url;
+	var sendmail = function (task, settings, cb) {
+		var linkurl = url + settings.urlpath + task.linkkey;
+		var emailbody = settings.body() || url;
 
 		var mailOptions = {
 			from: config.from, // sender address
 			to: task.email,
-			subject: i18n.__("[LobbyCloud] Please verify your email '%s'", task.email),
+			subject: settings.title(task),
 			text: mustache.render(emailbody, {html: false, task: task, url: linkurl}),
 			html: mustache.render(emailbody, {html: true, task: task, url: linkurl})
 		};
@@ -55,68 +50,70 @@ module.exports = registration = function (users, config, url, i18n) {
 
 	var queue = async.queue(function (task, callback) {
 		task.sent = new Date();
-		registration.save();
-		sendmail(task, function (err) {
+		mailqueue.save();
+		var settings = emails[task.type];
+		if (!settings) return callback();
+		sendmail(task, settings, function (err) {
 			//TODO: try resend and then give up
 			callback();
 		});
 	}, config.maxqueueworker);
 
-	registration.cleanup = function () {
+	mailqueue.cleanup = function () {
 		tasks = tasks.filter(function (t) {
 			return (!exeeds(t.sent, config.expiredperiod));
 		});
 	};
 
-	registration.save = function (callback) {
+	mailqueue.save = function (callback) {
 		fs.writeFile(config.dbfile, JSON.stringify(tasks), callback);
 	};
 
-	registration.send = function (user, cb) {
+	mailqueue.send = function (user, type, cb) {
 		if (!cb) cb = function () {
 		};
+		//if there is no email for the user, just report success
+		if (!user.email)
+			return cb(null, true);
 		var task = tasks.filter(function (t) {
-			return t.id === user.id;
+			return ((t.id === user.id) && (t.type === type));
 		})[0];
 		if (task) {
 			if (!task.sent) {
-				return cb(null, i18n.__("Validation mail is in queue, please wait."));
+				return cb(null, true);
 			} else {
 				if (!exeeds(task.sent, config.waitperiod)) {
-					return cb(null, i18n.__("Last validation Mail sent too soon, please wait.")); //TODO: notify how long?
+					return cb(null, false);
 				}
 				tasks.remove(tasks.indexOf(task));
 			}
 		} else {
-			task = {email: user.email, id: user.id};
+			task = {email: user.email, id: user.id, type: type};
 		}
 		task.sent = false;
 		task.linkkey = crypto.randomBytes(23).toString("hex");
 		queue.push(task);
 		tasks.push(task);
-		registration.save();
-		cb(null, i18n.__("Mail queued. Please wait a moment and check your e-mail inbox."));
+		mailqueue.save();
+		cb(null, true);
 	};
 
-	registration.verify = function (linkkey, cb) {
-		registration.cleanup();
-		var task = tasks.filter(function (t) {
-			return t.linkkey === linkkey;
-		})[0];
-		if (!task) {
-			return cb(new Error(i18n.__("Link expired, invalid or does not exists.")));
+	/*	gets a task by link key and removes it from the task list */
+
+	mailqueue.pop = function (linkkey) {
+		mailqueue.cleanup();
+		for (var i = 0; i < tasks.length; i++) {
+			var t = tasks[i];
+			if (t.linkkey === linkkey) {
+				tasks.splice(i, 1);
+				mailqueue.save();
+				return t;
+			}
 		}
-		users.get(task.id, function (err, user) {
-			if (err || (!user)) return cb(new Error(i18n.__("Link invalid, did you change your email adress?")));
-			users.verified(user, function (err, user) {
-				if (err) return cb(new Error(i18n.__("Internal Error :(")));
-				tasks.splice(tasks.indexOf(task), 1);
-				registration.save();
-				cb(null, user);
-			});
-		});
+		return null;
 	};
 
-	return registration;
+
+	return mailqueue;
 
 };

@@ -1,0 +1,12 @@
+{{^html}}
+Hallo! Jemand, hoffentlich du, hat eine Passwortrücksetzung für "{{task.email}}" angefordert. Ist das der Fall, folge bitte dem folgenden Link:
+{{url}}
+Wenn du keine Passwortrücksetzung angefordert hast, ignoriere bitte diese E-Mail.
+{{/html}}
+{{#html}}
+    Hallo! Jemand, hoffentlich du, hat eine Passwortrücksetzung für "{{task.email}}" angefordert. Ist das der Fall, folge bitte dem folgenden Link:<br />
+    <a href="{{url}}">Reset Password</a><br /><br />
+    Wenn du keine Passwortrücksetzung angefordert hast, ignoriere bitte diese E-Mail.<br /><br />
+    Wenn du den Link nicht anklicken kannst, kopiere bitte folgende URL in deinen Browser:<br />
+	{{url}}
+{{/html}}
