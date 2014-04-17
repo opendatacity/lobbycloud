@@ -17,10 +17,10 @@
                             <input id="login-pass" type="password" name="password" placeholder="{{#__}}Password{{/__}}" class="form-control input-block-level" required>
                         </div>
                         <div class="form-group">
+                            <input type="hidden" type="text" id="login-redirect" name="redirect" value="{{redirect}}">
                             <button class="btn btn-lg btn-primary btn-block" type="submit">{{#__}}Login{{/__}}</button>
                         </div>
                     </form>
-
                     <a class="pull-right" href="#reset" data-toggle="tab">{{#__}}Can't remember the password{{/__}}</a>
                 </div>
                 <div class="tab-pane" id="reset">

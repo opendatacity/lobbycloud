@@ -205,14 +205,22 @@ app.get('/', function (req, res) {
 app.get('/login', function (req, res) {
 	res.render('login', {
 		"_user": users.prepareClientUser(req.user),
-		"url": config.url
+		"url": config.url,
+		"redirect": req.query.redirect
 	});
 });
 
-app.post('/login', passport.authenticate('local', {
-	successRedirect: '/',
-	failureRedirect: '/login'
-}));
+app.post('/login', function (req, res, next) {
+	passport.authenticate('local', function (err, user, info) {
+		if (err) return next(err);
+		var redirect = (req.body && req.body.redirect && req.body.redirect.toString().length > 0) ? req.body.redirect.toString() : null;
+		if (!user) return res.redirect('/login' + (redirect ? '?redirect=' + redirect : ''));
+		req.logIn(user, function (err) {
+			if (err) return next(err);
+			res.redirect(redirect ? redirect : '/');
+		});
+	})(req, res, next);
+});
 
 app.get('/logout', function (req, res) {
 	if (req.user) req.logout();
@@ -386,7 +394,7 @@ app.post('/api/upload', function (req, res) {
 				file: {
 					name: req.files._upload.originalname,
 					file: _filename,
-					mimetype: _mimetype,
+					mimetype: _mimetype
 				},
 				source: {
 					interface: "api",
