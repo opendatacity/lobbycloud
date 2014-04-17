@@ -16,6 +16,7 @@ var mmmagic = require("mmmagic");
 var mongojs = require("mongojs");
 var express = require("express");
 var multer = require("multer");
+var moment = require("moment");
 var i18n = require("i18n");
 
 /* require config */
@@ -289,29 +290,34 @@ app.post('/beta', function (req, res) {
 	});
 });
 
-/* profile */
-app.get('/profile', function (req, res) {
+
+var sendProfile = function (profile, req, res) {
 	res.render('profile', {
 		"_user": users.prepareClientUser(req.user),
 		"url": config.url,
-		"profile": users.prepareClientUser(req.user),
+		"is_own": (profile) && (req.user) && (profile.id == req.user.id),
+		"profile": ((profile) ? users.prepareClientUser(profile) : null),
+		"moment": function () {
+			return function (text, render) {
+				var date = moment(new Date(render(text)));
+				return date.format("LLL");
+			}
+		},
 		"headers": {
 			"profile": true
 		}
 	});
+};
+
+/* profile */
+app.get('/profile', function (req, res) {
+	sendProfile(req.user, req, res);
 });
 
 /* user profile */
 app.get('/profile/:user', function (req, res) {
 	users.get(req.param("user"), function (err, profile) {
-		res.render('profile', {
-			"_user": users.prepareClientUser(req.user),
-			"url": config.url,
-			"profile": ((profile) ? users.prepareClientUser(profile) : null),
-			"headers": {
-				"profile": true
-			}
-		});
+		sendProfile(profile, req, res);
 	});
 });
 
