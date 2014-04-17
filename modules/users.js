@@ -300,7 +300,7 @@ module.exports = function (opts, mailqueue, i18n) {
 				return cb(new Error(i18n.__("Link is invalid")));
 			db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
 				if (err) return cb(new Error(i18n.__("Internal Error :(")));
-				callback(null, i18n.__("Thank you. Your email adress is now validated."));
+				cb(null, i18n.__("Thank you. Your email adress is now validated."));
 			});
 		});
 	};
