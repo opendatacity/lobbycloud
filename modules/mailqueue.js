@@ -154,7 +154,7 @@ module.exports = mailqueue = function (config, url, emails) {
 
 	/*	gets a task by link key and removes it from the task list */
 
-	mailqueue.pop = function (linkkey) {
+	mailqueue.pop = function (linkkey, cb) {
 		mailqueue.cleanup();
 		for (var i = 0; i < tasks.length; i++) {
 			var t = tasks[i];
