@@ -16,7 +16,14 @@ module.exports = mailqueue = function (config, url, emails) {
 	var tasks = [];
 
 	fs.exists(config.dbfile, function (ex) {
-		if (ex) tasks = JSON.parse(fs.readFileSync(config.dbfile));
+		if (ex) {
+			try {
+				tasks = JSON.parse(fs.readFileSync(config.dbfile));
+			} catch (e) {
+				console.log('[LobbyCloud: ERROR: mail file damaged');
+				task = [];
+			}
+		}
 	});
 
 	//TODO: start all not sent email tasks
