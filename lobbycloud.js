@@ -85,7 +85,10 @@ passport.serializeUser(function (user, done) {
 
 passport.deserializeUser(function (id, done) {
 	users.get(id, function (err, user) {
-		done(err, user);
+		if (err)
+			done(null, false); //remove session (invalid username, e.g. after id change)
+		else
+			done(null, user);
 	});
 });
 
@@ -452,22 +455,7 @@ app.post('/users/reset/request', function (req, res) {
 	});
 });
 
-/* passwort reset site */
-app.get('/users/reset/:key', function (req, res) {
-	if (!req.param("key")) return res.send(400);
-	res.render('reset', {
-		"_user": req.user,
-		"url": config.url,
-		"headers": {
-			"signup": true
-		},
-		"key": req.params.key
-	});
-});
-
-/* passwort reset */
-app.post('/users/reset/:key', function (req, res) {
-	if ((!req.body) || (!req.param("key"))) return res.send(400);
+var resetPasswordCmd = function (req, res) {
 	var _form = function (message) {
 		res.render('reset', {
 			"_user": req.user,
@@ -476,20 +464,59 @@ app.post('/users/reset/:key', function (req, res) {
 				"signup": true
 			},
 			message: message,
+			"needs_old_password": needsold,
 			"key": req.params.key
 		});
 	};
+
+	var _reset = function () {
+		users.password_reset(req.params.key, req.body.password, function (err, result) {
+			res.render('generic', {
+				"_user": req.user,
+				"url": config.url,
+				"err": err,
+				"result": result
+			});
+		});
+	};
+
+	var _change = function () {
+		if ((!req.body.hasOwnProperty("password-old") || req.body["password-old"] === "")) return _form(i18n.__("Please enter your old password"));
+		users.changepass(req.user.id, req.body.password, req.body["password-old"], function (err) {
+			if (err) return _form(i18n.__("Old password is invalid"));
+			res.render('generic', {
+				"_user": req.user,
+				"url": config.url,
+				"result": i18n.__("Password changed")
+			});
+		});
+	};
+
+	if (!req.param("key")) return res.send(400);
+	var needsold = false;
+	if (req.params.key == 'password') {
+		if (req.user)
+			needsold = true;
+		else
+			return res.send(400);
+	}
+	if ((!req.body) || (Object.keys(req.body).length == 0)) {
+		return _form();
+	}
 	if (!req.body.hasOwnProperty("password") || req.body.password === "") return _form(i18n.__("Please pick a password"));
 	if (req.body["password"] !== req.body["password-verify"]) return _form(i18n.__("Your passwords don't match"));
-	users.password_reset(req.params.key, req.body.password, function (err, result) {
-		res.render('generic', {
-			"_user": req.user,
-			"url": config.url,
-			"err": err,
-			"result": result
-		});
-	});
-});
+	if (needsold) {
+		_change();
+	} else {
+		_reset();
+	}
+};
+
+/* passwort reset site */
+app.get('/users/reset/:key', resetPasswordCmd);
+
+/* passwort reset */
+app.post('/users/reset/:key', resetPasswordCmd);
 
 /* backend api login */
 app.post('/api/backend/login', passport.authenticate('local', {}), function (req, res) {
@@ -501,7 +528,7 @@ app.post('/api/backend/:cmd', function (req, res) {
 	if (!req.user) {
 		res.send(401);
 	} else {
-		backendapi.request(req,res);
+		backendapi.request(req, res);
 	}
 });
 

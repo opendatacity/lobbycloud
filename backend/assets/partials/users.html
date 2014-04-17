@@ -11,9 +11,11 @@
 <table class="table" ng-show="users.length">
     <thead>
     <tr>
+        <th translate>Gravatar</th>
         <th translate>Login Name</th>
         <th translate>Name</th>
         <th translate>Organisation</th>
+        <th translate>Location</th>
         <th translate>Role</th>
         <th translate>Created</th>
         <th translate>Actions</th>
@@ -21,13 +23,16 @@
     </thead>
     <tbody>
     <tr ng-repeat="rowuser in users">
+        <td><img ng-src="http://www.gravatar.com/avatar/{{rowuser.gravatar}}.png?s=36&amp;d=mm&amp;r=pg" width="36" height="36"></td>
         <td>{{rowuser.id}}<br />
             <i ng-if="rowuser.email" class="fa fa-envelope-o" popover="{{rowuser.email}}" popover-trigger="mouseenter"></i>
             <i ng-if="rowuser.verified" class="fa fa-check-circle" title="{{'Verified'|translate}}"></i>
             <i ng-if="rowuser.description" class="fa fa-info-circle" popover="{{rowuser.description}}" popover-trigger="mouseenter"></i>
+            <a ng-if="rowuser.url" href="{{rowuser.url}}"><i class="fa fa-link" popover="{{rowuser.url}}" popover-trigger="mouseenter"></i></a>
         </td>
         <td>{{rowuser.name}}</td>
         <td>{{rowuser.organisation}}</td>
+        <td>{{rowuser.location}}</td>
         <td>{{rowuser.role}}</td>
         <td>{{rowuser.created | amDateFormat:'LLL'}}</td>
         <td>

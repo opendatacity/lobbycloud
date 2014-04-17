@@ -130,14 +130,13 @@ module.exports = function (opts, mailqueue, i18n) {
 		if (cache.hasOwnProperty(id)) return callback(null, cache[id]);
 		db.collection("users").findOne({id: id}, function (err, result) {
 			if (err) return callback(err);
-			if (result === null) return callback(new Error("user does not exist"));
+			if (result === null) return callback("user does not exist");
 			cache[id] = result;
 			cache["apikey:" + result.apikey] = id;
 			/* fix missing gravatar */
 			if (!result.hasOwnProperty("gravatar")) {
 				result.gravatar = crypto.createHash('md5').update(result.email.toLowerCase()).digest('hex');
-				users.update(id, { "email": result.email }, function (err, res) {
-					console.log("HERE!!!", err, res)
+				db.collection("users").findAndModify({query: {id: id}, update: {$set: {gravatar: result.gravatar}}, new: false}, function (err) {
 				});
 			}
 			callback(null, result);
@@ -182,11 +181,12 @@ module.exports = function (opts, mailqueue, i18n) {
 		var id = slugmaker(id);
 
 		var update = {};
+		if (user.hasOwnProperty("id")) update.id = user.id;
 		if (user.hasOwnProperty("name")) update.name = user.name;
 		if (user.hasOwnProperty("email") && validator.isEmail(user.email)) update.email = user.email;
 		if (user.hasOwnProperty("url") && validator.isURL(user.url, {protocols: ['http', 'https', 'gopher'], require_tld: true, require_protocol: true})) update.url = user.url;
 		if (user.hasOwnProperty("description")) update.description = user.description;
-		if (user.hasOwnProperty("location")) update.organisation = user.location;
+		if (user.hasOwnProperty("location")) update.location = user.location;
 		if (user.hasOwnProperty("organisation")) update.organisation = user.organisation;
 		if (user.hasOwnProperty("email")) {
 			update.gravatar = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
@@ -198,7 +198,7 @@ module.exports = function (opts, mailqueue, i18n) {
 			if (Object.keys(update).length === 0) return callback(null);
 			db.collection("users").findAndModify({query: {id: id}, update: {$set: update}, new: true}, function (err, doc) {
 				if (err) return callback(err);
-				cache[id] = doc;
+				cache[doc.id] = doc;
 				callback(err, doc);
 			});
 		};
@@ -229,22 +229,16 @@ module.exports = function (opts, mailqueue, i18n) {
 
 	/* change password */
 	users.changepass = function (id, password, oldpassword, callback) {
-		if (typeof oldpassword === "function") {
-			/* just update the password */
+		users.auth(id, oldpassword, function (success, user) {
+			if (!user) return callback(new Error("could not change password"));
 			users.password(password, function (err, method, key, salt, it, time) {
-				db.collection("users").update({id: id}, {password: [method, key, salt, it]}, function (err, doc) {
+				db.collection("users").findAndModify({query: {id: id}, update: {$set: {password: [method, key, salt, it]}}, new: true}, function (err, doc) {
 					if (err) return callback(err);
-					cache[id] = doc; //FIXME: ACHTUNG, ACHTUNG, ACHTUNG: collection.update does NOT return the changed doc
+					cache[id] = doc;
 					callback(null);
 				});
 			});
-		} else {
-			/* check password first */
-			users.auth(id, password, function (auth) {
-				if (!auth) return callback(new Error("could not change password"));
-				users.changepass(id, password, callback);
-			});
-		}
+		});
 	};
 
 	/* get user by apikey */
@@ -330,12 +324,12 @@ module.exports = function (opts, mailqueue, i18n) {
 			id: 'admin',
 			password: 'admin',
 			email: 'admin@localhost',
-			url: false,
+			url: null,
 			description: "",
 			role: 'admin',
 			apikey: crypto.randomBytes(8).toString("hex"),
 			verification: crypto.randomBytes(8).toString("hex"),
-			verified: true,
+			verified: false,
 			created: (new Date())
 		};
 		users.check(defaultuser.id, function (err, exists) {

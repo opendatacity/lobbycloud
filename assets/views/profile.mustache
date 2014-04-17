@@ -1,7 +1,7 @@
 {{>header}}
 <div class="container vcard" itemtype="http://schema.org/Person" itemscope="">
-	{{#profile}}
-        <div class="row">
+    <div class="row">
+		{{#profile}}
             <div class="col-md-12">
                 <br/>
 
@@ -14,8 +14,10 @@
                 </h1>
                 <br/>
             </div>
-        </div>
-        <div class="row">
+		{{/profile}}
+    </div>
+    <div class="row">
+		{{#profile}}
             <div class="col-md-3">
                 <img src="//www.gravatar.com/avatar/{{gravatar}}.png?s=460&amp;d=mm&amp;r=pg" width="230" height="230">
 
@@ -66,24 +68,24 @@
                     </tr>
                 </table>
             </div>
-            <div class="col-md-3">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Actions</div>
-                    <div class="panel-body">
-                        <button class="btn btn-link"><i class="fa fa-edit"></i> Edit Profile</button>
-                        <button class="btn btn-link"><i class="fa fa-lock"></i> Change Password</button>
-                        <button class="btn btn-link"><i class="fa fa-trash-o"></i> Delete Profile</button>
-                    </div>
+		{{/profile}}
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">Actions</div>
+                <div class="panel-body">
+                    <a class="btn btn-link"><i class="fa fa-edit"></i> Edit Profile</a>
+                    <a class="btn btn-link" href="{{url}}/users/reset/password"><i class="fa fa-lock"></i> Change Password</a>
+                    <a class="btn btn-link"><i class="fa fa-trash-o"></i> Delete Profile</a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="action-info" class="row hidden">
-            <div class="col-md-12">
-                <div id="action-info-progress" class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> Requesting</div>
-                <div id="action-info-result" class="alert hidden"></div>
-            </div>
+    <div id="action-info" class="row hidden">
+        <div class="col-md-12">
+            <div id="action-info-progress" class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> Requesting</div>
+            <div id="action-info-result" class="alert hidden"></div>
         </div>
-	{{/profile}}
+    </div>
 </div>
 {{>footer}}
