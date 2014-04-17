@@ -66,7 +66,13 @@ module.exports = mailqueue = function (config, url, emails) {
 	};
 
 	mailqueue.save = function (callback) {
-		fs.writeFile(config.dbfile, JSON.stringify(tasks), callback);
+		fs.rename(config.dbfile, config.dbfile+".backup", function(err){
+			if (err) return callback(err);
+			fs.writeFile(config.dbfile, JSON.stringify(tasks), function(err){
+				if (err) return callback(err);
+				fs.unlink(config.dbfile+".backup", callback)
+			});
+		});
 	};
 
 	mailqueue.send = function (user, type, cb) {
