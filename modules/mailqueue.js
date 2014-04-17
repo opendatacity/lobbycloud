@@ -19,18 +19,18 @@ module.exports = mailqueue = function (config, url, emails) {
 		if (ex) {
 			try {
 				tasks = JSON.parse(fs.readFileSync(config.dbfile));
-			} catch(e) {
+			} catch (e) {
 				tasks = [];
 				console.error("could not load mailqueue");
 			}
 		}
 	});
 
-	if (tasks.length === 0) fs.exists(config.dbfile+".backup", function (ex) {
+	if (tasks.length === 0) fs.exists(config.dbfile + ".backup", function (ex) {
 		if (ex) {
 			try {
-				tasks = JSON.parse(fs.readFileSync(config.dbfile+".backup"));
-			} catch(e) {
+				tasks = JSON.parse(fs.readFileSync(config.dbfile + ".backup"));
+			} catch (e) {
 				tasks = [];
 				console.error("could not load mailqueue from backup");
 			}
@@ -85,6 +85,14 @@ module.exports = mailqueue = function (config, url, emails) {
 
 	mailqueue.save = function (callback) {
 		fs.writeFile(config.dbfile, JSON.stringify(tasks), callback);
+		fs.rename(config.dbfile, config.dbfile + ".backup", function (err) {
+			if (err) return callback(err);
+			fs.writeFile(config.dbfile, JSON.stringify(tasks), function (err) {
+				if (err) return callback(err);
+				fs.unlink(config.dbfile + ".backup", callback)
+
+			});
+		});
 	};
 
 	mailqueue.send = function (user, type, cb) {
