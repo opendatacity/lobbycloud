@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-app.controller('BodyController', function ($scope, $state, $location, $window, AuthenticationService, gettextCatalog) {
+app.controller('BodyController', function ($scope, $state, $window, AuthenticationService, gettextCatalog) {
 	'use strict';
 
 	gettextCatalog.debug = false;
@@ -29,13 +29,9 @@ app.controller('BodyController', function ($scope, $state, $location, $window, A
 		return AuthenticationService.authorize(level);
 	};
 
-	$scope.isActive = function (viewLocation) {
-		return $location.path().indexOf(viewLocation) >= 0;
-	};
-
 });
 
-app.controller('LogoutController', function ($scope, $location, AuthenticationService) {
+app.controller('LogoutController', function ($scope, AuthenticationService) {
 	'use strict';
 	AuthenticationService.logout(
 		function () {
@@ -46,7 +42,7 @@ app.controller('LogoutController', function ($scope, $location, AuthenticationSe
 	);
 });
 
-app.controller('LoginController', function ($scope, $location, AuthenticationService) {
+app.controller('LoginController', function ($scope, $state, AuthenticationService) {
 	'use strict';
 
 	$scope.login = {};
@@ -58,7 +54,7 @@ app.controller('LoginController', function ($scope, $location, AuthenticationSer
 		};
 		AuthenticationService.login($scope.login,
 			function (user) {
-				$location.path("/app");
+				$state.go('start');
 			},
 			function (err) {
 				$scope.error = err;
@@ -70,7 +66,6 @@ app.controller('LoginController', function ($scope, $location, AuthenticationSer
 
 app.controller('StartController', function ($scope, InvitesService, AuthenticationService) {
 	'use strict';
-	$scope.account = AuthenticationService.user;
 	$scope.genInvite = function() {
 		$scope.invite = InvitesService.create();
 	};
@@ -78,7 +73,6 @@ app.controller('StartController', function ($scope, InvitesService, Authenticati
 
 app.controller('UserListController', function ($scope, $state, $modal, AuthenticationService, UsersService) {
 	'use strict';
-	$scope.account = AuthenticationService.user;
 
 	$scope.getUserByID = function (id) {
 		return $scope.users.filter(function (user) {
@@ -194,7 +188,6 @@ app.controller('UserListController', function ($scope, $state, $modal, Authentic
 
 app.controller('InvitesController', function ($scope, InvitesService, AuthenticationService) {
 	'use strict';
-	$scope.account = AuthenticationService.user;
 	$scope.loading = true;
 	$scope.invites = InvitesService.list();
 });
@@ -202,7 +195,6 @@ app.controller('InvitesController', function ($scope, InvitesService, Authentica
 app.controller('DocsListController', function ($scope, $state, $filter, $templateCache, ngTableParams, gettextCatalog, AuthenticationService, DocsService) {
 	'use strict';
 
-	$scope.account = AuthenticationService.user;
 	$scope.loading = true;
 	var data = [];
 	$scope.docs = [];

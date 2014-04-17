@@ -14,16 +14,21 @@ var app = angular
 	]);
 
 
-app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
+app.config(function ($stateProvider, $urlRouterProvider, $logProvider, $locationProvider) {
 	'use strict';
+//	$locationProvider.html5Mode(true).hashPrefix('!');
 
 	$logProvider.debugEnabled(false);
 
 	var access = routingConfig.accessLevels;
 
 	$urlRouterProvider.otherwise('/start');
+//	$routeProvider.when "/",
+//		controller: ["$state", ($state) ->
+//		$state.transitionTo("catalogue.popular")
+//	]
 
-//	$urlRouterProvider.when('/docs', '/docs/list');
+//	$urlRouterProvider.when('/', '/docs/list');
 
 	$stateProvider
 		.state('login', {
@@ -34,7 +39,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider) {
 				access: access.public
 			}
 		})
-		.state('app', {
+		.state('start', {
 			url: '/start',
 			templateUrl: 'partials/start.html',
 			controller: 'StartController'
@@ -77,6 +82,12 @@ app.run(function ($window, $rootScope, $location, $state, gettextCatalog, Authen
 	'use strict';
 
 	var access = routingConfig.accessLevels;
+
+	var resize = function(e) {
+		$('#main').css('min-height', $(window).innerHeight()-($('header').outerHeight()+$('footer').outerHeight()));
+	};
+	$(window).resize(resize);
+	resize();
 
 	$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 		var state_access = toState.data ? toState.data.access : access.user;

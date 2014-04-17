@@ -1,7 +1,7 @@
 body {
-    background-color: #fff;
-    background-image: none;
-    box-shadow: none;
+    /*background-color: #fff;*/
+    /*background-image: none;*/
+    /*box-shadow: none;*/
 }
 
 .fa-mouse-pointer {
@@ -49,4 +49,13 @@ body {
 .modal-dialog .modal-body {
     margin-bottom: 0;
     padding-bottom: 0;
+}
+
+#nav-lang {
+    position: absolute;
+    bottom: 24px;
+}
+
+#nav-lang a {
+    margin: 6px;
 }
