@@ -16,10 +16,28 @@ module.exports = mailqueue = function (config, url, emails) {
 	var tasks = [];
 
 	fs.exists(config.dbfile, function (ex) {
-		if (ex) tasks = JSON.parse(fs.readFileSync(config.dbfile));
+		if (ex) {
+			try {
+				tasks = JSON.parse(fs.readFileSync(config.dbfile));
+			} catch(e) {
+				tasks = [];
+				console.error("could not load mailqueue");
+			}
+		}
 	});
 
-	//TODO: start all not sent email tasks
+	if (tasks.length === 0) fs.exists(config.dbfile+".backup", function (ex) {
+		if (ex) {
+			try {
+				tasks = JSON.parse(fs.readFileSync(config.dbfile+".backup"));
+			} catch(e) {
+				tasks = [];
+				console.error("could not load mailqueue from backup");
+			}
+		}
+	});
+
+	//TODO: start all not sent email tasks #FIXME
 
 	var exeeds = function (date, period) {
 		if (!date) return false;
