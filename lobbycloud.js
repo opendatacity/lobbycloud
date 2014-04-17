@@ -195,17 +195,12 @@ app.configure(function () {
 
 /* routes */
 app.get('/', function (req, res) {
-	res.render('index', {
-		"_user": users.prepareClientUser(req.user),
-		"url": config.url
-	});
+	render(req, res, 'index', {});
 });
 
 /* frontend login & logout */
 app.get('/login', function (req, res) {
-	res.render('login', {
-		"_user": users.prepareClientUser(req.user),
-		"url": config.url,
+	render(req, res, 'login', {
 		"redirect": req.query.redirect
 	});
 });
@@ -236,12 +231,7 @@ app.all('/signup/:invite?', function (req, res) {
 	var invite = (req.param("invite") || req.body.invite || req.query.invite || null)
 
 	var _form = function (message) {
-		res.render('signup', {
-			"_user": users.prepareClientUser(req.user),
-			"headers": {
-				"signup": true
-			},
-			"url": config.url,
+		render(req, res, 'signup', {
 			"invited": ((invite) ? invites.check(invite) : false),
 			"invite": invite,
 			"message": message,
@@ -273,11 +263,7 @@ app.all('/signup/:invite?', function (req, res) {
 		users.send_verify_email(user);
 
 		/* show login form */
-		res.render('login', {
-			"_user": false,
-			"url": config.url
-		});
-
+		render(req, res, 'login', {});
 	});
 
 });
@@ -290,29 +276,21 @@ app.post('/beta', function (req, res) {
 		req.body.email,
 		req.body.motivation
 	], function (err) {
-		res.render('beta', {
-			"url": config.url,
+		render(req, res, 'beta', {
 			"thankyou": (err === null),
 			"error": (err !== null)
 		});
 	});
 });
 
-
 var sendProfile = function (profile, req, res) {
-	res.render('profile', {
-		"_user": users.prepareClientUser(req.user),
-		"url": config.url,
+	render(req, res, 'profile', {
 		"is_own": (profile) && (req.user) && (profile.id == req.user.id),
 		"profile": ((profile) ? users.prepareClientUser(profile) : null),
 		"moment": function () {
 			return function (text, render) {
-				var date = moment(new Date(render(text)));
-				return date.format("LLL");
+				return moment(new Date(render(text))).format("LLL");
 			}
-		},
-		"headers": {
-			"profile": true
 		}
 	});
 };
@@ -331,13 +309,7 @@ app.get('/profile/:user', function (req, res) {
 
 /* upload */
 app.get('/upload', function (req, res) {
-	res.render('upload', {
-		"_user": users.prepareClientUser(req.user),
-		"headers": {
-			"upload": true
-		},
-		"url": config.url
-	});
+	render(req, res, 'upload', {});
 });
 
 /**
@@ -440,13 +412,30 @@ app.post('/users/verification/request', function (req, res) {
 	});
 });
 
+var render = function (req, res, name, opt) {
+	opt._user = req.user;
+	opt._url = config.url;
+	opt._userrole = {};
+	if (req.user) {
+		opt._userrole[opt._user.role] = true;
+		if (opt._user.role == users.roles.admin) {
+			opt._userrole[users.roles.editor] = true;
+			opt._userrole[users.roles.user] = true;
+		}
+		if (opt._user.role == users.roles.editor) {
+			opt._userrole[users.roles.user] = true;
+		}
+	}
+	opt._headers = {};
+	opt._headers[name] = true;
+	res.render(name, opt);
+};
+
 /* check validation e-mail key */
 app.get('/users/verification/:key', function (req, res) {
 	if (!req.param("key")) return res.send(400);
 	users.verify_email(req.params.key, function (err, result) {
-		res.render('generic', {
-			"_user": req.user,
-			"url": config.url,
+		render(req, res, 'generic', {
 			"err": err,
 			"result": result
 		});
@@ -459,9 +448,7 @@ app.post('/users/reset/request', function (req, res) {
 	users.email(req.body.email, function (err, user) {
 		if (err || (!user)) return res.send(400);
 		users.send_mail(user, 'reset', function (err, result) {
-			res.render('generic', {
-				"_user": req.user,
-				"url": config.url,
+			render(req, res, 'generic', {
 				"err": err,
 				"result": result
 			});
@@ -471,13 +458,8 @@ app.post('/users/reset/request', function (req, res) {
 
 var resetPasswordCmd = function (req, res) {
 	var _form = function (message) {
-		res.render('reset', {
-			"_user": req.user,
-			"url": config.url,
-			"headers": {
-				"signup": true
-			},
-			message: message,
+		render(req, res, 'reset', {
+			"message": message,
 			"needs_old_password": needsold,
 			"key": req.params.key
 		});
@@ -485,9 +467,7 @@ var resetPasswordCmd = function (req, res) {
 
 	var _reset = function () {
 		users.password_reset(req.params.key, req.body.password, function (err, result) {
-			res.render('generic', {
-				"_user": req.user,
-				"url": config.url,
+			render(req, res, 'generic', {
 				"err": err,
 				"result": result
 			});
@@ -498,9 +478,7 @@ var resetPasswordCmd = function (req, res) {
 		if ((!req.body.hasOwnProperty("password-old") || req.body["password-old"] === "")) return _form(i18n.__("Please enter your old password"));
 		users.changepass(req.user.id, req.body.password, req.body["password-old"], function (err) {
 			if (err) return _form(i18n.__("Old password is invalid"));
-			res.render('generic', {
-				"_user": req.user,
-				"url": config.url,
+			render(req, res, 'generic', {
 				"result": i18n.__("Password changed")
 			});
 		});

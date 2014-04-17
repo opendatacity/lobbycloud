@@ -7,7 +7,7 @@
                     <div id="headline">
                         <h1>{{#__}}Login{{/__}}</h1>
                     </div>
-                    <form class="form form-signin" role="form" action="{{url}}/login" method="post">
+                    <form class="form form-signin" role="form" action="{{_url}}/login" method="post">
                         <div class="form-group input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                             <input id="login-user" type="text" name="username" placeholder="{{#__}}Username{{/__}}" class="form-control input-block-level" required>
@@ -27,7 +27,7 @@
                     <div id="headline">
                         <h1>{{#__}}Password Reset{{/__}}</h1>
                     </div>
-                    <form class="form form-reset" role="form" action="{{url}}/users/reset/request" method="post">
+                    <form class="form form-reset" role="form" action="{{_url}}/users/reset/request" method="post">
                         <div class="form-group input-group">
                             <span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
                             <input id="reset-email" type="email" name="email" placeholder="{{#__}}Mail adress{{/__}}" class="form-control input-block-level" required>

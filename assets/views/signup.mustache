@@ -8,7 +8,7 @@
 		<div class="col-md-6 col-md-offset-3 white-box">
 			<h2>{{#__}}Are you invited?{{/__}}</h2>
 			<p>{{#__}}LobbyCloud is still in closed beta. In order to sign up, you need an invite key.{{/__}}</p>
-			<form  action="{{{url}}}/signup" method="post" class="form-inline" role="form">
+			<form  action="{{{_url}}}/signup" method="post" class="form-inline" role="form">
 				<div class="form-group">
 					<label for="invite">{{#__}}Invite key{{/__}}</label>
 					<input type="text" name="invite" class="form-control" id="invite" value="{{invitekey}}" placeholder="{{#__}}Your beta invite key{{/__}}">
@@ -21,7 +21,7 @@
 		<div class="col-md-6 col-md-offset-3 white-box">
 			<h2>{{#__}}Get invited!{{/__}}</h2>
 			<p>{{#__}}Let us know about your interest in LobbyCloud. We will put you on the waiting list.{{/__}}</p>
-			<form action="{{{url}}}/beta" method="post" role="form">
+			<form action="{{{_url}}}/beta" method="post" role="form">
 				<div class="form-group">
 					<label for="name">{{#__}}Your name{{/__}}</label>
 					<input type="text" name="name" class="form-control" id="name" placeholder="{{#__}}Enter your name{{/__}}">
@@ -87,7 +87,7 @@
 			{{#message}}
 			<div class="alert alert-danger">{{message}}</div>
 			{{/message}}
-			<form action="{{{url}}}/signup" method="post" role="form">
+			<form action="{{{_url}}}/signup" method="post" role="form">
 				<fieldset>
 					<div class="form-group">
 						<label for="invite">{{#__}}Invite key{{/__}}</label>
