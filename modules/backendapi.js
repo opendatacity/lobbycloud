@@ -36,7 +36,7 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 		},
 		'user': {
 			//returns the current user as json
-			access: users.roles.editor,
+			access: users.roles.user,
 			execute: function (req, res) {
 				res.json(users.prepareClientUser(req.user));
 			}

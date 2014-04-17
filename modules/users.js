@@ -113,10 +113,11 @@ module.exports = function (opts, mailqueue, i18n) {
 				if (err) return callback(err);
 
 				user.password = [method, key, salt, it];
-
 				/* insert user to database */
-				db.collection("users").save(user, function (err, result) {
-					callback(err, result);
+				db.collection("users").save(user, function (err, doc) {
+					if (!err)
+						cache[doc.id] = doc;
+					callback(err, doc);
 				});
 
 			});
@@ -147,6 +148,7 @@ module.exports = function (opts, mailqueue, i18n) {
 	users.auth = function (id, pass, callback) {
 		users.get(id, function (err, user) {
 			if (err) return callback(false);
+			cache[user.id] = user;
 			users.password(pass, {
 				method: user.password[0],
 				salt: user.password[2],
@@ -256,9 +258,10 @@ module.exports = function (opts, mailqueue, i18n) {
 
 	/* get user by email */
 	users.email = function (email, callback) {
-		db.collection("users").findOne({email: email}, function (err, result) {
+		db.collection("users").findOne({email: email}, function (err, doc) {
 			if (err) return callback(err);
-			callback(null, result);
+			cache[doc.id] = doc;
+			callback(null, doc);
 		});
 	};
 
@@ -300,6 +303,7 @@ module.exports = function (opts, mailqueue, i18n) {
 				return cb(new Error(i18n.__("Link is invalid")));
 			db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
 				if (err) return cb(new Error(i18n.__("Internal Error :(")));
+				cache[doc.id] = doc;
 				cb(null, i18n.__("Thank you. Your email adress is now validated."));
 			});
 		});

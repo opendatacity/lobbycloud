@@ -2,7 +2,7 @@
 
 /* Services */
 
-app.factory('AuthenticationService', function ($http, $cookieStore) {
+app.factory('AuthenticationService', function ($http, $rootScope, $cookieStore) {
 
 	var
 		cookieName = 'lobbycloud-user',
@@ -12,9 +12,12 @@ app.factory('AuthenticationService', function ($http, $cookieStore) {
 		userRoleList = routingConfig.userRoleList,
 		currentUser = cookieUser || { username: '', role: userRoles.public };
 
+	$rootScope.account = currentUser;
+
 	function changeUser(user) {
 		$cookieStore.put(cookieName, user);
 		angular.extend(currentUser, user);
+		$rootScope.account = currentUser;
 	}
 
 	function setCurrentUser(user) {

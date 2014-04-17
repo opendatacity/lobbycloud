@@ -44,12 +44,12 @@
                             <td itemprop="description" class="text-right">{{description}}</td>
                         </tr>
 					{{/organisation}}
-					{{#profile.url}}
+					{{#url}}
                         <tr>
                             <td class="bold">{{#__}}Website{{/__}}</td>
-                            <td itemprop="url" class="text-right"><a rel="nofollow" href="{{profile.url}}">{{profile.url}}</a></td>
+                            <td itemprop="url" class="text-right"><a rel="nofollow" href="{{url}}">{{url}}</a></td>
                         </tr>
-					{{/profile.url}}
+					{{/url}}
 					{{#is_own}}
                         <tr>
                             <td class="bold">{{#__}}Email{{/__}}</td>
@@ -75,7 +75,7 @@
                     <div class="panel-heading">{{#__}}Actions{{/__}}</div>
                     <div class="panel-body">
                         <a class="btn btn-link"><i class="fa fa-edit"></i> {{#__}}Edit Profile{{/__}}</a>
-                        <a class="btn btn-link" href="{{url}}/users/reset/password"><i class="fa fa-lock"></i> {{#__}}Change Password{{/__}}</a>
+                        <a class="btn btn-link" href="{{_url}}/users/reset/password"><i class="fa fa-lock"></i> {{#__}}Change Password{{/__}}</a>
                         <a class="btn btn-link"><i class="fa fa-trash-o"></i> {{#__}}Delete Profile{{/__}}</a>
                     </div>
                 </div>

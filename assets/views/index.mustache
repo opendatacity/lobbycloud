@@ -10,18 +10,18 @@
 			{{#document}}
 			<tr>
 				<td>
-					<a href="{{{url}}}/document/{{slug}}">{{title}}</a>
+					<a href="{{{_url}}}/document/{{slug}}">{{title}}</a>
 					{{#__}}{{age}} days ago{{/__}}, 
 					{{#__}}{{pages}} pages{{/__}},
 					{{#comments}}<span class="label">{{#__}}{{comments}} comments{{/__}}<span>{{/comments}}
 				</td>
 				<td>
-					{{#tag}}<a href="{{{url}}}/tags/{{label}}" class="{{class}}">#{{label}}</a>{{/tag}}
+					{{#tag}}<a href="{{{_url}}}/tags/{{label}}" class="{{class}}">#{{label}}</a>{{/tag}}
 				</td>
 			</tr>
 			{{/document}}
 		</table>
-		<a href="{{{url}}}/documents">{{#__}}more{{/__}} ...</a>
+		<a href="{{{_url}}}/documents">{{#__}}more{{/__}} ...</a>
 	</div>
 {{/just_in}}
 <div id="intro" class="row">

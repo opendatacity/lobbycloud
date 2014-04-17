@@ -10,46 +10,49 @@
 	<!-- meta -->
 	<meta property="og:title" content="LobbyCloud">
 	<meta property="og:type" content="article">
-	<meta property="og:url" content="{{{url}}}/">
-	<meta property="og:image" content="{{{url}}}/assets/img/lobbycloud-square-black.png">
-	<link rel="shortcut icon" href="{{{url}}}/assets/img/favicon.ico?v=1"/>
+	<meta property="og:url" content="{{{_url}}}/">
+	<meta property="og:image" content="{{{_url}}}/assets/img/lobbycloud-square-black.png">
+	<link rel="shortcut icon" href="{{{_url}}}/assets/img/favicon.ico?v=1"/>
 
 	<!-- fonts -->
-	<link href="{{{url}}}/assets/fonts/roboto-slab/roboto-slab.css" rel="stylesheet" type="text/css">
-	<link href="{{{url}}}/assets/fonts/roboto/roboto.css" rel="stylesheet" type="text/css">
+	<link href="{{{_url}}}/assets/fonts/roboto-slab/roboto-slab.css" rel="stylesheet" type="text/css">
+	<link href="{{{_url}}}/assets/fonts/roboto/roboto.css" rel="stylesheet" type="text/css">
 
 	<!-- css -->
-	<link href="{{{url}}}/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-	<link href="{{{url}}}/assets/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
-	<link href="{{{url}}}/assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-	<link href="{{{url}}}/assets/css/lobbycloud.css" rel="stylesheet" type="text/css">
+	<link href="{{{_url}}}/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="{{{_url}}}/assets/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+	<link href="{{{_url}}}/assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link href="{{{_url}}}/assets/css/lobbycloud.css" rel="stylesheet" type="text/css">
 
 	<!-- javascript -->
-	<script type="text/javascript" src="{{{url}}}/assets/js/jquery.min.js"></script>
-	<script type="text/javascript" src="{{{url}}}/assets/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="{{{url}}}/assets/js/lobbycloud.js"></script>
+	<script type="text/javascript" src="{{{_url}}}/assets/js/jquery.min.js"></script>
+	<script type="text/javascript" src="{{{_url}}}/assets/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="{{{_url}}}/assets/js/lobbycloud.js"></script>
 
 	<!-- polyfills -->
-	<!--[if lt IE 9]><script type="text/javascript" src="{{{url}}}/assets/js/html5shiv.min.js"></script><![endif]-->
-	<!--[if lt IE 9]><script type="text/javascript" src="{{{url}}}/assets/js/respond.min.js"></script><![endif]-->
+	<!--[if lt IE 9]><script type="text/javascript" src="{{{_url}}}/assets/js/html5shiv.min.js"></script><![endif]-->
+	<!--[if lt IE 9]><script type="text/javascript" src="{{{_url}}}/assets/js/respond.min.js"></script><![endif]-->
 	
-	{{#headers}}
+	{{#_headers}}
 	{{#upload}}
 	<!-- file upload -->
-	<script type="text/javascript" src="{{{url}}}/assets/js/jquery.knob.js"></script>
-	<script type="text/javascript" src="{{{url}}}/assets/js/jquery.ui.widget.js"></script>
-	<script type="text/javascript" src="{{{url}}}/assets/js/jquery.iframe-transport.js"></script>
-	<script type="text/javascript" src="{{{url}}}/assets/js/jquery.fileupload.js"></script>
-	<script type="text/javascript" src="{{{url}}}/assets/js/jquery.upload.js"></script>
-	<link href="{{{url}}}/assets/css/upload.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="{{{_url}}}/assets/js/jquery.knob.js"></script>
+	<script type="text/javascript" src="{{{_url}}}/assets/js/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="{{{_url}}}/assets/js/jquery.iframe-transport.js"></script>
+	<script type="text/javascript" src="{{{_url}}}/assets/js/jquery.fileupload.js"></script>
+	<script type="text/javascript" src="{{{_url}}}/assets/js/jquery.upload.js"></script>
+	<link href="{{{_url}}}/assets/css/upload.css" rel="stylesheet" type="text/css">
 	{{/upload}}
 	{{#signup}}
-	<script type="text/javascript" src="{{{url}}}/assets/js/zxcvbn.min.js"></script>
+	<script type="text/javascript" src="{{{_url}}}/assets/js/zxcvbn.min.js"></script>
 	{{/signup}}
+	{{#reset}}
+	<script type="text/javascript" src="{{{_url}}}/assets/js/zxcvbn.min.js"></script>
+	{{/reset}}
 	{{#profile}}
-	<script type="text/javascript" src="{{{url}}}/assets/js/profile.js"></script>
+	<script type="text/javascript" src="{{{_url}}}/assets/js/profile.js"></script>
 	{{/profile}}
-	{{/headers}}
+	{{/_headers}}
 	
 </head>
 <body>
@@ -77,6 +80,11 @@
 						<li>
 							<a href="/comment">{{#__}}Comment{{/__}}</a>
 						</li>
+						{{#_userrole.editor}}
+                        <li>
+                            <a href="/central">{{#__}}Central{{/__}}</a>
+                        </li>
+						{{/_userrole.editor}}
 					</ul>
 					<ul class="nav navbar-nav navbar-right navbar-user">
 						<li>
