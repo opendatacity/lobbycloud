@@ -79,5 +79,20 @@
 	"Password Reset": "Password Reset",
 	"Mail adress": "Mail adress",
 	"Reset Password": "Reset Password",
-	"Change Password!": "Change Password!"
+	"Change Password!": "Change Password!",
+	"Profile": "Profile",
+	"Email": "Email",
+	"Not Verified": "Not Verified",
+	"Request Validation Email": "Request Validation Email",
+	"Joined": "Joined",
+	"Actions": "Actions",
+	"Edit Profile": "Edit Profile",
+	"Change Password": "Change Password",
+	"Delete Profile": "Delete Profile",
+	"Requesting": "Requesting",
+	"Enter your old password": "Enter your old password",
+	"Old Password": "Old Password",
+	"Pick a strong new password": "Pick a strong new password",
+	"New Password": "New Password",
+	"Retype new Password": "Retype new Password"
 }

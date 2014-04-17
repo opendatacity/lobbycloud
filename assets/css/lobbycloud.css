@@ -23,7 +23,6 @@ header {
 	margin: 0px;
 	padding: 0px;
 	height: 51px;
-	background-color: #f00;
 	
 }
 
@@ -40,7 +39,6 @@ header {
 		header #navbar a:active {
 			
 			color: #fff;
-			background-color: #f00;
 			background-image: linear-gradient(to bottom, #88aa00 0px, #558800 100%);
 			background-repeat: repeat-x;
 			
