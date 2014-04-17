@@ -296,29 +296,31 @@ module.exports = function (opts, mailqueue, i18n) {
 
 	/* check user e-mail validation */
 	users.verify_email = function (linkkey, cb) {
-		var task = mailqueue.pop(linkkey);
-		if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
-		users.get(task.id, function (err, user) {
-			if (err || (!user) || (task.email !== user.email))
-				return cb(new Error(i18n.__("Link is invalid")));
-			db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
-				if (err) return cb(new Error(i18n.__("Internal Error :(")));
-				cache[doc.id] = doc;
-				cb(null, i18n.__("Thank you. Your email adress is now validated."));
+		mailqueue.pop(linkkey, function (task) {
+			if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
+			users.get(task.id, function (err, user) {
+				if (err || (!user) || (task.email !== user.email))
+					return cb(new Error(i18n.__("Link is invalid")));
+				db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
+					if (err) return cb(new Error(i18n.__("Internal Error :(")));
+					cache[doc.id] = doc;
+					cb(null, i18n.__("Thank you. Your email adress is now validated."));
+				});
 			});
 		});
 	};
 
 	/* check new passwort request */
 	users.password_reset = function (linkkey, password, cb) {
-		var task = mailqueue.pop(linkkey);
-		if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
-		users.get(task.id, function (err, user) {
-			if (err || (!user))
-				return cb(new Error(i18n.__("Link is invalid")));
-			users.changepass(user.id, password, user.password, function (err, result) {
-				cb(err, result ? i18n.__("Password successfully changed.") : i18n.__("Internal Error :("));
-			})
+		mailqueue.pop(linkkey, function (task) {
+			if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
+			users.get(task.id, function (err, user) {
+				if (err || (!user))
+					return cb(new Error(i18n.__("Link is invalid")));
+				users.changepass(user.id, password, user.password, function (err, result) {
+					cb(err, result ? i18n.__("Password successfully changed.") : i18n.__("Internal Error :("));
+				})
+			});
 		});
 	};
 

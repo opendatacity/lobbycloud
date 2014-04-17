@@ -29,28 +29,18 @@ var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 var emails = {
 	"verify": {
 		urlpath: "/users/verification/",
-		emailbodies: {
-			en: fs.readFileSync(path.resolve(__dirname, './assets/mails/verification.mustache')).toString(),
-			de: fs.readFileSync(path.resolve(__dirname, './assets/mails/verification-de.mustache')).toString()
-		},
-		body: function () {
-			return emails.verify.emailbodies[i18n.getLocale()];
-		},
-		title: function (task) {
-			return i18n.__("[LobbyCloud] Please verify your email '%s'", task.email);
+		mailview: "verification",
+		title: {
+			txt: "[LobbyCloud] Please verify your email '%s'",
+			propname: "email"
 		}
 	},
 	"reset": {
 		urlpath: "/users/reset/",
-		emailbodies: {
-			en: fs.readFileSync(path.resolve(__dirname, './assets/mails/reset.mustache')).toString(),
-			de: fs.readFileSync(path.resolve(__dirname, './assets/mails/reset-de.mustache')).toString()
-		},
-		body: function () {
-			return emails.reset.emailbodies[i18n.getLocale()];
-		},
-		title: function (task) {
-			return i18n.__("[LobbyCloud] Password reset");
+		mailview: "reset",
+		title: {
+			txt: "[LobbyCloud] Password reset",
+			propname: "email"
 		}
 	}
 };
