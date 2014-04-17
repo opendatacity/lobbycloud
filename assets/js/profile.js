@@ -1,22 +1,29 @@
 $(document).ready(function (e) {
 	var reqmail = false;
 
-	var setActiveRequesting = function(active){
-		reqmail = active;
-		$('#btn-request-validation i').toggle(active);
+	var $resultdisplay = $("#action-info-result");
+
+	var display = function (alertclass, html) {
+		reqmail = false;
+		$('#action-info-progress').addClass('hidden');
+		$resultdisplay.removeClass('alert-success');
+		$resultdisplay.removeClass('alert-danger');
+		$resultdisplay.addClass(alertclass);
+		$resultdisplay.html(html);
+		$resultdisplay.removeClass('hidden');
 	};
 
 	$('#btn-request-validation').click(function () {
 		if (reqmail) return;
-		setActiveRequesting(true);
-
+		reqmail = true;
+		$('#action-info-progress').removeClass('hidden');
+		$resultdisplay.addClass('hidden');
+		$('#action-info').removeClass('hidden');
 		$.post("/users/verification/request", function (data) {
-			setActiveRequesting(false);
-			$("#div-request-validation").html(data);
+			display('alert-success', data);
 		})
 			.fail(function (err) {
-				setActiveRequesting(false);
-				$("#div-request-validation").html(err);
+				display('alert-danger', err.responseText);
 			});
 	});
 

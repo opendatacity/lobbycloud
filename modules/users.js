@@ -23,9 +23,9 @@ module.exports = function (opts, mailqueue, i18n) {
 	db.collection("users").ensureIndex("created", {"background": true});
 
 	users.roles = {
-		admin:"admin",
-		user:"user",
-		editor:"editor"
+		admin: "admin",
+		user: "user",
+		editor: "editor"
 	};
 
 	/* generate password hash */
@@ -289,11 +289,11 @@ module.exports = function (opts, mailqueue, i18n) {
 	/* send user e-mail  */
 	users.send_mail = function (user, type, cb) {
 		mailqueue.send(user, type, function (err, success) {
-			if (err) return cb(new Error(i18n.__("Error occured. mail not sent")));
-			cb(null,
-				(success ?
-					i18n.__("Mail queued. Please wait a moment and check your e-mail inbox") :
-					i18n.__("Last mail sent too soon, please wait")))
+			if (err)
+				cb(i18n.__("Error occured. mail not sent"));
+			else if (!success)
+				cb(i18n.__("Last mail sent too soon, please wait"));
+			else cb(null, i18n.__("Mail queued. Please wait a moment and check your e-mail inbox"))
 		})
 	};
 

@@ -1,40 +1,91 @@
 {{>header}}
-<div class="container">
+<div class="container vcard" itemtype="http://schema.org/Person" itemscope="">
 	{{#profile}}
-	<div class="row">
-		<div class="col-md-3">
-			<div itemtype="http://schema.org/Person" itemscope="" class="vcard">
-				<img src="//www.gravatar.com/avatar/{{gravatar}}.png?s=460&amp;d=mm&amp;r=pg" width="230" height="230">
-				
-				<h1 class="vcard-names">
-					<span itemprop="name" class="vcard-fullname">{{name}}</span>
-					<span itemprop="additionalName" class="vcard-username">{{id}}</span>
-				</h1>
-				
-				<p>{{description}}</p>
+        <div class="row">
+            <div class="col-md-12">
+                <br/>
 
-				<ul class="vcard-details">
-					<li itemprop="worksFor">{{location}}</li>
-					<li itemprop="worksFor">{{organisation}}</li>
+                <h1 class="vcard-names">
+					{{#name}}
+                        <span itemprop="name" class="vcard-fullname">{{name}}</span>
+                        -
+					{{/name}}
+                    <span itemprop="additionalName" class="vcard-username">{{id}}</span>
+                </h1>
+                <br/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <img src="//www.gravatar.com/avatar/{{gravatar}}.png?s=460&amp;d=mm&amp;r=pg" width="230" height="230">
+
+            </div>
+            <div class="col-md-6 vcard-details">
+
+                <table class="table table-responsive">
+                    <tr>
+                        <td colspan="2" class="text-muted">Profile</td>
+                    </tr>
+					{{#organisation}}
+                        <tr>
+                            <td class="bold">Organisation</td>
+                            <td itemprop="worksFor" class="text-right">{{organisation}}</td>
+                        </tr>
+					{{/organisation}}
+					{{#location}}
+                        <tr>
+                            <td class="bold">Location</td>
+                            <td itemprop="location" class="text-right">{{location}}</td>
+                        </tr>
+					{{/location}}
+					{{#organisation}}
+                        <tr>
+                            <td class="bold">Description</td>
+                            <td itemprop="description" class="text-right">{{description}}</td>
+                        </tr>
+					{{/organisation}}
 					{{#url}}
-					<li itemprop="url"><a rel="nofollow" href="{{url}}">{{url}}</a></li>
+                        <tr>
+                            <td class="bold">Website</td>
+                            <td itemprop="url" class="text-right"><a rel="nofollow" href="{{url}}">{{url}}</a></td>
+                        </tr>
 					{{/url}}
-				</ul>
-			</div>
-		</div>
-		<div class="col-md-9">
-			<p>Whatever.</p>
-			<p>{{#verified}}
-				<i class="fa fa-check">Verified email</i>
-			{{/verified}}
-			{{^verified}}
-				<button id="btn-request-validation" class="btn btn-default">Request Validation Email <i class="fa fa-spinner fa-spin hidden"></i></button>
-				<div id="div-request-validation"></div>
-			{{/verified}}
-            </p>
-			<strong>FIXME: make this look nice and add infos</strong>
-		</div>
-	</div>
+                    <tr>
+                        <td class="bold">E-Mail</td>
+                        <td class="text-right">{{email}}
+							{{#verified}}<i class="fa fa-check" title="Verified"></i>{{/verified}}
+							{{^verified}}<i class="fa fa-question" title="Not Verified"></i>
+                                <br/>
+                                <a id="btn-request-validation" href="javascript:;"><i class="fa fa-envelope-o"></i> Request Validation Email</a>
+							{{/verified}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Joined</td>
+                        <td class="text-right">{{created}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-3">
+				{{#url}}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Actions</div>
+                        <div class="panel-body">
+                            <button class="btn btn-link"><i class="fa fa-edit"></i> Edit Profile</button>
+                            <button class="btn btn-link"><i class="fa fa-lock"></i> Change Password</button>
+                            <button class="btn btn-link"><i class="fa fa-trash-o"></i> Delete Profile</button>
+                        </div>
+                    </div>
+				{{/url}}
+            </div>
+        </div>
+
+        <div id="action-info" class="row hidden">
+            <div class="col-md-12">
+                <div id="action-info-progress" class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> Requesting</div>
+                <div id="action-info-result" class="alert hidden"></div>
+            </div>
+        </div>
 	{{/profile}}
 </div>
 {{>footer}}
