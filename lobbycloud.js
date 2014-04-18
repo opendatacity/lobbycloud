@@ -28,15 +28,6 @@ var config = require(path.resolve(__dirname, "config.js"), 20);
 /* get an instance of lobbycloud */
 var l = new lobbycloud(config);
 
-/* provide legacy vars, FIXME: use l.* instead of cluttering valuable global namespace */
-var invites = l.invites;
-var mailqueue = l.mailqueue;
-var mockupdocs = l.mockupdocs;
-var organisations = l.organisations;
-var topics = l.topics;
-var users = l.users;
-var queue = l.queue;
-
 /* signup database */
 var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 
@@ -62,7 +53,7 @@ passport.serializeUser(function (user, done) {
 });
 
 passport.deserializeUser(function (id, done) {
-	users.get(id, function (err, user) {
+	l.users.get(id, function (err, user) {
 		if (err)
 			done(null, false); //remove session (invalid username, e.g. after id change)
 		else
@@ -72,7 +63,7 @@ passport.deserializeUser(function (id, done) {
 
 passport.use(new passportlocal.Strategy(function (username, password, done) {
 	process.nextTick(function () {
-		users.auth(username, password, function (result, user) {
+		l.users.auth(username, password, function (result, user) {
 			if ((!result) || (!user)) {
 				done(null, false, { message: 'Invalid Credentials'});
 			} else {
@@ -209,7 +200,7 @@ app.all('/signup/:invite?', function (req, res) {
 
 	var _form = function (message) {
 		render(req, res, 'signup', {
-			"invited": ((invite) ? invites.check(invite) : false),
+			"invited": ((invite) ? l.invites.check(invite) : false),
 			"invite": invite,
 			"message": message,
 			"form": req.body
@@ -221,7 +212,7 @@ app.all('/signup/:invite?', function (req, res) {
 	if (!req.body.hasOwnProperty("password") || req.body.password === "") return _form(i18n.__("Please pick a password"));
 	if (req.body["password"] !== req.body["password-verify"]) return _form(i18n.__("Your passwords don't match"));
 
-	users.add({
+	l.users.add({
 		id: req.body.username,
 		password: req.body.password,
 		email: req.body.email,
@@ -234,10 +225,10 @@ app.all('/signup/:invite?', function (req, res) {
 		if (err) return _form(err.message);
 
 		/* invalidate invite */
-		invites.spend(invite);
+		l.invites.spend(invite);
 
 		/* send validation email */
-		users.send_verify_email(user);
+		l.users.send_verify_email(user);
 
 		/* show login form */
 		render(req, res, 'login', {});
@@ -263,7 +254,7 @@ app.post('/beta', function (req, res) {
 var sendProfile = function (profile, req, res) {
 	render(req, res, 'profile', {
 		"is_own": (profile) && (req.user) && (profile.id == req.user.id),
-		"profile": ((profile) ? users.prepareClientUser(profile) : null),
+		"profile": ((profile) ? l.users.prepareClientUser(profile) : null),
 		"moment": function () {
 			return function (text, render) {
 				return moment(new Date(render(text))).format("LLL");
@@ -279,7 +270,7 @@ app.get('/profile', function (req, res) {
 
 /* user profile */
 app.get('/profile/:user', function (req, res) {
-	users.get(req.param("user"), function (err, profile) {
+	l.users.get(req.param("user"), function (err, profile) {
 		sendProfile(profile, req, res);
 	});
 });
@@ -374,8 +365,8 @@ app.post('/api/upload', function (req, res) {
 
 /* invites testing endpoint REMOVEME */
 app.get('/api/test/invites/:create?', function (req, res) {
-	if (req.param("create")) invites.create(req.param("create"));
-	res.json(invites.all());
+	if (req.param("create")) l.invites.create(req.param("create"));
+	res.json(l.invites.all());
 });
 
 /* manual validation e-mail request */
@@ -383,7 +374,7 @@ app.post('/users/verification/request', function (req, res) {
 	// only logged-in users may request a confirmation mail
 	if (!req.user) return res.send(401);
 	/* send validation email */
-	users.send_mail(req.user, 'verify', function (err, result) {
+	l.users.send_mail(req.user, 'verify', function (err, result) {
 		if (err) res.send(400, err);
 		else res.send(result);
 	});
@@ -395,12 +386,12 @@ var render = function (req, res, name, opt) {
 	opt._userrole = {};
 	if (req.user) {
 		opt._userrole[opt._user.role] = true;
-		if (opt._user.role == users.roles.admin) {
-			opt._userrole[users.roles.editor] = true;
-			opt._userrole[users.roles.user] = true;
+		if (opt._user.role == l.users.roles.admin) {
+			opt._userrole[l.users.roles.editor] = true;
+			opt._userrole[l.users.roles.user] = true;
 		}
-		if (opt._user.role == users.roles.editor) {
-			opt._userrole[users.roles.user] = true;
+		if (opt._user.role == l.users.roles.editor) {
+			opt._userrole[l.users.roles.user] = true;
 		}
 	}
 	opt._headers = {};
@@ -411,7 +402,7 @@ var render = function (req, res, name, opt) {
 /* check validation e-mail key */
 app.get('/users/verification/:key', function (req, res) {
 	if (!req.param("key")) return res.send(400);
-	users.verify_email(req.params.key, function (err, result) {
+	l.users.verify_email(req.params.key, function (err, result) {
 		render(req, res, 'generic', {
 			"err": err,
 			"result": result
@@ -422,9 +413,9 @@ app.get('/users/verification/:key', function (req, res) {
 /* passwort reset request */
 app.post('/users/reset/request', function (req, res) {
 	if ((!req.body) || (!req.body.email)) return res.send(400);
-	users.email(req.body.email, function (err, user) {
+	l.users.email(req.body.email, function (err, user) {
 		if (err || (!user)) return res.send(400);
-		users.send_mail(user, 'reset', function (err, result) {
+		l.users.send_mail(user, 'reset', function (err, result) {
 			render(req, res, 'generic', {
 				"err": err,
 				"result": result
@@ -443,7 +434,7 @@ var resetPasswordCmd = function (req, res) {
 	};
 
 	var _reset = function () {
-		users.password_reset(req.params.key, req.body.password, function (err, result) {
+		l.users.password_reset(req.params.key, req.body.password, function (err, result) {
 			render(req, res, 'generic', {
 				"err": err,
 				"result": result
@@ -453,7 +444,7 @@ var resetPasswordCmd = function (req, res) {
 
 	var _change = function () {
 		if ((!req.body.hasOwnProperty("password-old") || req.body["password-old"] === "")) return _form(i18n.__("Please enter your old password"));
-		users.changepass(req.user.id, req.body.password, req.body["password-old"], function (err) {
+		l.users.changepass(req.user.id, req.body.password, req.body["password-old"], function (err) {
 			if (err) return _form(i18n.__("Old password is invalid"));
 			render(req, res, 'generic', {
 				"result": i18n.__("Password changed")
@@ -489,7 +480,7 @@ app.post('/users/reset/:key', resetPasswordCmd);
 
 /* backend api login */
 app.post('/api/backend/login', passport.authenticate('local', {}), function (req, res) {
-	res.json(users.prepareClientUser(req.user));
+	res.json(l.users.prepareClientUser(req.user));
 });
 
 /* backend api */
