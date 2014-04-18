@@ -70,6 +70,24 @@ module.exports = {
 				user: "lobbycloud@gmail.com",
 				pass: ""
 			}
+		},
+		templates: {
+			verify: {
+				urlpath: "/users/verification/",
+				mailview: "verification",
+				title: {
+					txt: "[LobbyCloud] Please verify your email '%s'",
+					propname: "email"
+				}
+			},
+			reset: {
+				urlpath: "/users/reset/",
+				mailview: "reset",
+				title: {
+					txt: "[LobbyCloud] Password reset",
+					propname: "email"
+				}
+			}
 		}
 	}
 

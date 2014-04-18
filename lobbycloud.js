@@ -26,24 +26,6 @@ var config = require(path.resolve(__dirname, "config.js"), 20);
 var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 
 /* require local modules */
-var emails = {
-	"verify": {
-		urlpath: "/users/verification/",
-		mailview: "verification",
-		title: {
-			txt: "[LobbyCloud] Please verify your email '%s'",
-			propname: "email"
-		}
-	},
-	"reset": {
-		urlpath: "/users/reset/",
-		mailview: "reset",
-		title: {
-			txt: "[LobbyCloud] Password reset",
-			propname: "email"
-		}
-	}
-};
 var invites = new (require("./modules/invites"))(path.resolve(__dirname, config.invitedb));
 var mailqueue = new (require("./modules/mailqueue"))(config.mails, config.url, emails);
 var users = new (require("./modules/users"))({db: config.db}, mailqueue, i18n);
