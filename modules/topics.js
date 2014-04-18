@@ -28,7 +28,7 @@ module.exports = function(opts){
 		if (cache.hasOwnProperty(id)) return callback(null, true);
 		db.collection("topics").find({id: id}, {_id: 1}).limit(1, function(err, result){
 			if (err) return callback(err);
-			callback(null, (result.length > 0));
+			callback(null, (result.length > 0), id);
 		});
 	};
 	
