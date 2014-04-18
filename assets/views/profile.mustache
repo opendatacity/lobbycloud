@@ -19,6 +19,9 @@
     <div class="row">
         <div class="col-md-3">
             <img src="//www.gravatar.com/avatar/{{profile.gravatar}}.png?s=460&amp;d=mm&amp;r=pg" width="230" height="230">
+			{{#is_own}}
+                <a href="http://gravatar.com" class="small">Image via Gravatar</a>
+			{{/is_own}}
         </div>
         <div class="col-md-6 vcard-details">
             <table class="table table-responsive">
