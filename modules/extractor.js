@@ -64,6 +64,7 @@ module.exports = extractor = function(store){
 		var file = path.resolve(file);
 		if (typeof pages !== "number") return callback(new Error("invalid argument: pages."));
 		var hash = gm(file+"["+1+"]");
+		// FIXME: gremnlins here!
 		for (var i = 2; i <= pages; i++) {
 			hash.append(file+"["+i+"]");
 		}
@@ -102,6 +103,8 @@ module.exports = extractor = function(store){
 
 	/* everything */
 	t.extract = function(file, callback) {
+
+		/* FIXME: check if file exists */
 
 		/* FIXME: make this async and way more solid*/
 

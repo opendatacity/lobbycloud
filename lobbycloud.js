@@ -313,11 +313,6 @@ app.post('/api/upload', function (req, res) {
 			return res.json({"status": "error"});
 		}
 
-		/* prepare the user */
-		/* FIXME: integrate user */
-		var _user = false;
-		var _ip = (req.headers['x-original-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress);
-
 		/* put file in storage */
 		storage.save(req.files._upload.path, req.files._upload.extension, function (err, _filename) {
 
@@ -326,35 +321,28 @@ app.post('/api/upload', function (req, res) {
 				return res.json({"status": "error"});
 			}
 
-			/* put document into database */
-			db.collection("documents").save({
-				status: 0,
-				active: false,
-				created: new Date(),
-				file: {
-					name: req.files._upload.originalname,
-					file: _filename,
-					mimetype: _mimetype
-				},
-				source: {
-					interface: "api",
-					user: _user,
-					trace: _ip,
-					topic: (req.body.topic || false),
-					comment: (req.body.comment || false),
-					tags: _totags(req.body.tags)
-				}
-			}, function (err) {
+			console.log("[new upload]", _filename);
+			
+			l.queue.add({
+				file: _filename,
+				orig: path.basename(req.files._upload.path),
+				topic: (req.body.topic || null),
+				organisation: (req.body.organisation || null),
+				tags: (req.body.tags || null),
+				comment: (req.body.comment || null),
+				source: "upload,"+(req.headers['x-original-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress),
+				user: req.user.id
+			}, function(err, data){
+								
+				console.log("[upload queued]", _filename, data.id);
+
 				if (err) {
 					console.log("error", err); // FIXME: better logging
 					return res.json({"status": "error"});
 				}
 
 				res.json({"status": "success"});
-				console.log("upload", _filename);
-
-				// FIXME: trigger processing
-
+				
 			});
 
 		});

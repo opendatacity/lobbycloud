@@ -15,6 +15,7 @@ module.exports = function(opts, db, es){
 	/* check if a topic exists */
 	topics.check = function(id, callback){
 		id = slugmaker(id);
+		if (!id) return callback(new Error("Invalid ID"));
 		if (cache.hasOwnProperty(id)) return callback(null, true);
 		db.collection("topics").find({id: id}, {_id: 1}).limit(1, function(err, result){
 			if (err) return callback(err);

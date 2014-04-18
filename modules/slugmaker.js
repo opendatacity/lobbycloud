@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 module.exports = function(str) {
+	if (typeof str !== "string") return false;
 	return str
 	.replace(/^\s+|\s+$/g,'')
 	.replace(/[\s\u0021-\u002f\u003a-\u0040\u005b-\u0060\u007b-\u007f]+/g,'-')

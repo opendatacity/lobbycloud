@@ -3,6 +3,7 @@
 /** a queue for uploaded or received documents **/
 
 /* require node modules */
+var fs = require("fs");
 var path = require("path");
 var crypto = require("crypto");
 
@@ -10,11 +11,17 @@ var crypto = require("crypto");
 var mongojs = require("mongojs");
 
 /* require local modules */
-var topics = require("./topics");
+var extractor = require("./extractor");
+
+/* get dirname of main module */
+var __root = path.dirname(process.mainModule.filename);
 
 module.exports = queue = function(config, db, es, organisations, topics, users){
 	
 	var queue = this;
+
+	/* set up extractor */
+	var ex = extractor(path.resolve(__root, config.storage));
 
 	var cache = {};
 
@@ -68,7 +75,6 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		});
 	};
 
-
 	/* check if a document exists */
 	queue.check = function(id, callback){
 		if (cache.hasOwnProperty(id)) return callback(null, true);
@@ -101,18 +107,32 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		
 		/* check if document has a vald user */
 		if (!data.hasOwnProperty("user") || typeof data.user !== "string" || data.user === "") return callback(new Error("Queue Item has no user"));
-		users.exists(data.user, function(err, exists, user_id){
-			
-			if (!err) return callback(err);
+		users.check(data.user, function(err, exists, user_id){
+
+			if (err) return callback(err);
 			if (!exists) return callback(new Error("Queue Item user does not exist"));
 			
 			doc.user = user_id;
 			
 			/* check if specified file exists */
-			fs.exists(data.file, function(exists){
+			fs.exists(path.resolve(__root, config.storage, data.file), function(exists){
 				if (!exists) return callback(new Error("Queue Item file does not exist"));
 
 				doc.file = data.file;
+
+				/* check for original filename */
+				if (data.hasOwnProperty("orig") && typeof data.source === "orig" || data.source !== "") {
+					doc.orig = data.orig;
+				} else {
+					doc.orig = null;
+				}
+
+				/* check for source */
+				if (data.hasOwnProperty("source") && typeof data.source === "string" || data.source !== "") {
+					doc.source = data.source;
+				} else {
+					doc.source = null;
+				}
 
 				/* check for topic */
 				if (data.hasOwnProperty("topic") && typeof data.topic === "string" || data.topic !== "") {
@@ -157,34 +177,34 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 				}
 		
 				/* check if an organisation exists */
-				var check_organisation = function(callback) {
-					if (doc.organisation === null) callback();
+				var check_organisation = function(_callback) {
+					if (doc.organisation === null) return _callback();
 					organisations.check(doc.organisation, function(err, exists, org_id){
 						if (err) {
 							doc.organisation = null;
-							return callback();
+							return _callback();
 						} else if (exists) {
 							doc.organisation = {"id": org_id};
 						} else {
 							doc.organisation = {"new": doc.organisation};
 						}
-						callback();
+						_callback();
 					});
 				}
 		
 				/* check if an organisation exists */
-				var check_topic = function(callback) {
-					if (doc.topic === null) callback();
+				var check_topic = function(_callback) {
+					if (doc.topic === null) return _callback();
 					topics.check(doc.topic, function(err, exists, topic_id){
 						if (err) {
 							doc.topic = null;
-							return callback();
+							return _callback();
 						} else if (exists) {
 							doc.topic = {"id": topic_id};
 						} else {
 							doc.topic = {"new": doc.topic};
 						}
-						callback();
+						_callback();
 					});
 				}
 		
@@ -192,27 +212,29 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 					check_topic(function(){
 				
 						/* generate an id */
-						queue.genid(function(err,id){
+						queue.idgen(function(err,id){
 							if (err) return callback(err);
 							doc.id = id;
+
 							/* add to database and call back */
 							db.collection("queue").save(doc, function(err, result){
+
 								if (err) return callback(err);
 
 								/* cache it */
-								cache[topic.id] = result;
+								cache[doc.id] = result;
 							
 								/* call back */
 								callback(null, result);
 								
 								/* extract */
-								extractor.extract(doc.file, function(err, data){
+								ex.extract(path.resolve(__root, config.storage, doc.file), function(err, data){
 									if (err) return console.log("extraction error", err);
 
 									doc.data = data;
 
 									/* update data */
-									db.collection("topics").findAndModify({"query":{"id":doc.id},"update":{"$set":{
+									db.collection("queue").findAndModify({"query":{"id":doc.id},"update":{"$set":{
 										stage: 1,
 										data: doc.data,
 										updated: (new Date())
