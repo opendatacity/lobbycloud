@@ -71,7 +71,8 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 							return res.send(401);
 
 						users.delete(user.id, function (err) {
-							res.json(err ? 400 : 200, err.toString());
+							if (err) return res.json(400, err.message);
+							res.json(200);
 						});
 					});
 				});
