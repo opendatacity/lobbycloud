@@ -59,8 +59,8 @@ module.exports = {
 	mails: {
 		dbfile: "data/mails.json",
 		from: "LobbyCloud <lobbycloud@gmail.com>",
-		waitperiod: 5 * 60 * 1000,
-		expiredperiod: 6 * 60 * 60 * 60 * 1000,
+		waitperiod: (5 * 60 * 1000),
+		expiredperiod: (6 * 60 * 60 * 60 * 1000),
 		maxqueueworker: 3,
 //		transport: {name: "sendmail"},
 		transport: {
