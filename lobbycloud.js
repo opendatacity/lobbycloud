@@ -19,18 +19,26 @@ var multer = require("multer");
 var moment = require("moment");
 var i18n = require("i18n");
 
+/* get local modules */
+var lobbycloud = require("./modules/lobbycloud");
+
 /* require config */
 var config = require(path.resolve(__dirname, "config.js"), 20);
 
+/* get an instance of lobbycloud */
+var l = new lobbycloud(config);
+
+/* provide legacy vars, FIXME: use l.* instead of cluttering valuable global namespace */
+var invites = l.invites;
+var mailqueue = l.mailqueue;
+var mockupdocs = l.mockupdocs;
+var organisations = l.organisations;
+var topics = l.topics;
+var users = l.users;
+var queue = l.queue;
+
 /* signup database */
 var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
-
-/* require local modules */
-var invites = new (require("./modules/invites"))(path.resolve(__dirname, config.invitedb));
-var mailqueue = new (require("./modules/mailqueue"))(config.mails, config.url, emails);
-var users = new (require("./modules/users"))({db: config.db}, mailqueue, i18n);
-/* mockup docs */
-var mockupdocs = require('./modules/mockdocs')();
 
 /* backendapi */
 var backendapi = new (require("./modules/backendapi"))(users, mockupdocs, invites, i18n);

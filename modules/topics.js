@@ -1,21 +1,11 @@
 #!/usr/bin/env node
 
-/* require npm modules */
-var elasticsearch = require("elasticsearch");
-var mongojs = require("mongojs");
-
 /* require local modules */
 var slugmaker = require("./slugmaker");
 
-module.exports = function(opts){
+module.exports = function(opts, db, es){
 
 	var topics = this;
-
-	/* set up mongodb */
-	var db = new mongojs(opts.db);
-
-	/* set up elasticsearch */
-	var es = new elasticsearch.Client(opts.elasticsearch.connect);
 	
 	var cache = {};
 

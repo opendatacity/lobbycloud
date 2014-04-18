@@ -9,16 +9,10 @@ var _ = require("underscore");
 /* require local modules */
 var slugmaker = require("./slugmaker");
 
-module.exports = orgs = function(opts){
+module.exports = orgs = function(opts, db, es){
 
 	var organisations = this;
 
-	/* set up mongodb */
-	var db = new mongojs(opts.db);
-
-	/* set up elasticsearch */
-	var es = new elasticsearch.Client(opts.elasticsearch.connect);
-	
 	var cache = {};
 
 	db.collection("organisations").ensureIndex("id", {"unique": true, "background": true, "dropDups": true});

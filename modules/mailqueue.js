@@ -9,7 +9,7 @@ var crypto = require("crypto");
 var mustache = require("mustache");
 var i18n = require("i18n");
 
-module.exports = mailqueue = function (config, url, emails) {
+module.exports = mailqueue = function (config, url) {
 
 	var transport = nodemailer.createTransport(config.transport.name, config.transport);
 
@@ -97,7 +97,7 @@ module.exports = mailqueue = function (config, url, emails) {
 	var queue = async.queue(function (task, callback) {
 		task.sent = new Date();
 		mailqueue.save(function () {
-			var settings = emails[task.type];
+			var settings = config.mails.templates[task.type];
 			if (!settings) return callback();
 			sendmail(task, settings, function (err) {
 				//TODO: try resend and then give up FIXME:

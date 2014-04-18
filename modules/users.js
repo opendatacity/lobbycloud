@@ -11,10 +11,10 @@ var _ = require("underscore");
 
 /* prepare regexp */
 
-module.exports = function (opts, mailqueue, i18n) {
+module.exports = function (opts, db, es, mailqueue, i18n) {
 
 	var users = this;
-	var db = new mongojs(opts.db);
+
 	var cache = {};
 
 	/* make sure indexes are there */
