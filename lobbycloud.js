@@ -40,9 +40,6 @@ var queue = l.queue;
 /* signup database */
 var signupdb = new sqlite3.Database(path.resolve(__dirname, config.signupdb));
 
-/* backendapi */
-var backendapi = new (require("./modules/backendapi"))(users, mockupdocs, invites, i18n);
-
 /* configure storage */
 var storage = new filedump(path.resolve(__dirname, config.storage));
 
@@ -500,7 +497,7 @@ app.post('/api/backend/:cmd', function (req, res) {
 	if (!req.user) {
 		res.send(401);
 	} else {
-		backendapi.request(req, res);
+		l.backendapi.request(req, res);
 	}
 });
 

@@ -11,12 +11,13 @@ var i18n = require("i18n");
 /* require local modules */
 var modules = {
 	organisations: require("./organisations"),
-	mailqueue: require("./mailqueue"),
+	backendapi: require("./backendapi"),
 	mockupdocs: require("./mockdocs"),
+	mailqueue: require("./mailqueue"),
 	invites: require("./invites"),
 	topics: require("./topics"),
 	users: require("./users"),
-	queue: require("./queue"),
+	queue: require("./queue")
 };
 
 /* get dirname of main module */
@@ -44,6 +45,8 @@ var Lobbycloud = function(config){
 	this.topics = new modules.topics(config, db, es);
 	this.users = new modules.users(config, db, es, this.mailqueue, i18n);
 	this.queue = new modules.queue(config, db, es, this.organisations, this.topics, this.users); 
+
+	this.backendapi = new modules.backendapi(this.users, this.mockupdocs, this.invites, i18n);
 
 	return l;
 	

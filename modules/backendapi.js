@@ -3,7 +3,7 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 
 	var validateUser = function (err, user, cb) {
 		if ((!user) && (!err)) err = 'Unknown Error';
-		if (err || (!user)) return res.send(400, err.toString());
+		if (err || (!user)) return res.send(400, err.toString()); // FIXME: there is no var res at this point
 		cb();
 	};
 
