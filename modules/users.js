@@ -149,15 +149,20 @@ module.exports = function (opts, mailqueue, i18n) {
 		users.get(id, function (err, user) {
 			if (err) return callback(false);
 			cache[user.id] = user;
-			users.password(pass, {
-				method: user.password[0],
-				salt: user.password[2],
-				iterations: user.password[3]
-			}, function (err, method, hash, salt, iterations, time) {
-				if (err) return callback(false);
-				if (hash !== user.password[1]) return callback(false);
+			if (typeof pass == 'string') {
+				users.password(pass, {
+					method: user.password[0],
+					salt: user.password[2],
+					iterations: user.password[3]
+				}, function (err, method, hash, salt, iterations, time) {
+					if (err) return callback(false);
+					if (hash !== user.password[1]) return callback(false);
+					callback(true, user);
+				});
+			} else {
+				if (pass[1] !== user.password[1]) return callback(false);
 				callback(true, user);
-			});
+			}
 		});
 	};
 
@@ -229,20 +234,6 @@ module.exports = function (opts, mailqueue, i18n) {
 		});
 	};
 
-	/* change password */
-	users.changepass = function (id, password, oldpassword, callback) {
-		users.auth(id, oldpassword, function (success, user) {
-			if (!user) return callback(new Error("could not change password"));
-			users.password(password, function (err, method, key, salt, it, time) {
-				db.collection("users").findAndModify({query: {id: id}, update: {$set: {password: [method, key, salt, it]}}, new: true}, function (err, doc) {
-					if (err) return callback(err);
-					cache[id] = doc;
-					callback(null);
-				});
-			});
-		});
-	};
-
 	/* get user by apikey */
 	users.apikey = function (apikey, callback) {
 		var cacheid = "apikey:" + apikey;
@@ -296,29 +287,45 @@ module.exports = function (opts, mailqueue, i18n) {
 
 	/* check user e-mail validation */
 	users.verify_email = function (linkkey, cb) {
-		var task = mailqueue.pop(linkkey);
-		if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
-		users.get(task.id, function (err, user) {
-			if (err || (!user) || (task.email !== user.email))
-				return cb(new Error(i18n.__("Link is invalid")));
-			db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
-				if (err) return cb(new Error(i18n.__("Internal Error :(")));
-				cache[doc.id] = doc;
-				cb(null, i18n.__("Thank you. Your email adress is now validated."));
+		mailqueue.pop(linkkey, function (task) {
+			if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
+			users.get(task.id, function (err, user) {
+				if (err || (!user) || (task.email !== user.email))
+					return cb(new Error(i18n.__("Link is invalid")));
+				db.collection("users").findAndModify({query: {id: user.id}, update: {$set: {verified: true}}, new: true}, function (err, doc) {
+					if (err) return cb(new Error(i18n.__("Internal Error :(")));
+					cache[doc.id] = doc;
+					cb(null, i18n.__("Thank you. Your email adress is now validated."));
+				});
+			});
+		});
+	};
+
+	/* change password */
+	users.changepass = function (id, password, oldpassword, callback) {
+		users.auth(id, oldpassword, function (success, user) {
+			if (!user) return callback(new Error("could not change password"));
+			users.password(password, function (err, method, key, salt, it, time) {
+				db.collection("users").findAndModify({query: {id: id}, update: {$set: {password: [method, key, salt, it]}}, new: true}, function (err, doc) {
+					if (err) return callback(err);
+					cache[id] = doc;
+					callback(null, doc);
+				});
 			});
 		});
 	};
 
 	/* check new passwort request */
 	users.password_reset = function (linkkey, password, cb) {
-		var task = mailqueue.pop(linkkey);
-		if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
-		users.get(task.id, function (err, user) {
-			if (err || (!user))
-				return cb(new Error(i18n.__("Link is invalid")));
-			users.changepass(user.id, password, user.password, function (err, result) {
-				cb(err, result ? i18n.__("Password successfully changed.") : i18n.__("Internal Error :("));
-			})
+		mailqueue.pop(linkkey, function (task) {
+			if (!task) return cb(new Error(i18n.__("Link expired, invalid or does not exists")));
+			users.get(task.id, function (err, user) {
+				if (err || (!user))
+					return cb(new Error(i18n.__("Link is invalid")));
+				users.changepass(user.id, password, user.password, function (err, result) {
+					cb(err, result ? i18n.__("Password successfully changed.") : '');
+				});
+			});
 		});
 	};
 

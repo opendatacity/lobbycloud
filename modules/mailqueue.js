@@ -7,6 +7,7 @@ var async = require("async");
 var fs = require("fs");
 var crypto = require("crypto");
 var mustache = require("mustache");
+var i18n = require("i18n");
 
 module.exports = mailqueue = function (config, url, emails) {
 
@@ -44,36 +45,64 @@ module.exports = mailqueue = function (config, url, emails) {
 		return ((new Date()) - date > period);
 	};
 
+	var loadBody = function (settings, cb) {
+		var lang = i18n.getLocale();
+		var tmplpath = path.resolve(__dirname, '../assets/mails');
+		var filename = tmplpath + '/' + settings.mailview + '-' + lang + '.mustache';
+		console.log();
+		fs.exists(filename, function (exists) {
+			if (!exists) {
+				console.log('mail template "' + filename + '" is missing');
+				filename = tmplpath + '/' + settings.mailview + '-en.mustache';
+			}
+			fs.exists(filename, function (exists) {
+				if (!exists) {
+					console.log('mail template "' + filename + '" is missing');
+					return cb('');
+				}
+				fs.readFile(filename, function (err, data) {
+					if (err) {
+						console.log('error loading mail template', filename);
+						return cb('');
+					}
+					cb(data.toString());
+				});
+			});
+		});
+	};
+
 	var sendmail = function (task, settings, cb) {
 		var linkurl = url + settings.urlpath + task.linkkey;
-		var emailbody = settings.body() || url;
+		loadBody(settings, function (emailbody) {
 
-		var mailOptions = {
-			from: config.from, // sender address
-			to: task.email,
-			subject: settings.title(task),
-			text: mustache.render(emailbody, {html: false, task: task, url: linkurl}),
-			html: mustache.render(emailbody, {html: true, task: task, url: linkurl})
-		};
+			var mailOptions = {
+				from: config.from, // sender address
+				to: task.email,
+				subject: i18n.__(settings.title.txt, task[settings.title.propname]),
+				text: mustache.render(emailbody, {html: false, task: task, url: linkurl}),
+				html: mustache.render(emailbody, {html: true, task: task, url: linkurl})
+			};
 
-		transport.sendMail(mailOptions, function (error, response) {
-			if (error) { //FIXME: logging
-				console.log("Message NOT sent:", error);
-			} else {
-				console.log("Message sent:", task.email, response);
-			}
-			cb(error);
+			transport.sendMail(mailOptions, function (error, response) {
+				if (error) { //FIXME: logging
+					console.log("Message NOT sent:", error);
+				} else {
+					console.log("Message sent:", task.email, response);
+				}
+				cb(error);
+			});
 		});
 	};
 
 	var queue = async.queue(function (task, callback) {
 		task.sent = new Date();
-		mailqueue.save();
-		var settings = emails[task.type];
-		if (!settings) return callback();
-		sendmail(task, settings, function (err) {
-			//TODO: try resend and then give up
-			callback();
+		mailqueue.save(function () {
+			var settings = emails[task.type];
+			if (!settings) return callback();
+			sendmail(task, settings, function (err) {
+				//TODO: try resend and then give up FIXME:
+				callback();
+			});
 		});
 	}, config.maxqueueworker);
 
@@ -84,13 +113,11 @@ module.exports = mailqueue = function (config, url, emails) {
 	};
 
 	mailqueue.save = function (callback) {
-		fs.writeFile(config.dbfile, JSON.stringify(tasks), callback);
 		fs.rename(config.dbfile, config.dbfile + ".backup", function (err) {
-			if (err) return callback(err);
+//			if (err) return callback(err); //ignore if not exists
 			fs.writeFile(config.dbfile, JSON.stringify(tasks), function (err) {
 				if (err) return callback(err);
 				fs.unlink(config.dbfile + ".backup", callback)
-
 			});
 		});
 	};
@@ -120,23 +147,26 @@ module.exports = mailqueue = function (config, url, emails) {
 		task.linkkey = crypto.randomBytes(23).toString("hex");
 		queue.push(task);
 		tasks.push(task);
-		mailqueue.save();
-		cb(null, true);
+		mailqueue.save(function () {
+			cb(null, true);
+		});
 	};
 
 	/*	gets a task by link key and removes it from the task list */
 
-	mailqueue.pop = function (linkkey) {
+	mailqueue.pop = function (linkkey, cb) {
 		mailqueue.cleanup();
 		for (var i = 0; i < tasks.length; i++) {
 			var t = tasks[i];
 			if (t.linkkey === linkkey) {
 				tasks.splice(i, 1);
-				mailqueue.save();
-				return t;
+				mailqueue.save(function () {
+					cb(t);
+				});
+				return;
 			}
 		}
-		return null;
+		cb(null);
 	};
 
 
