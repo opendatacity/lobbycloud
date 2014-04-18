@@ -1,9 +1,9 @@
 module.exports = function (users, mockupdocs, invites, i18n) {
 	var api = this;
 
-	var validateUser = function (err, user, cb) {
+	var validateUser = function (res, err, user, cb) {
 		if ((!user) && (!err)) err = 'Unknown Error';
-		if (err || (!user)) return res.send(400, err.toString()); // FIXME: there is no var res at this point
+		if (err) return res.send(400, err.toString());
 		cb();
 	};
 
@@ -64,7 +64,7 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 			access: users.roles.editor,
 			execute: function (req, res) {
 				users.get(req.body.id, function (err, user) {
-					validateUser(err, user, function () {
+					validateUser(res, err, user, function () {
 
 						//only admins may delete admins
 						if ((user.role === users.roles.admin) && (req.user.role !== users.roles.admin))
@@ -89,7 +89,7 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 					return res.send(401);
 
 				users.add(req.body.user, function (err, user) {
-					validateUser(err, user, function () {
+					validateUser(res, err, user, function () {
 						res.json(users.prepareClientUser(user));
 					});
 				});
@@ -101,14 +101,14 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id) || (!req.body.user)) return res.send(400);
 				users.get(req.body.id, function (err, user) {
-					validateUser(err, user, function () {
+					validateUser(res, err, user, function () {
 
 						//only admins may edit admins
 						if ((req.body.user.role === users.roles.admin) && (req.user.role !== users.roles.admin))
 							return res.send(401);
 
 						users.update(user.id, req.body.user, req.user.role, function (err, user) {
-							validateUser(err, user, function () {
+							validateUser(res, err, user, function () {
 								res.json(users.prepareClientUser(user));
 							});
 						});
