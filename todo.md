@@ -3,3 +3,4 @@
 This is just for the LobbyCloud team to keep track of things we would otherwise forget.
 
 * generate and set `id` for uploaded documents
+* delete old tmp files!!!
