@@ -91,8 +91,9 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 			stages: 
 			0: new, just received
 			1: extracted ready for review
-			2: reviewed and accepted
-			3: reviewed and declined
+			2: extraction failed
+			3: reviewed and accepted
+			4: reviewed and declined
 		*/
 	
 		var doc = {
@@ -229,7 +230,31 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 								
 								/* extract */
 								ex.extract(path.resolve(__root, config.storage, doc.file), function(err, data){
-									if (err) return console.log("extraction error", err);
+									if (err) {
+
+										/* set database to failed extraction */
+										db.collection("queue").findAndModify({"query":{"id":doc.id},"update":{"$set":{
+											stage: 2,
+											data: {
+												error: err.message
+											},
+											updated: (new Date())
+										}},"new":true}, function(err, doc){
+											if (err) return console.log("extraction error", err); // FIXME: better error handling
+
+											/* update cache */
+											cache[id] = doc;
+
+											/* notify */
+											if (typeof queue.notify === "function") queue.notify(doc.id, 2, doc);
+
+										});
+
+										/* don't proceed */
+										return console.log("extraction error", err); // FIXME: better error handling
+									}
+
+									console.log("[queue]", "convert finished for doc", doc.id);
 
 									doc.data = data;
 

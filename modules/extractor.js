@@ -63,17 +63,25 @@ module.exports = extractor = function(store){
 	t.hashthumb = function(file, pages, callback) {
 		var file = path.resolve(file);
 		if (typeof pages !== "number") return callback(new Error("invalid argument: pages."));
-		var hash = gm(file+"["+1+"]");
-		// FIXME: gremnlins here!
-		for (var i = 2; i <= pages; i++) {
-			hash.append(file+"["+i+"]");
+		/* hint: if a pdf has just one page, imagemagick fails on bracket notation */
+		if (pages === 1) {
+			var hash = gm(file);
+		} else {
+			var hash = gm(file+"["+0+"]");
+			for (var i = 1; i < pages; i++) {
+				hash.append(file+"["+i+"]");
+			}
 		}
 		t.filedump.save(hash.resize(50).stream("png"), "png", callback);
 	};
 	
 	/* thumbnails */
-	t.thumb = function(file, page, callback) {
+	t.thumb = function(file, pages, page, dim, callback) {
 		var file = path.resolve(file);
+		
+		/* check for pages argument since it is crucial due to imagemagick behaviour */
+		if (typeof pages !== "number") return callback(new Error("invalid argument: pages."));
+
 		/* set page 1 as default */
 		if (typeof page === "function") {
 			var callback = page;
@@ -81,24 +89,18 @@ module.exports = extractor = function(store){
 		} else if (typeof page !== "number") {
 			var page = 1;
 		}
+
+		/* hint: if a pdf has just one page, imagemagick fails on bracket notation */
+		if (page > pages) return callback(new Error("page out of range"));
+
+		var page = (pages === 1) ? "" : "["+(page-1)+"]";
+
 		t.filedump.prepare("png", function(err, filename){
-			gm(file+"["+page+"]").resize(300,300).write(path.resolve(t.store, filename), function(err){
+			gm(file+page).resize(dim,dim).write(path.resolve(t.store, filename), function(err){
 				if (err) return callback(err);
 				callback(null, filename);
 			});
 		});
-	};
-	
-	
-	/* hashable thumbnails */
-	t.hashthumb = function(file, pages, callback) {
-		var file = path.resolve(file);
-		if (typeof pages !== "number") return callback(new Error("invalid argument: pages."));
-		var hash = gm(file+"["+1+"]");
-		for (var i = 2; i <= pages; i++) {
-			hash.append(file+"["+i+"]");
-		}
-		t.filedump.save(hash.resize(50).stream("png"), "png", callback);
 	};
 
 	/* everything */
@@ -122,7 +124,7 @@ module.exports = extractor = function(store){
 					e.data.particles = particles;
 					e.data.text = [];
 					e.data.particles.forEach(function(pages){
-						pages.forEach(function(blocks){
+						pages.blocks.forEach(function(blocks){
 							e.data.text.push(blocks.lines.join(" "));
 						});
 					});
@@ -131,16 +133,38 @@ module.exports = extractor = function(store){
 						if (err) return callback(err);
 						e.data.hashthumb = hashthumb;
 						e.data.thumbs = [];
+						e.data.images = [];
 						for (var p = 1; p <= e.data.info.pages; p++) {
 							(function(p){
-								t.thumb(file, file, function(err, thumb){
+								t.thumb(file, e.data.info.pages, p, 300, function(err, thumb){
 									if (err) return callback(err);
 									e.data.thumbs.push({
 										"page": p,
 										"file": thumb
 									});
 									if (e.data.thumbs.length === e.data.info.pages) {
-										callback(null, e.data);
+										/* thumbs are done */
+										e.data.thumbs = e.data.thumbs.sort(function(a,b){
+											return (a.page - b.page);
+										});
+										for (var p = 1; p <= e.data.info.pages; p++) {
+											(function(p){
+												t.thumb(file, e.data.info.pages, p, 1024, function(err, image){
+													if (err) return callback(err);
+													e.data.images.push({
+														"page": p,
+														"file": image
+													});
+													if (e.data.images.length === e.data.info.pages) {
+														e.data.images = e.data.images.sort(function(a,b){
+															return (a.page - b.page);
+														});
+														/* images are done */
+														callback(null, e.data);
+													}
+												});
+											})(p);
+										}
 									}
 								});
 							})(p);
