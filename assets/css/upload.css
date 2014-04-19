@@ -39,14 +39,14 @@
     display: none;
 }
 
-#upload ul{
+#drop+ul{
 	display: block;
 	list-style: none;
 	margin: 0px;
 	padding: 0px;
 }
 
-#upload ul li {
+#drop+ul li {
 	display: block;
 	list-style: none;
 	background-color: #333;
@@ -56,11 +56,11 @@
 	border-top: 1px dashed #555;
 }
 
-#upload ul li input{
+#drop+ul li input{
     display: none;
 }
 
-#upload ul li p {
+#drop+ul li p {
     width: 144px;
     overflow: hidden;
     white-space: nowrap;
@@ -72,20 +72,20 @@
     left: 100px;
 }
 
-#upload ul li i{
+#drop+ul li i{
     font-weight: normal;
     font-style:normal;
     color:#7f7f7f;
     display:block;
 }
 
-#upload ul li canvas{
+#drop+ul li canvas{
     top: 15px;
     left: 32px;
     position: absolute;
 }
 
-#upload ul li span{
+#drop+ul li span{
     width: 15px;
     height: 12px;
     background: url('../img/upload-icons.png') no-repeat;
@@ -95,11 +95,11 @@
     cursor:pointer;
 }
 
-#upload ul li.working span{
+#drop+ul li.working span{
     height: 16px;
     background-position: 0 -12px;
 }
 
-#upload ul li.error p{
+#drop+ul li.error p{
     color:red;
 }

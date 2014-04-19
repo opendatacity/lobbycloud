@@ -9,9 +9,21 @@
 	<form id="upload" method="post" action="{{{_url}}}/api/upload" enctype="multipart/form-data" role="form">
 		<div class="row">
 			<div id="meta" class="col-md-6">
-				<div class="form-group">
+				<div class="form-group form-topic">
 					<label for="document-topic">{{#__}}Topic{{/__}}</label>
-					<input type="text" class="form-control" id="document-topic" name="topic" placeholder="{{#__}}Topic{{/__}}">
+					<div class="input-group">
+						<div class="input-group-btn dropdown-action">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No topic{{/__}}</span> <span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="javascript:;" data-action="disabled">{{#__}}No topic{{/__}}</a></li>
+								<li class="divider"></li>
+								<li><a href="javascript:;" data-action="select">{{#__}}Select topic{{/__}}</a></li>
+								<li><a href="javascript:;" data-action="suggest">{{#__}}Suggest new topic{{/__}}</a></li>
+							</ul>
+						</div>
+						<input type="hidden" class="form-control" id="document-topic-search" name="query" placeholder="{{#__}}Search for topics{{/__}}">
+						<input type="text" class="form-control" id="document-topic" name="topic" disabled="disabled" placeholder="{{#__}}Topic{{/__}}">
+					</div>
 				</div>
 				<div class="form-group">
 					<label for="document-tags">{{#__}}Tags, separated by comma{{/__}}</label>
