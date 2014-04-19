@@ -485,6 +485,50 @@ app.get('/api/whatever', function (req, res) {
 	res.json("not implemented");
 });
 
+/* topic suggestions */
+app.all('/api/topics/suggest', function (req, res) {
+	
+	// FIXME: let this be done by someone who truly understands elasticsearch
+	
+	var q = (req.body.q || req.query.q || null).replace(/\*/g,'');
+	
+	if (q === null || q === "") return res.json([]);
+
+	/* first just the query */
+	l.topics.find(q, function(err, result){
+
+		if (err) return res.json([]);
+	
+		if (result.length > 0) return res.json(result.map(function(r){
+			return { id: r.id, label: r.label };
+		}));
+		
+		/* then word beginning wildcard i guess */
+		l.topics.find(q+"*", function(err, result){
+
+			if (err) return res.json([]);
+	
+			if (result.length > 0) return res.json(result.map(function(r){
+				return { id: r.id, label: r.label };
+			}));
+		
+			/* finally wildcard yay! */
+			l.topics.find("*"+q+"*", function(err, result){
+				if (err) return res.json([]);
+				if (result.length === 0) return res.json([]);
+
+				return res.json(result.map(function(r){
+					return { id: r.id, label: r.label };
+				}));
+
+			});
+
+		});
+				
+	});
+	
+});
+
 /* default */
 app.all('*', function (req, res) {
 	res.redirect('/');
