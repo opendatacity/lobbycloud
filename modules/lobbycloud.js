@@ -41,7 +41,7 @@ var Lobbycloud = function(config){
 
 	/* FIXME: this is a bit ridiculous, future plan: pass this and use that. */
 
-	this.organisations = new modules.topics(config, db, es);
+	this.organisations = new modules.organisations(config, db, es);
 	this.topics = new modules.topics(config, db, es);
 	this.users = new modules.users(config, db, es, this.mailqueue, i18n);
 	this.queue = new modules.queue(config, db, es, this.organisations, this.topics, this.users); 
