@@ -46,31 +46,37 @@ $(document).ready(function(e){
 		$q.on("typeahead:selected", _activate);
 		$q.on("typeahead:autocompleted", _activate);
 		
+		var _select = function($f){
+			/* show text on dropdown button */
+			$(".dropdown-label", $e).text($f.text());
+			
+			/* do magic */
+			switch ($f.attr("data-action")) {
+				case "disabled":
+					$q.attr("type","hidden");
+					$v.val("").attr("disabled", "disabled").attr("type","text");
+				break;
+				case "select":
+					$q.val("").removeAttr("readonly").removeClass("fixed").attr("type","text");
+					$v.val("").removeAttr("disabled").attr("type","hidden");
+				break;
+				case "suggest":
+					$q.attr("type","hidden");
+					$v.val("").removeAttr("disabled").attr("type","text").focus();
+				break;
+			}
+		}
+		
 		$(".dropdown-action .dropdown-menu li a", $e).each(function(idx,f){
 			var $f = $(this);
 			$f.click(function(evt){
 				evt.preventDefault();
-
-				/* show text on dropdown button */
-				$(".dropdown-label", $e).text($f.text());
-				
-				/* do magic */
-				switch ($f.attr("data-action")) {
-					case "disabled":
-						$q.attr("type","hidden");
-						$v.val("").attr("disabled", "disabled").attr("type","text");
-					break;
-					case "select":
-						$q.val("").removeAttr("readonly").removeClass("fixed").attr("type","text");
-						$v.val("").removeAttr("disabled").attr("type","hidden");
-					break;
-					case "suggest":
-						$q.attr("type","hidden");
-						$v.val("").removeAttr("disabled").attr("type","text").focus();
-					break;
-				}
+				_select($f);
 			});
 		});
+		
+		_select($(".dropdown-menu li:first a", $e));
+		
 	});
 	
 });
