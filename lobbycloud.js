@@ -486,7 +486,7 @@ app.get('/api/whatever', function (req, res) {
 });
 
 /* topic suggestions */
-app.all('/api/topics/suggest', function (req, res) {
+app.all('/api/topic/suggest', function (req, res) {
 	
 	// FIXME: let this be done by someone who truly understands elasticsearch
 	
@@ -519,6 +519,50 @@ app.all('/api/topics/suggest', function (req, res) {
 
 				return res.json(result.map(function(r){
 					return { id: r.id, label: r.label };
+				}));
+
+			});
+
+		});
+				
+	});
+	
+});
+
+/* topic suggestions */
+app.all('/api/organisation/suggest', function (req, res) {
+	
+	// FIXME: let this be done by someone who truly understands elasticsearch
+	
+	var q = (req.body.q || req.query.q || null).replace(/\*/g,'');
+	
+	if (q === null || q === "") return res.json([]);
+
+	/* first just the query */
+	l.organisations.find(q, function(err, result){
+
+		if (err) return res.json([]);
+	
+		if (result.length > 0) return res.json(result.map(function(r){
+			return { id: r.id, label: [r.name, r.fullname].join(" - ") };
+		}));
+		
+		/* then word beginning wildcard i guess */
+		l.organisations.find(q+"*", function(err, result){
+
+			if (err) return res.json([]);
+	
+			if (result.length > 0) return res.json(result.map(function(r){
+				return { id: r.id, label: [r.name, r.fullname].join(" - ") };
+			}));
+		
+			/* finally wildcard yay! */
+			l.organisations.find("*"+q+"*", function(err, result){
+				if (err) return res.json([]);
+				if (result.length === 0) return res.json([]);
+
+				return res.json(result.map(function(r){
+					return { id: r.id, label: [r.name, r.fullname].join(" - ") };
 				}));
 
 			});
