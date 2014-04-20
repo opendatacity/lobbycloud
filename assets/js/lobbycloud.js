@@ -20,18 +20,19 @@ $(document).ready(function(e){
 		});
 	});
 	
-	/* topic select */
-	$('.form-topic').each(function(idx,e){
+	/* prop-select */
+	$('.prop-select').each(function(idx,e){
 		var $e = $(this);
-		var $v = $("input[name=topic]", $e);
-		var $q = $("input[name=query]", $e);
+		var $prop = $e.attr("data-prop");
+		var $v = $("input[name="+$prop+"]", $e);
+		var $q = $("input[name="+$prop+"-query]", $e);
 		$q.typeahead({
 		  minLength: 3,
 		  highlight: true
 		},{
 			displayKey: "label",
 			source: function(query, callback) {
-				$.get("/api/topics/suggest", {q: query}, callback, "json");
+				$.get("/api/"+$prop+"/suggest", {q: query}, callback, "json");
 			}
 		});
 		var _activate = function(o,v){
@@ -68,18 +69,9 @@ $(document).ready(function(e){
 						$v.val("").removeAttr("disabled").attr("type","text").focus();
 					break;
 				}
-				
 			});
 		});
-		
 	});
-
-	/*
-	$('.dropdown-menu li').click(function(e){
-	  var selected = $(this).text();
-	  $('.category').val(selected);  
-	});
-	*/
 	
 });
 
