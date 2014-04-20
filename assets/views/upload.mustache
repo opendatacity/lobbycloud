@@ -6,63 +6,74 @@
 	<p>
 		{{#__}}Lorem Ipsum{{/__}}
 	</p>
-	<form id="upload" method="post" action="{{{_url}}}/api/upload" enctype="multipart/form-data" role="form">
-		<div class="row">
-			<div id="meta" class="col-md-6">
-
-				<div class="form-group form-topic prop-select" data-prop="topic">
-					<label for="document-topic">{{#__}}Topic{{/__}}</label>
-					<div class="input-group">
-						<div class="input-group-btn dropdown-action">
-							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No topic{{/__}}</span> <span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="javascript:;" data-action="disabled">{{#__}}No topic{{/__}}</a></li>
-								<li class="divider"></li>
-								<li><a href="javascript:;" data-action="select">{{#__}}Select topic{{/__}}</a></li>
-								<li><a href="javascript:;" data-action="suggest">{{#__}}Suggest new topic{{/__}}</a></li>
-							</ul>
+	<div class="row">
+		<div class="col-md-6">
+			<h2>{{#__}}Upload queue{{/__}}</h2>
+			<p>{{#__}}These are your uploaded documents waiting for processing or approval.{{/__}}</p>
+		</div>
+		<div class="col-md-6">
+			<h2>{{#__}}Upload new documents{{/__}}</h2>
+			<p>{{#__}}Lorem Ipsum{{/__}}</p>
+			<div class="upload-form">
+				<form id="upload" method="post" action="{{{_url}}}/api/upload" enctype="multipart/form-data" role="form">
+					<div class="form-group form-topic prop-select" data-prop="topic">
+						<label for="document-topic">{{#__}}Topic{{/__}}</label>
+						<div class="input-group">
+							<div class="input-group-btn dropdown-action">
+								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No topic{{/__}}</span> <span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="javascript:;" data-action="disabled">{{#__}}No topic{{/__}}</a></li>
+									<li class="divider"></li>
+									<li><a href="javascript:;" data-action="select">{{#__}}Select topic{{/__}}</a></li>
+									<li><a href="javascript:;" data-action="suggest">{{#__}}Suggest new topic{{/__}}</a></li>
+								</ul>
+							</div>
+							<input type="hidden" class="form-control" id="document-topic-search" name="topic-query" placeholder="{{#__}}Search for topics{{/__}}">
+							<input type="text" class="form-control" id="document-topic" name="topic" disabled="disabled" placeholder="{{#__}}Topic{{/__}}">
 						</div>
-						<input type="hidden" class="form-control" id="document-topic-search" name="topic-query" placeholder="{{#__}}Search for topics{{/__}}">
-						<input type="text" class="form-control" id="document-topic" name="topic" disabled="disabled" placeholder="{{#__}}Topic{{/__}}">
 					</div>
-				</div>
 
-				<div class="form-group form-organisation prop-select" data-prop="organisation">
-					<label for="document-organisation">{{#__}}Organisation{{/__}}</label>
-					<div class="input-group">
-						<div class="input-group-btn dropdown-action">
-							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No organisation{{/__}}</span> <span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="javascript:;" data-action="disabled">{{#__}}No organisation{{/__}}</a></li>
-								<li class="divider"></li>
-								<li><a href="javascript:;" data-action="select">{{#__}}Select organisation{{/__}}</a></li>
-								<li><a href="javascript:;" data-action="suggest">{{#__}}Suggest new organisation{{/__}}</a></li>
-							</ul>
+					<div class="form-group form-organisation prop-select" data-prop="organisation">
+						<label for="document-organisation">{{#__}}Organisation{{/__}}</label>
+						<div class="input-group">
+							<div class="input-group-btn dropdown-action">
+								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No organisation{{/__}}</span> <span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="javascript:;" data-action="disabled">{{#__}}No organisation{{/__}}</a></li>
+									<li class="divider"></li>
+									<li><a href="javascript:;" data-action="select">{{#__}}Select organisation{{/__}}</a></li>
+									<li><a href="javascript:;" data-action="suggest">{{#__}}Suggest new organisation{{/__}}</a></li>
+								</ul>
+							</div>
+							<input type="hidden" class="form-control" id="document-organisation-search" name="organisation-query" placeholder="{{#__}}Search for organisations{{/__}}">
+							<input type="text" class="form-control" id="document-organisation" name="organisation" disabled="disabled" placeholder="{{#__}}Organisation{{/__}}">
 						</div>
-						<input type="hidden" class="form-control" id="document-organisation-search" name="organisation-query" placeholder="{{#__}}Search for organisations{{/__}}">
-						<input type="text" class="form-control" id="document-organisation" name="organisation" disabled="disabled" placeholder="{{#__}}Organisation{{/__}}">
 					</div>
-				</div>
 
+					<div class="form-group">
+						<label for="document-tags">{{#__}}Tags, separated by comma{{/__}}</label>
+						<input type="text" class="form-control" id="document-tags" name="tags" data-role="tagsinput" placeholder="{{#__}}Tags{{/__}}">
+					</div>
+					
+					<div class="form-group">
+						<label for="document-comment">{{#__}}Comment for the review{{/__}}</label>
+						<textarea id="document-comment" name="comment" class="form-control" rows="3"></textarea>
+					</div>
 
-				<div class="form-group">
-					<label for="document-tags">{{#__}}Tags, separated by comma{{/__}}</label>
-					<input type="text" class="form-control" id="document-tags" name="tags" data-role="tagsinput" placeholder="{{#__}}Tags{{/__}}">
-				</div>
-				<div class="form-group">
-					<label for="document-comment">{{#__}}Comment for the review{{/__}}</label>
-					<textarea id="document-comment" name="comment" class="form-control" rows="3"></textarea>
-				</div>
-			</div>
-			<div class="col-md-6">
-				<div id="drop">
-					<span>{{#__}}Drop files here{{/__}}</span>
-					<a>{{#__}}Choose files{{/__}}</a>
-					<input type="file" name="_upload" multiple />
-				</div>
-				<ul></ul>
+					<div class="form-group">
+						<label for="document-comment">{{#__}}Uplaod files{{/__}}</label>
+						<div class="upload-area">
+							<div id="drop" class="upload-area-drop">
+								<span class="txt">{{#__}}Drop files here{{/__}}</span>
+								<a class="btn btn-primary">{{#__}}Choose files{{/__}}</a>
+								<input type="file" id="document-upload" name="_upload" multiple />
+							</div>
+							<ul class="upload-queue"></ul>
+						</div>
+					</div>
+				</form>
 			</div>
 		</div>
-	</form>
+	</div>
 </div>
 {{>footer}}

@@ -20,8 +20,7 @@ $(function(){
 	
 				console.log(e);
 
-            var tpl = $('<li class="working"><input type="text" value="0" data-width="48" data-height="48"'+
-                ' data-fgColor="#0788a5" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span></span></li>');
+            var tpl = $('<li class="working"><input type="text" value="0" data-width="48" data-height="48" data-fgColor="#0788a5" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span><i class="fa fa-times"></i><i class="fa fa-check"></i></span></li>');
 
             // Append the file name and file size
             tpl.find('p').text(data.files[0].name)
@@ -60,7 +59,7 @@ $(function(){
             data.context.find('input').val(progress).change();
 
             if(progress == 100){
-                data.context.removeClass('working');
+                data.context.removeClass('working').addClass('done');
             }
         },
 
