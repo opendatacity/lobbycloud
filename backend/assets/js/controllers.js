@@ -66,154 +66,93 @@ app.controller('LoginController', function ($scope, $state, AuthenticationServic
 
 app.controller('StartController', function ($scope, InvitesService, AuthenticationService) {
 	'use strict';
-	$scope.genInvite = function() {
+	$scope.genInvite = function () {
 		$scope.invite = InvitesService.create();
 	};
 });
 
-app.controller('UserListController', function ($scope, $state, $modal, AuthenticationService, UsersService) {
+app.controller('InvitesController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, InvitesService) {
 	'use strict';
 
-	$scope.getUserByID = function (id) {
-		return $scope.users.filter(function (user) {
-			return user.id === id;
-		})[0]
-	};
-
-	$scope.users = UsersService.users({},
-		function (data) {
-		},
-		function (err) {
+	$scope.load = function () {
+		$scope.loading = true;
+		InvitesService.list(function (invites) {
+			$scope.loading = false;
+			$scope.invites = invites;
+		}, function (err) {
+			$scope.loading = false;
 			if (err.status == 401) {
 				AuthenticationService.reset();
 				$state.go('login');
 			}
 		});
+	}
 
-	var deleteUser = function (user) {
-		user.processing = true;
-		UsersService.delete({id: user.id},
-			function () {
-				$scope.users = $scope.users.filter(function (u) {
-					return u.id !== user.id;
-				});
-			}, function (err) {
-				user.processing = false;
-				alert(err.data);
-			}
-		);
-	};
-
-	var updateUser = function (edit_user, org_user) {
-		if (org_user) {
-			org_user.processing = true;
-			UsersService.edit({id: org_user.id, user: edit_user}, function (user) {
-				$scope.users[$scope.users.indexOf(org_user)] = user;
-			}, function (err) {
-				org_user.processing = false;
-				alert(err.data);
-			})
-		} else {
-			UsersService.add({user: edit_user}, function (user) {
-				$scope.users.push(user);
-			}, function (err) {
-				alert(err.data);
-			})
-		}
-	};
-
-	$scope.editUserDialog = function (org_user) {
-		var user = org_user ? angular.copy(org_user) : {role: AuthenticationService.userRoles.user.title, create: true};
-		if (!user.url)
-			user.url = null;
-		var modalInstance = $modal.open({
-			templateUrl: 'partials/user.html',
-			controller: function ($scope, $modalInstance, user, AuthenticationService) {
-
-				$scope.user = user;
-				$scope.userRoles = AuthenticationService.userRolesList;
-				console.log(AuthenticationService.userRoles);
-				console.log(AuthenticationService.userRolesList);
-				$scope.ok = function (form) {
-					if (form.$valid)
-						$modalInstance.close($scope.user);
-				};
-
-				$scope.cancel = function () {
-					$modalInstance.dismiss('cancel');
-				};
-			},
-			resolve: {
-				user: function () {
-					return user;
-				}
-			}
-		});
-
-		modalInstance.result.then(function (user) {
-			updateUser(user, org_user);
-		}, function () {
-//			$log.info('Modal dismissed at: ' + new Date());
-		});
-	};
-
-	$scope.deleteUserDialog = function (org_user) {
-		var modalInstance = $modal.open({
-			templateUrl: 'deleteUserDialog.html',
-			controller: function ($scope, $modalInstance, user, AuthenticationService) {
-				$scope.user = user;
-				$scope.ok = function () {
-					$modalInstance.close($scope.user);
-				};
-				$scope.cancel = function () {
-					$modalInstance.dismiss('cancel');
-				};
-			},
-			resolve: {
-				user: function () {
-					return org_user;
-				}
-			}
-		});
-
-		modalInstance.result.then(function () {
-			deleteUser(org_user);
-		}, function () {
-//			$log.info('Modal dismissed at: ' + new Date());
-		});
-	};
-
+	$scope.load();
 });
 
-
-app.controller('InvitesController', function ($scope, InvitesService, AuthenticationService) {
-	'use strict';
-	$scope.loading = true;
-	$scope.invites = InvitesService.list();
-});
-
-app.controller('DocsListController', function ($scope, $state, $filter, $templateCache, ngTableParams, gettextCatalog, AuthenticationService, DocsService) {
+app.controller('DocsListController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, DocsService) {
 	'use strict';
 
-	$scope.loading = true;
-	var data = [];
-	$scope.docs = [];
-
-	var reload = function (o, n) {
+	var reloadTable = function (o, n) {
 		if ((!$scope.loading) && ($scope.tableParams) && (n !== undefined) && (o !== undefined) && (o !== n)) {
-			console.log('reload');
+//			console.log('reload');
 			$scope.tableParams.reload();
 		}
 	};
 
-	$scope.$watch("search.range", function (o, n) {
-		if (($scope.search) && (!$scope.search.range_enabled))
-			$scope.search.range_enabled = true;
-		else
-			reload(o, n);
-	});
-	$scope.$watch("search.range_enabled", reload);
-	$scope.$watch("search.title", reload);
+	$scope.initData = function (data) {
+		//init filter
+		var min = null;
+		var max = 0;
+		data.forEach(function (doc) {
+			min = min ? Math.min(doc.uploaded, min) : doc.uploaded;
+			max = Math.max(doc.uploaded, max);
+		});
+		$scope.filter = {
+			title: '',
+			range: {
+				startDate: moment(min),
+				endDate: moment(max)
+			},
+			range_enabled: false
+		};
+		$scope.$watch("filter.range", function (o, n) {
+			if (($scope.filter) && (!$scope.filter.range_enabled))
+				$scope.filter.range_enabled = true;
+			else
+				reloadTable(o, n);
+		});
+		$scope.$watch("filter.range_enabled", reloadTable);
+		$scope.$watch("filter.title", reloadTable);
+
+		//init table
+		$scope.tableParams = new ngTableParams({
+			page: 1,
+			count: 10,
+			sorting: {name: 'asc'}
+		}, {
+			total: data.length,
+			getData: function ($defer, params) {
+				var orderedData = data;
+				orderedData = $scope.filter.title ? $filter('filter')(orderedData, {'title': $scope.filter.title}) : orderedData;
+				if ($scope.filter.range && $scope.filter.range_enabled) {
+					var startDate = new Date($scope.filter.range.startDate).valueOf();
+					var endDate = new Date($scope.filter.range.endDate).valueOf();
+					orderedData = $filter('filter')(orderedData, function (value) {
+						return (value.uploaded >= startDate) && (value.uploaded <= endDate);
+					});
+				}
+				orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
+				params.total(orderedData.length);
+				$scope.docs = orderedData;
+				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+			}
+//				,groupBy: function(item) {
+//					return 'First letter "' + item.title[0] + '"';
+//				}
+		});
+	};
 
 	$scope.selectRow = function (clickdoc) {
 		if (clickdoc.$selected) {
@@ -228,67 +167,303 @@ app.controller('DocsListController', function ($scope, $state, $filter, $templat
 		}
 	};
 
-	DocsService.list({},
-		function (docsdata) {
-			data = docsdata;
-			var min = null;
-			var max = 0;
-			data.forEach(function (doc) {
-				min = min ? Math.min(doc.uploaded, min) : doc.uploaded;
-				max = Math.max(doc.uploaded, max);
-			});
-			$scope.search = {
-				title: '',
-				range: {
-					startDate: moment(min),
-					endDate: moment(max)
-				},
-				range_enabled: false
-			};
-			$scope.tableParams = new ngTableParams({
-				page: 1,            // show first page
-				count: 10,           // count per page,
-				sorting: {
-					name: 'asc'     // initial sorting
-				}
-			}, {
-				total: data.length, // length of data
-//				groupBy: function(item) {
-//					return 'First letter "' + item.title[0] + '"';
-//				},
-				getData: function ($defer, params) {
-					var
-						orderedData = $scope.search.title ? $filter('filter')(data, {'title': $scope.search.title}) : data;
-					if ($scope.search.range && $scope.search.range_enabled) {
-						var startDate = new Date($scope.search.range.startDate).valueOf();
-						var endDate = new Date($scope.search.range.endDate).valueOf();
-						orderedData = $filter('filter')(orderedData, function (value) {
-							return (value.uploaded >= startDate) && (value.uploaded <= endDate);
-						});
-					}
+	$scope.load = function () {
+		$scope.loading = true;
+		DocsService.list({},
+			function (fulldata) {
+				$scope.initData(fulldata);
+				$scope.filter.range_enabled = false;
+				$scope.loading = false;
 
-					orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
-
-					params.total(orderedData.length); // set total for recalc pagination
-					$scope.docs = orderedData;
-					$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+			},
+			function (err) {
+				$scope.loading = false;
+				if (err.status == 401) {
+					AuthenticationService.reset();
+					$state.go('login');
 				}
 			});
+	};
 
-			$scope.search.range_enabled = false;
-			$scope.loading = false;
+	$scope.load();
 
-		},
-		function (err) {
-			if (err.status == 401) {
-				AuthenticationService.reset();
-				$state.go('login');
-			}
-		});
 });
-
 
 app.controller('DocsUploadController', function ($scope) {
 	'use strict';
 	//we use the components from the front end
+});
+
+var editModalDialog = function ($modal, data, templateUrl, cb) {
+	var modalInstance = $modal.open({
+		templateUrl: templateUrl,
+		controller: function ($scope, $modalInstance, data) {
+
+			$scope.data = data;
+
+			$scope.ok = function (form) {
+				if (form.$valid)
+					$modalInstance.close($scope.data);
+			};
+
+			$scope.cancel = function () {
+				$modalInstance.dismiss('cancel');
+			};
+		},
+		resolve: {
+			data: function () {
+				return data;
+			}
+		}
+	});
+
+	modalInstance.result.then(function (data) {
+		cb(data);
+	}, function () {
+//			$log.info('Modal dismissed at: ' + new Date());
+	});
+};
+
+var deleteModalDialog = function ($modal, data, templateUrl, cb) {
+	var modalInstance = $modal.open({
+		templateUrl: templateUrl,
+		controller: function ($scope, $modalInstance, data) {
+			$scope.data = data;
+			$scope.ok = function () {
+				$modalInstance.close($scope.data);
+			};
+			$scope.cancel = function () {
+				$modalInstance.dismiss('cancel');
+			};
+		},
+		resolve: {
+			data: function () {
+				return data;
+			}
+		}
+	});
+
+	modalInstance.result.then(function () {
+		cb(data);
+	}, function () {
+//			$log.info('Modal dismissed at: ' + new Date());
+	});
+};
+
+app.controller('UserListController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, UsersService) {
+	'use strict';
+
+	$scope.load = function () {
+		$scope.loading = true;
+		$scope.users = UsersService.list({},
+			function (data) {
+				$scope.loading = false;
+			},
+			function (err) {
+				$scope.loading = false;
+				if (err.status == 401) {
+					AuthenticationService.reset();
+					$state.go('login');
+				}
+			});
+	};
+
+	$scope.newDialog = function () {
+		$scope.editDialog({role: AuthenticationService.userRoles.user.title, create: true});
+	};
+
+	$scope.editDialog = function (org_user) {
+		var user = angular.copy(org_user);
+		if (!user.url) user.url = null;
+		editModalDialog($modal, {
+			user: user,
+			userRoles: AuthenticationService.userRolesList
+		}, 'editUserDialog.html', function (data) {
+			if (data) {
+				if (!org_user.create) {
+					org_user.$processing = true;
+					UsersService.edit({id: org_user.id, user: data.user}, function (user) {
+						$scope.users[$scope.users.indexOf(org_user)] = user;
+					}, function (err) {
+						org_user.$processing = false;
+						alert(err.data);
+					})
+				} else {
+					UsersService.add({user: data.user}, function (user) {
+						$scope.users.push(user);
+					}, function (err) {
+						alert(err.data);
+					})
+				}
+			}
+		});
+	};
+
+	$scope.deleteDialog = function (user) {
+		deleteModalDialog($modal, user, 'deleteUserDialog.html', function (ok) {
+			if (!ok) return;
+			user.$processing = true;
+			UsersService.delete({id: user.id},
+				function () {
+					$scope.users = $scope.users.filter(function (u) {
+						return u.id !== user.id;
+					});
+				}, function (err) {
+					user.$processing = false;
+					alert(err.data);
+				}
+			);
+		});
+	};
+
+	$scope.load();
+
+});
+
+app.controller('TopicsListController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, TopicsService) {
+	'use strict';
+
+	var reloadTable = function (o, n) {
+		if (($scope) && (!$scope.loading) && ($scope.tableParams) && (n !== undefined) && (o !== undefined) && (o !== n)) {
+			$scope.tableParams.reload();
+		}
+	};
+
+	$scope.selectRow = function (clicktopic) {
+		if (clicktopic.$selected) {
+			clicktopic.$selected = false;
+			$scope.topic = null;
+		} else {
+			if ($scope.topic) {
+				$scope.topic.$selected = false;
+			}
+			clicktopic.$selected = true;
+			$scope.topic = clicktopic;
+		}
+	};
+
+	$scope.fulldata = [];
+
+	$scope.initData = function (data) {
+		$scope.fulldata = data;
+		// init filter
+		var min = null;
+		var max = 0;
+		data.forEach(function (topic) {
+			min = min ? Math.min(topic.created, min) : topic.created;
+			max = Math.max(topic.created, max);
+		});
+		$scope.filter = {
+			subject: '',
+			label: '',
+			description: '',
+			range: {
+				startDate: moment(min),
+				endDate: moment(max)
+			},
+			range_enabled: false
+		};
+		console.log($scope.filter);
+		$scope.$watch("filter.subject", reloadTable);
+		$scope.$watch("filter.label", reloadTable);
+		$scope.$watch("filter.description", reloadTable);
+
+		// init table
+		$scope.tableParams = new ngTableParams({
+			page: 1,
+			count: 10,
+			sorting: {label: 'asc'}
+		}, {
+			total: $scope.fulldata.length,
+			getData: function ($defer, params) {
+				var orderedData = $scope.fulldata;
+				orderedData = $scope.filter.subject ? $filter('filter')(orderedData, {'subject': $scope.filter.subject}) : orderedData;
+				orderedData = $scope.filter.label ? $filter('filter')(orderedData, {'label': $scope.filter.label}) : orderedData;
+				orderedData = $scope.filter.description ? $filter('filter')(orderedData, {'description': $scope.filter.description}) : orderedData;
+				if ($scope.filter.range_enabled) {
+					var startDate = new Date($scope.filter.range.startDate).valueOf();
+					var endDate = new Date($scope.filter.range.endDate).valueOf();
+					orderedData = $filter('filter')(orderedData, function (value) {
+						return (value.created >= startDate) && (value.created <= endDate);
+					});
+				}
+				orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
+				params.total(orderedData.length); // set total for recalc pagination
+				$scope.topics = orderedData;
+				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+			}
+//				,groupBy: function(item) {
+//					return 'First letter "' + item.title[0] + '"';
+//				}
+		});
+	};
+
+	$scope.load = function () {
+		$scope.loading = true;
+		TopicsService.list({},
+			function (data) {
+				$scope.initData(data);
+				$scope.filter.range_enabled = false;
+				$scope.loading = false;
+
+			},
+			function (err) {
+				$scope.loading = false;
+				if (err.status == 401) {
+					AuthenticationService.reset();
+					$state.go('login');
+				}
+			});
+	};
+
+	$scope.newDialog = function () {
+		$scope.editDialog({create: true});
+	};
+
+	$scope.editDialog = function (org_topic) {
+		editModalDialog($modal, {
+			topic: angular.copy(org_topic)
+		}, 'editTopicDialog.html', function (data) {
+			if (data) {
+				if (!org_topic.create) {
+					org_topic.$processing = true;
+					TopicsService.edit({topic: data.topic}, function (topic) {
+						$scope.fulldata[$scope.fulldata.indexOf(org_topic)] = topic;
+						$scope.tableParams.reload();
+					}, function (err) {
+						org_topic.$processing = false;
+						alert(err.data);
+					})
+				} else {
+					TopicsService.add({topic: data.topic}, function (topic) {
+						$scope.fulldata.push(topic);
+						$scope.tableParams.reload();
+					}, function (err) {
+						alert(err.data);
+					})
+				}
+			}
+		});
+	};
+
+	$scope.deleteDialog = function (topic) {
+		deleteModalDialog($modal, topic, 'deleteTopicDialog.html', function (ok) {
+			if (!ok) return;
+			topic.$processing = true;
+			TopicsService.delete({id: topic.id},
+				function () {
+					$scope.fulldata = $scope.fulldata.filter(function (t) {
+						return topic.id !== t.id;
+					});
+					$scope.tableParams.reload();
+				}, function (err) {
+					topic.$processing = false;
+					alert(err.data);
+				}
+			);
+		});
+	};
+
+	$scope.load();
+
 });

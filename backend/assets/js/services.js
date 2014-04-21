@@ -90,7 +90,7 @@ app.factory('AuthenticationService', function ($http, $rootScope, $cookieStore) 
 app.factory('UsersService', function ($resource) {
 	'use strict';
 	return $resource('/api/backend/:cmd', {}, {
-			users: {
+			list: {
 				method: 'POST',
 				params: {cmd: 'users'},
 				isArray: true
@@ -129,6 +129,30 @@ app.factory('DocsService', function ($resource) {
 				method: 'POST',
 				params: {cmd: 'docs'},
 				isArray: true
+			}
+		}
+	);
+});
+
+app.factory('TopicsService', function ($resource) {
+	'use strict';
+	return $resource('/api/backend/:cmd', {}, {
+			list: {
+				method: 'POST',
+				params: {cmd: 'topics'},
+				isArray: true
+			},
+			delete: {
+				method: 'POST',
+				params: {cmd: 'topics.delete'}
+			},
+			add: {
+				method: 'POST',
+				params: {cmd: 'topics.add'}
+			},
+			edit: {
+				method: 'POST',
+				params: {cmd: 'topics.update'}
 			}
 		}
 	);

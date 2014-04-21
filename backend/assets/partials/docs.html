@@ -1,17 +1,5 @@
-<!--<div class="well">-->
-<!--<h1>DEBUG</h1>-->
-<!--<button ng-click="tableParams.sorting({})" class="btn btn-default pull-right">Clear sorting</button>-->
-<!--<p><strong>Sorting:</strong> {{tableParams.sorting()|json}}</p>-->
-
-<!--<p><strong>Filter:</strong> {{search}}</p>-->
-
-<!--<p><strong>Page:</strong> {{tableParams.page()}}</p>-->
-
-<!--<p><strong>Count per page:</strong> {{tableParams.count()}}</p>-->
-<!--</div>-->
 <h1 translate>Manage Documents</h1>
 
-<br />
 <div class="row" ng-show="loading">
     <div class="col-md-9">
         <div>
@@ -20,73 +8,83 @@
     </div>
 </div>
 
-<div class="row" ng-show="!loading">
-    <div class="col-md-9">
-        <div>
-            <form class="form-inline" role="form">
-                <div class="form-group">
-                    <label translate>Filter Title</label>
-                    <input type="text" ng-model="search.title" placeholder="{{'Filter Title' | translate}}">
+<div ng-show="!loading">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="row">
+                <form class="form" role="form">
+                    <div class="form-group col-md-6">
+                        <label translate>Filter Title</label>
+                        <input class="form-group" type="text" ng-model="filter.title" placeholder="{{'Filter Title' | translate}}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label><input type="checkbox" ng-model="filter.range_enabled"> <span translate>Filter Date</span></label>
+                        <input class="input-daterange form-group" type="daterange" format="L" ng-model="filter.range">
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-left">
+                        <button type="button" class="btn btn-default" translate>Upload</button>
+                        <div class="list-title pull-left" translate translate-n="docs.length" translate-plural="{{docs.length}} documents">One document</div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label><input type="checkbox" ng-model="search.range_enabled"> <span translate>Filter Date</span></label>
-                    <input class="input-daterange" type="daterange" format="L" ng-model="search.range">
-                </div>
-            </form>
-
-            <h3 translate translate-n="count" translate-plural="{{docs.length}} documents">One document</h3>
-        </div>
-        <hr />
-
-        <table class="table table-responsive table-docs ng-table-rowselected" ng-table="tableParams" show-filter="true">
-            <thead>
-            <tr>
-                <th class="sortable" ng-class="{
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-responsive table-docs ng-table-rowselected" ng-table="tableParams" show-filter="true">
+                        <thead>
+                        <tr>
+                            <th class="sortable" ng-class="{
                     'sort-asc': tableParams.isSortBy('title', 'asc'),
                     'sort-desc': tableParams.isSortBy('title', 'desc')}"
-                    ng-click="tableParams.sorting({'title' : tableParams.isSortBy('title', 'asc') ? 'desc' : 'asc'})">
-                    <div translate>Title</div>
-                </th>
-                <th class="sortable" ng-class="{
+                                ng-click="tableParams.sorting({'title' : tableParams.isSortBy('title', 'asc') ? 'desc' : 'asc'})">
+                                <div translate>Title</div>
+                            </th>
+                            <th class="sortable" ng-class="{
                     'sort-asc': tableParams.isSortBy('uploaded', 'asc'),
                     'sort-desc': tableParams.isSortBy('uploaded', 'desc')}"
-                    ng-click="tableParams.sorting({'uploaded' : tableParams.isSortBy('uploaded', 'asc') ? 'desc' : 'asc'})">
-                    <div translate>Uploaded</div>
-                </th>
-                <th class="sortable" ng-class="{
+                                ng-click="tableParams.sorting({'uploaded' : tableParams.isSortBy('uploaded', 'asc') ? 'desc' : 'asc'})">
+                                <div translate>Uploaded</div>
+                            </th>
+                            <th class="sortable" ng-class="{
                     'sort-asc': tableParams.isSortBy('tags', 'asc'),
                     'sort-desc': tableParams.isSortBy('tags', 'desc')}"
-                    ng-click="tableParams.sorting({'tags' : tableParams.isSortBy('tags', 'asc') ? 'desc' : 'asc'})">
-                    <div translate>Tags</div>
-                </th>
-                <th translate>Actions</th>
-            </tr>
-            </thead>
+                                ng-click="tableParams.sorting({'tags' : tableParams.isSortBy('tags', 'asc') ? 'desc' : 'asc'})">
+                                <div translate>Tags</div>
+                            </th>
+                            <th translate>Actions</th>
+                        </tr>
+                        </thead>
 
-            <tr ng-repeat="doc in $data" ng-class="{'selected': doc.$selected}" ng-click="selectRow(doc)">
-                <td filter="{ 'title': 'text' }" sortable="'title'">{{doc.title}}</td>
-                <td sortable="'uploaded'">{{doc.uploaded | amDateFormat:'LLL'}}</td>
-                <td sortable="'tags'">{{doc.tags.join(',')}}</td>
-                <td>
-                    <div ng-show="doc.processing">
-                        <i class="fa fa-spinner fa-spin"></i>
-                    </div>
-                    <div ng-show="!doc.processing">
-                        <i class="btn btn-default fa fa-edit" title="{{'Edit Document'|translate}}" ng-click="showEditDialog()" />
-                        <i class="btn btn-default fa fa-trash-o" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(user.id)" />
-                    </div>
-                </td>
-            </tr>
+                        <tr ng-repeat="doc in $data" ng-class="{'selected': doc.$selected}" ng-click="selectRow(doc)">
+                            <td filter="{ 'title': 'text' }" sortable="'title'">{{doc.title}}</td>
+                            <td sortable="'uploaded'">{{doc.uploaded | amDateFormat:'LLL'}}</td>
+                            <td sortable="'tags'">{{doc.tags.join(',')}}</td>
+                            <td>
+                                <div ng-show="doc.$processing">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </div>
+                                <div ng-show="!doc.$processing">
+                                    <i class="btn btn-default fa fa-edit" title="{{'Edit Document'|translate}}" ng-click="showEditDialog()"/>
+                                    <i class="btn btn-default fa fa-trash-o" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(user.id)"/>
+                                </div>
+                            </td>
+                        </tr>
 
-        </table>
+                    </table>
 
-    </div>
-    <div class="col-md-3">
-        <div class="doc-view">
-            {{doc.title}}<br/>
-            {{doc.uploaded | amDateFormat:'LLL'}}<br/>
-            {{doc.tags.join(',')}}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="doc-view">
+                {{doc.title}}<br/>
+                {{doc.uploaded | amDateFormat:'LLL'}}<br/>
+                {{doc.tags.join(',')}}
+            </div>
         </div>
     </div>
 </div>
-

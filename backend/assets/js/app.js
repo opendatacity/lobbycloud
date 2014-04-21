@@ -57,6 +57,11 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider, $location
 			templateUrl: 'partials/docs.html',
 			controller: 'DocsListController'
 		})
+		.state('topics', {
+			url: '/topics',
+			templateUrl: 'partials/topics.html',
+			controller: 'TopicsListController'
+		})
 		.state('upload', {
 			url: '/upload',
 			templateUrl: 'partials/upload.html',

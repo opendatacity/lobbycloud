@@ -15,8 +15,8 @@
     <div ng-show="access(accessLevels.editor)" class="col-md-6">
         <h3 translate>Administration</h3>
         <a class="btn btn-default" ui-sref="users" translate>Manage Users</a>
-        <a class="btn btn-default" href="javascript:;" ng-click="genInvite()" translate>Generate Invite</a>
-        <!--<a class="btn btn-default" href="#/admin/groups" translate>Manage Groups</a>-->
+        <a class="btn btn-default" ng-click="genInvite()" translate>Generate Invite</a>
+        <a class="btn btn-default" ui-sref="topics" translate>Manage Topics</a>
     </div>
 </div>
 
