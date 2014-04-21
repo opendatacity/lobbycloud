@@ -50,6 +50,9 @@ module.exports = function(opts, db, es){
 				/* cache it */
 				cache[topic.id] = result;
 
+				//do not wait for elasticsearch and ignore it's errors
+				callback(null, result);
+
 				/* add to elasticsearch */
 				es.create({
 					index: opts.elasticsearch.index,
@@ -60,8 +63,7 @@ module.exports = function(opts, db, es){
 						subject: data.subject
 					}
 				}, function (err, resp) {
-					if (err) return callback(err);
-					callback(null, result);
+					if (err) return console.log(err); //TODO: better logging
 				});
 			});
 		});
@@ -82,14 +84,16 @@ module.exports = function(opts, db, es){
 				/* remove from cache */
 				if (cache.hasOwnProperty(id)) delete cache[id];
 
+				//do not wait for elasticsearch and ignore it's errors
+				callback(null);
+
 				/* remove from elasticsearch */
 				es.delete({
 					index: opts.elasticsearch.index,
 					type: 'topic',
-					id: id,
+					id: id
 				}, function (err, resp) {
-					if (err) return callback(err);
-					callback(null);
+					if (err) return console.log(err); //TODO: better logging
 				});
 			});
 		});
@@ -109,7 +113,7 @@ module.exports = function(opts, db, es){
 		if (Object.keys(update).length === 0) return callback(null);
 		
 		/* check if topic exists */
-		topics.check(topic.id, function(err, exists){
+		topics.check(id, function(err, exists){
 			if (err) return callback(err);
 			if (!exists) return callback(new Error("Topic does not exists"));
 		
@@ -122,12 +126,15 @@ module.exports = function(opts, db, es){
 				
 				/* check if elasticsearch doesn't need an update */
 				if (!update.hasOwnProperty("label") && !update.hasOwnProperty("subject")) return callback(null, doc);
-				
+
+				//do not wait for elasticsearch and ignore it's errors
+				callback(null, doc);
+
 				/* update elasticsearch index */
 				es.update({
 					index: opts.elasticsearch.index,
 					type: 'topic',
-					id: topic.id,
+					id: id,
 					body: {
 						doc: {
 							label: update.label,
@@ -135,8 +142,7 @@ module.exports = function(opts, db, es){
 						}
 					}
 				}, function (err, resp) {
-					if (err) return callback(err);
-					callback(null, doc);
+					if (err) return console.log(err); //TODO: better logging
 				});
 			});
 		});
@@ -186,8 +192,8 @@ module.exports = function(opts, db, es){
 	topics.all = function(callback) {
 		db.collection("topics").find(function(err,results){
 			if (err) return callback(err);
-			results.forEach(function(user){
-				cache[user.id] = user;
+			results.forEach(function(r){
+				cache[r.id] = r;
 			});
 			callback(null, results);
 		});
