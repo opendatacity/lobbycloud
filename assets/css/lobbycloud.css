@@ -34,6 +34,10 @@ header {
 			
 		}
 
+        header #navbar .dropdown-menu a {
+            color: #000;
+        }
+
 		header #navbar a:focus,
 		header #navbar a:hover,
 		header #navbar a:active {
