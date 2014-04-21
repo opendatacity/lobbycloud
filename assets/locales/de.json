@@ -108,6 +108,12 @@
 	"Search for organisations": "Search for organisations",
 	"Uplaod files": "Uplaod files",
 	"Upload queue": "Upload queue",
-	"These are your uploaded documents waiting for processing or approval.": "These are your uploaded documents waiting for processing or approval.",
-	"Upload new documents": "Upload new documents"
+	"These are your uploaded documents waiting for processing or approval.": "Dies sind die von Dir hochgeladenen Dokumente, die auf Verarbeitung oder Freigabe warten.",
+	"Upload new documents": "Neue Dokumente hochladen",
+	"You haven't uploaded any documents yet.": "Du hast noch keine Dokumente hochgeladen.",
+	"Processed and ready for review.": "Verarbeitet und bereit für die Begutachtung.",
+	"Uploaded": "Hochgeladen",
+	"Last update": "Letztes Update",
+	"Processing status": "Verarbeitungs-Status",
+	"Just uploaded, waiting for automated processing.": "Warten auf die automatische Verarbeitung."
 }

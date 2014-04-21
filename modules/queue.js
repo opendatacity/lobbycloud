@@ -12,6 +12,7 @@ var mongojs = require("mongojs");
 
 /* require local modules */
 var extractor = require("./extractor");
+var slugmaker = require("./slugmaker");
 
 /* get dirname of main module */
 var __root = path.dirname(process.mainModule.filename);
@@ -291,6 +292,18 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		
 	};
 	
+	/* get by id */
+	queue.get = function(id, callback){
+		id = slugmaker(id);
+		if (cache.hasOwnProperty(id)) return callback(null, cache[id]);
+		db.collection("queue").findOne({id: id}, function(err, result){
+			if (err) return callback(err);
+			if (result === null) return callback(new Error("Queue item does not exist"));
+			cache[id] = result;
+			callback(null, result);
+		});
+	};
+
 	/* get complete queue by stage */
 	queue.all = function(stage, callback) {
 		
