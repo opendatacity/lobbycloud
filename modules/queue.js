@@ -84,7 +84,7 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		});
 	};
 
-	/* doc: {"file","topic","organisation","tags","comment","source"; "state"} */
+	/* doc: {"file","topic","organisation","tags","comment","user","source";"state"} */
 	queue.add = function(data, callback) {
 	
 		/* 
@@ -94,6 +94,7 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 			2: extraction failed
 			3: reviewed and accepted
 			4: reviewed and declined
+			5: cancelled by user
 		*/
 	
 		var doc = {
@@ -314,6 +315,7 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		/* get from collection */
 		db.collection("queue").find(find, function(err, result){
 			if (err) return callback(err);
+			var list = [];
 			result.forEach(function(r){
 				/* add to result set */
 				list.push(r);
@@ -324,6 +326,38 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		});
 		
 	};
+
+	/* get queue for user */
+	queue.user = function(user, callback) {
+
+		/* devise statement according to query */
+		if (user instanceof Array) {
+			/* get all stages */
+			var find = {"user": {"$in": user}};
+		} else if (typeof user === "string") {
+			/* get particular stage */
+			var find = {"user": user};
+		} else {
+			/* nope */
+			return callback(new Error("No user specified"));
+		}
+		
+		// FIXME: cache the result
+		
+		/* get from collection */
+		db.collection("queue").find(find, function(err, result){
+			if (err) return callback(err);
+
+			var list = [];
+			result.forEach(function(r){
+				/* add to result set */
+				list.push(r);
+				/* add to cache */
+				cache[r.id] = r;
+			});
+			callback(null, list);
+		});
+	}
 
 	return this;
 	
