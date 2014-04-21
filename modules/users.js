@@ -256,24 +256,6 @@ module.exports = function (opts, db, es, mailqueue, i18n) {
 		});
 	};
 
-	/* strips down user obj to values needed by ui */
-	users.prepareClientUser = function (user) {
-		if (!user) return null;
-		return {
-			id: user.id,
-			name: user.name,
-			role: user.role,
-			email: user.email,
-			gravatar: user.gravatar,
-			url: user.url,
-			description: user.description,
-			organisation: user.organisation,
-			location: user.location,
-			verified: user.verified,
-			created: user.created
-		}
-	};
-
 	/* send user e-mail  */
 	users.send_mail = function (user, type, cb) {
 		mailqueue.send(user, type, function (err, success) {
