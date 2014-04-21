@@ -26,7 +26,16 @@ module.exports = function (lobbycloud, i18n) {
 	};
 
 	var prepareClientOrganisation = function (organisation) {
-		return organisation;
+		if (!organisation) return null;
+		return {
+			id: organisation.id,
+			name: organisation.name,
+			fullname: organisation.fullname,
+			url: organisation.url,
+			logo: organisation.logo,
+			description: organisation.description,
+			created: new Date(organisation.created).valueOf()
+		}
 	};
 
 	/* strips down user obj to values needed by ui */
