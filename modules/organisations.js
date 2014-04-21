@@ -45,7 +45,7 @@ module.exports = orgs = function(opts, db, es){
 		})) data.url = false;
 
 		/* check supplied logo url */
-		if (data.logo && !data.url.match(/^(http|https):\/\//)) data.logo = "http://"+data.logo;
+		if (data.logo && !data.logo.match(/^(http|https):\/\//)) data.logo = "http://"+data.logo;
 		if (data.logo && !validator.isURL(data.logo, {
 			protocols: ['http','https'],
 			require_tld: true,
@@ -60,7 +60,7 @@ module.exports = orgs = function(opts, db, es){
 			url: data.url,
 			logo: data.logo,
 			created: (new Date())
-		}
+		};
 		
 		organisations.check(org.id, function(err, exists){
 			if (err) return callback(err);
@@ -73,6 +73,9 @@ module.exports = orgs = function(opts, db, es){
 				/* cache it */
 				cache[org.id] = result;
 
+				//do not wait for elasticsearch and ignore it's errors
+				callback(null, result);
+
 				/* add to elasticsearch */
 				es.create({
 					index: opts.elasticsearch.index,
@@ -83,8 +86,7 @@ module.exports = orgs = function(opts, db, es){
 						fullname: data.fullname
 					}
 				}, function (err, resp) {
-					if (err) return callback(err);
-					callback(null, result);
+					if (err) return console.log(err);
 				});
 			});
 		});
@@ -106,14 +108,16 @@ module.exports = orgs = function(opts, db, es){
 				/* remove from cache */
 				if (cache.hasOwnProperty(id)) delete cache[id];
 
+				//do not wait for elasticsearch and ignore it's errors
+				callback(null);
+
 				/* remove from elasticsearch */
 				es.delete({
 					index: opts.elasticsearch.index,
 					type: 'organisation',
 					id: id,
 				}, function (err, resp) {
-					if (err) return callback(err);
-					callback(null);
+					if (err) return console.log(err);
 				});
 			});
 		});
@@ -129,13 +133,13 @@ module.exports = orgs = function(opts, db, es){
 		if (data.hasOwnProperty("fullname")) update.fullname = data.fullname;
 		if (data.hasOwnProperty("description")) update.description = data.description;
 		if (data.hasOwnProperty("url") && validator.isURL(data.url, {protocols: ['http','https'], require_tld: true, require_protocol: true})) update.url = data.url;
-		if (data.hasOwnProperty("logo") && validator.isURL(data.url, {protocols: ['http','https'], require_tld: true, require_protocol: true})) update.logo = data.logo;
+		if (data.hasOwnProperty("logo") && validator.isURL(data.logo, {protocols: ['http','https'], require_tld: true, require_protocol: true})) update.logo = data.logo;
 
 		/* check if nothing to update */
 		if (Object.keys(update).length === 0) return callback(null);
 		
 		/* check if organisation exists */
-		organisations.check(org.id, function(err, exists){
+		organisations.check(id, function(err, exists){
 			if (err) return callback(err);
 			if (!exists) return callback(new Error("Organisation does not exists"));
 		
@@ -145,15 +149,18 @@ module.exports = orgs = function(opts, db, es){
 
 				/* update cache */
 				cache[id] = doc;
-				
+
+				//do not wait for elasticsearch and ignore it's errors
+				callback(null, doc);
+
 				/* check if elasticsearch doesn't need an update */
-				if (!update.hasOwnProperty("name") && !update.hasOwnProperty("fullname")) return callback(null, doc);
+				if (!update.hasOwnProperty("name") && !update.hasOwnProperty("fullname")) return;
 				
 				/* update elasticsearch index */
 				es.update({
 					index: opts.elasticsearch.index,
 					type: 'organisation',
-					id: org.id,
+					id: id,
 					body: {
 						doc: {
 							name: update.name,
@@ -161,8 +168,7 @@ module.exports = orgs = function(opts, db, es){
 						}
 					}
 				}, function (err, resp) {
-					if (err) return callback(err);
-					callback(null, doc);
+					if (err) return console.log(err);
 				});
 			});
 		});

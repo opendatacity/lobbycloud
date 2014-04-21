@@ -16,12 +16,12 @@ module.exports = function (lobbycloud, i18n) {
 			role: user.role,
 			email: user.email,
 			gravatar: user.gravatar,
-			url: user.url,
+			url: user.url || null, //convert false to null, because angular displays value of boolean instead of nothing in ui, and: input fields validation fails, because val is set
 			description: user.description,
 			organisation: user.organisation,
 			location: user.location,
 			verified: user.verified,
-			created: user.created
+			created: new Date(user.created).valueOf()
 		}
 	};
 
@@ -31,8 +31,8 @@ module.exports = function (lobbycloud, i18n) {
 			id: organisation.id,
 			name: organisation.name,
 			fullname: organisation.fullname,
-			url: organisation.url,
-			logo: organisation.logo,
+			url: organisation.url || null, //see desc above
+			logo: organisation.logo || null, //see desc above
 			description: organisation.description,
 			created: new Date(organisation.created).valueOf()
 		}
@@ -165,7 +165,7 @@ module.exports = function (lobbycloud, i18n) {
 			//change organisation properties, returns changed user as json
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
-				if ((!req.body) || (!req.body.topic)) return res.send(400);
+				if ((!req.body) || (!req.body.organisation)) return res.send(400);
 				lobbycloud.organisations.update(req.body.organisation.id, req.body.organisation, function (err, organisation) {
 					if (err) return res.send(400, err.message);
 					res.json(prepareClientOrganisation(organisation));

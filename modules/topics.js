@@ -123,12 +123,12 @@ module.exports = function(opts, db, es){
 
 				/* update cache */
 				cache[id] = doc;
-				
-				/* check if elasticsearch doesn't need an update */
-				if (!update.hasOwnProperty("label") && !update.hasOwnProperty("subject")) return callback(null, doc);
 
 				//do not wait for elasticsearch and ignore it's errors
 				callback(null, doc);
+
+				/* check if elasticsearch doesn't need an update */
+				if (!update.hasOwnProperty("label") && !update.hasOwnProperty("subject")) return;
 
 				/* update elasticsearch index */
 				es.update({
