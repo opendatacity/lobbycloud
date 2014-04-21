@@ -64,8 +64,18 @@
                 <ul id="nav-site" class="nav navbar-nav" ng-class="{ hidden: !isLoggedIn()}">
                     <li ui-sref-active="active"><a ui-sref="upload" translate>Upload</a></li>
                     <li ui-sref-active="active"><a ui-sref="docs" translate>Documents</a></li>
-                    <li ng-show="access(accessLevels.editor)" ui-sref-active="active"><a ui-sref="users" translate>Accounts</a></li>
-                    <li ui-sref-active="active"><a href="/" translate>Frontpage</a></li>
+                    <li class="dropdown" ng-show="access(accessLevels.editor)">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                            Administration
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            <li ui-sref-active="active"><a ui-sref="users" translate>Users</a></li>
+                            <li ui-sref-active="active"><a ui-sref="topics" translate>Topics</a></li>
+                            <li ui-sref-active="active"><a ui-sref="organisations" translate>Organisations</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/" title="{{'Frontpage' | translate}}"><i class="fa fa-cloud"></i></a></li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right navbar-user">

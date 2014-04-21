@@ -91,12 +91,11 @@ app.controller('InvitesController', function ($scope, $state, $modal, $filter, n
 	$scope.load();
 });
 
-app.controller('DocsListController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, DocsService) {
+app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, DocsService) {
 	'use strict';
 
 	var reloadTable = function (o, n) {
 		if ((!$scope.loading) && ($scope.tableParams) && (n !== undefined) && (o !== undefined) && (o !== n)) {
-//			console.log('reload');
 			$scope.tableParams.reload();
 		}
 	};
@@ -112,15 +111,13 @@ app.controller('DocsListController', function ($scope, $state, $modal, $filter, 
 		$scope.filter = {
 			title: '',
 			range: {
-				startDate: moment(min),
-				endDate: moment(max)
+				startDate: moment(min ? min : (new Date())),
+				endDate: moment(max ? max : (new Date()))
 			},
 			range_enabled: false
 		};
 		$scope.$watch("filter.range", function (o, n) {
-			if (($scope.filter) && (!$scope.filter.range_enabled))
-				$scope.filter.range_enabled = true;
-			else
+			if ($scope.filter.range_enabled)
 				reloadTable(o, n);
 		});
 		$scope.$watch("filter.range_enabled", reloadTable);
@@ -172,7 +169,6 @@ app.controller('DocsListController', function ($scope, $state, $modal, $filter, 
 		DocsService.list({},
 			function (fulldata) {
 				$scope.initData(fulldata);
-				$scope.filter.range_enabled = false;
 				$scope.loading = false;
 
 			},
@@ -250,7 +246,7 @@ var deleteModalDialog = function ($modal, data, templateUrl, cb) {
 	});
 };
 
-app.controller('UserListController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, UsersService) {
+app.controller('UsersController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, UsersService) {
 	'use strict';
 
 	$scope.load = function () {
@@ -273,10 +269,8 @@ app.controller('UserListController', function ($scope, $state, $modal, $filter, 
 	};
 
 	$scope.editDialog = function (org_user) {
-		var user = angular.copy(org_user);
-		if (!user.url) user.url = null;
 		editModalDialog($modal, {
-			user: user,
+			user: angular.copy(org_user),
 			userRoles: AuthenticationService.userRolesList
 		}, 'editUserDialog.html', function (data) {
 			if (data) {
@@ -320,25 +314,12 @@ app.controller('UserListController', function ($scope, $state, $modal, $filter, 
 
 });
 
-app.controller('TopicsListController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, TopicsService) {
+app.controller('TopicsController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, TopicsService) {
 	'use strict';
 
 	var reloadTable = function (o, n) {
 		if (($scope) && (!$scope.loading) && ($scope.tableParams) && (n !== undefined) && (o !== undefined) && (o !== n)) {
 			$scope.tableParams.reload();
-		}
-	};
-
-	$scope.selectRow = function (clicktopic) {
-		if (clicktopic.$selected) {
-			clicktopic.$selected = false;
-			$scope.topic = null;
-		} else {
-			if ($scope.topic) {
-				$scope.topic.$selected = false;
-			}
-			clicktopic.$selected = true;
-			$scope.topic = clicktopic;
 		}
 	};
 
@@ -358,44 +339,49 @@ app.controller('TopicsListController', function ($scope, $state, $modal, $filter
 			label: '',
 			description: '',
 			range: {
-				startDate: moment(min),
-				endDate: moment(max)
+				startDate: moment(min ? min : (new Date())),
+				endDate: moment(max ? max : (new Date()))
 			},
 			range_enabled: false
 		};
-		console.log($scope.filter);
 		$scope.$watch("filter.subject", reloadTable);
 		$scope.$watch("filter.label", reloadTable);
 		$scope.$watch("filter.description", reloadTable);
+		$scope.$watch("filter.range_enabled", reloadTable);
+		$scope.$watch("filter.range", function (o, n) {
+			if ($scope.filter.range_enabled)
+				reloadTable(o, n);
+		});
 
 		// init table
 		$scope.tableParams = new ngTableParams({
-			page: 1,
-			count: 10,
-			sorting: {label: 'asc'}
-		}, {
-			total: $scope.fulldata.length,
-			getData: function ($defer, params) {
-				var orderedData = $scope.fulldata;
-				orderedData = $scope.filter.subject ? $filter('filter')(orderedData, {'subject': $scope.filter.subject}) : orderedData;
-				orderedData = $scope.filter.label ? $filter('filter')(orderedData, {'label': $scope.filter.label}) : orderedData;
-				orderedData = $scope.filter.description ? $filter('filter')(orderedData, {'description': $scope.filter.description}) : orderedData;
-				if ($scope.filter.range_enabled) {
-					var startDate = new Date($scope.filter.range.startDate).valueOf();
-					var endDate = new Date($scope.filter.range.endDate).valueOf();
-					orderedData = $filter('filter')(orderedData, function (value) {
-						return (value.created >= startDate) && (value.created <= endDate);
-					});
+				page: 1,
+				count: 10,
+				sorting: {label: 'asc'}
+			},
+			{
+				total: $scope.fulldata.length,
+				getData: function ($defer, params) {
+					var orderedData = $scope.fulldata;
+					orderedData = $scope.filter.subject ? $filter('filter')(orderedData, {'subject': $scope.filter.subject}) : orderedData;
+					orderedData = $scope.filter.label ? $filter('filter')(orderedData, {'label': $scope.filter.label}) : orderedData;
+					orderedData = $scope.filter.description ? $filter('filter')(orderedData, {'description': $scope.filter.description}) : orderedData;
+					if ($scope.filter.range_enabled) {
+						var startDate = new Date($scope.filter.range.startDate).valueOf();
+						var endDate = new Date($scope.filter.range.endDate).valueOf();
+						orderedData = $filter('filter')(orderedData, function (value) {
+							return (value.created >= startDate) && (value.created <= endDate);
+						});
+					}
+					orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
+					params.total(orderedData.length); // set total for recalc pagination
+					$scope.topics = orderedData;
+					$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 				}
-				orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
-				params.total(orderedData.length); // set total for recalc pagination
-				$scope.topics = orderedData;
-				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-			}
 //				,groupBy: function(item) {
 //					return 'First letter "' + item.title[0] + '"';
 //				}
-		});
+			});
 	};
 
 	$scope.load = function () {
@@ -403,7 +389,6 @@ app.controller('TopicsListController', function ($scope, $state, $modal, $filter
 		TopicsService.list({},
 			function (data) {
 				$scope.initData(data);
-				$scope.filter.range_enabled = false;
 				$scope.loading = false;
 
 			},
@@ -458,6 +443,144 @@ app.controller('TopicsListController', function ($scope, $state, $modal, $filter
 					$scope.tableParams.reload();
 				}, function (err) {
 					topic.$processing = false;
+					alert(err.data);
+				}
+			);
+		});
+	};
+
+	$scope.load();
+
+});
+
+app.controller('OrganisationsController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, OrganisationsService) {
+	'use strict';
+
+	var reloadTable = function (o, n) {
+		if (($scope) && (!$scope.loading) && ($scope.tableParams) && (n !== undefined) && (o !== undefined) && (o !== n)) {
+			$scope.tableParams.reload();
+		}
+	};
+
+	$scope.fulldata = [];
+
+	$scope.initData = function (data) {
+		$scope.fulldata = data;
+		// init filter
+		var min = null;
+		var max = 0;
+		data.forEach(function (org) {
+			min = min ? Math.min(org.created, min) : org.created;
+			max = Math.max(org.created, max);
+		});
+		$scope.filter = {
+			name: '',
+			fullname: '',
+			description: '',
+			range: {
+				startDate: moment(min ? min : (new Date())),
+				endDate: moment(max ? max : (new Date()))
+			},
+			range_enabled: false
+		};
+		$scope.$watch("filter.name", reloadTable);
+		$scope.$watch("filter.fullname", reloadTable);
+		$scope.$watch("filter.description", reloadTable);
+		$scope.$watch("filter.range_enabled", reloadTable);
+		$scope.$watch("filter.range", function (o, n) {
+			if ($scope.filter.range_enabled)
+				reloadTable(o, n);
+		});
+
+		// init table
+		$scope.tableParams = new ngTableParams({
+			page: 1,
+			count: 10,
+			sorting: {label: 'asc'}
+		}, {
+			total: $scope.fulldata.length,
+			getData: function ($defer, params) {
+				var orderedData = $scope.fulldata;
+				orderedData = $scope.filter.name ? $filter('filter')(orderedData, {'name': $scope.filter.name}) : orderedData;
+				orderedData = $scope.filter.fullname ? $filter('filter')(orderedData, {'fullname': $scope.filter.fullname}) : orderedData;
+				orderedData = $scope.filter.description ? $filter('filter')(orderedData, {'description': $scope.filter.description}) : orderedData;
+				if ($scope.filter.range_enabled) {
+					var startDate = new Date($scope.filter.range.startDate).valueOf();
+					var endDate = new Date($scope.filter.range.endDate).valueOf();
+					orderedData = $filter('filter')(orderedData, function (value) {
+						return (value.created >= startDate) && (value.created <= endDate);
+					});
+				}
+				orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
+				params.total(orderedData.length); // set total for recalc pagination
+				$scope.organisations = orderedData;
+				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+			}
+//				,groupBy: function(item) {
+//					return 'First letter "' + item.title[0] + '"';
+//				}
+		});
+	};
+
+	$scope.load = function () {
+		$scope.loading = true;
+		OrganisationsService.list({},
+			function (data) {
+				$scope.initData(data);
+				$scope.loading = false;
+
+			},
+			function (err) {
+				$scope.loading = false;
+				if (err.status == 401) {
+					AuthenticationService.reset();
+					$state.go('login');
+				}
+			});
+	};
+
+	$scope.newDialog = function () {
+		$scope.editDialog({create: true});
+	};
+
+	$scope.editDialog = function (org_org) {
+		editModalDialog($modal, {
+			organisation: angular.copy(org_org)
+		}, 'editOrganisationDialog.html', function (data) {
+			if (data) {
+				if (!org_org.create) {
+					org_org.$processing = true;
+					OrganisationsService.edit({organisation: data.organisation}, function (organisation) {
+						$scope.fulldata[$scope.fulldata.indexOf(org_org)] = organisation;
+						$scope.tableParams.reload();
+					}, function (err) {
+						org_org.$processing = false;
+						alert(err.data);
+					})
+				} else {
+					OrganisationsService.add({organisation: data.organisation}, function (organisation) {
+						$scope.fulldata.push(organisation);
+						$scope.tableParams.reload();
+					}, function (err) {
+						alert(err.data);
+					})
+				}
+			}
+		});
+	};
+
+	$scope.deleteDialog = function (organisation) {
+		deleteModalDialog($modal, organisation, 'deleteOrganisationDialog.html', function (ok) {
+			if (!ok) return;
+			organisation.$processing = true;
+			OrganisationsService.delete({id: organisation.id},
+				function () {
+					$scope.fulldata = $scope.fulldata.filter(function (o) {
+						return organisation.id !== o.id;
+					});
+					$scope.tableParams.reload();
+				}, function (err) {
+					organisation.$processing = false;
 					alert(err.data);
 				}
 			);

@@ -47,7 +47,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider, $location
 		.state('users', {
 			url: '/users',
 			templateUrl: 'partials/users.html',
-			controller: 'UserListController',
+			controller: 'UsersController',
 			data: {
 				access: access.admin
 			}
@@ -55,12 +55,17 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider, $location
 		.state('docs', {
 			url: '/docs',
 			templateUrl: 'partials/docs.html',
-			controller: 'DocsListController'
+			controller: 'DocsController'
 		})
 		.state('topics', {
 			url: '/topics',
 			templateUrl: 'partials/topics.html',
-			controller: 'TopicsListController'
+			controller: 'TopicsController'
+		})
+		.state('organisations', {
+			url: '/organisations',
+			templateUrl: 'partials/organisations.html',
+			controller: 'OrganisationsController'
 		})
 		.state('upload', {
 			url: '/upload',
@@ -93,6 +98,10 @@ app.run(function ($window, $rootScope, $location, $state, gettextCatalog, Authen
 	};
 	$(window).resize(resize);
 	resize();
+
+	$rootScope.$on('stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+		resize();
+	});
 
 	$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 		var state_access = toState.data ? toState.data.access : access.user;

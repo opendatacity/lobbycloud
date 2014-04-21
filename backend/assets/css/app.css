@@ -16,22 +16,23 @@ body {
     background-color: #333;
     border: solid #ececec 1px;
     min-height: 400px;
-    color:#fff;
+    color: #fff;
+    padding: 20px;
 }
 
 #drop label {
-    background-color:#007a96;
-    color:#fff;
+    background-color: #007a96;
+    color: #fff;
     padding: 12px 26px;
-    font-size:14px;
-    border-radius:2px;
-    cursor:pointer;
-    display:inline-block;
-    line-height:1;
+    font-size: 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 1;
 }
 
-#drop label:hover{
-    background-color:#0986a3;
+#drop label:hover {
+    background-color: #0986a3;
 }
 
 .input-daterange {
@@ -67,4 +68,12 @@ body {
 
 .nomargins {
     margin: 0;
+}
+
+.btn-link {
+    color: #000;
+}
+
+.btn-link i {
+    margin-right: 6px;
 }

@@ -157,3 +157,27 @@ app.factory('TopicsService', function ($resource) {
 		}
 	);
 });
+
+app.factory('OrganisationsService', function ($resource) {
+	'use strict';
+	return $resource('/api/backend/:cmd', {}, {
+			list: {
+				method: 'POST',
+				params: {cmd: 'organisations'},
+				isArray: true
+			},
+			delete: {
+				method: 'POST',
+				params: {cmd: 'organisations.delete'}
+			},
+			add: {
+				method: 'POST',
+				params: {cmd: 'organisations.add'}
+			},
+			edit: {
+				method: 'POST',
+				params: {cmd: 'organisations.update'}
+			}
+		}
+	);
+});

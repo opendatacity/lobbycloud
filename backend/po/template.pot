@@ -3,11 +3,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: assets/index.html
-msgid "Accounts"
-msgstr ""
-
 #: assets/partials/docs.html
+#: assets/partials/organisations.html
+#: assets/partials/topics.html
 #: assets/partials/users.html
 msgid "Actions"
 msgstr ""
@@ -20,7 +18,6 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: assets/partials/user.html
 #: assets/js/directives.js
 msgid "Cancel"
 msgstr ""
@@ -33,10 +30,8 @@ msgstr ""
 msgid "Comment for the review"
 msgstr ""
 
-#: assets/partials/user.html
-msgid "Create User"
-msgstr ""
-
+#: assets/partials/organisations.html
+#: assets/partials/topics.html
 #: assets/partials/users.html
 msgid "Created"
 msgstr ""
@@ -45,8 +40,22 @@ msgstr ""
 msgid "Delete Document"
 msgstr ""
 
+#: assets/partials/organisations.html
+msgid "Delete Organisation"
+msgstr ""
+
+#: assets/partials/topics.html
+msgid "Delete Topic"
+msgstr ""
+
 #: assets/partials/users.html
 msgid "Delete User"
+msgstr ""
+
+#: assets/partials/organisations.html
+#: assets/partials/topics.html
+#: assets/partials/users.html
+msgid "Description"
 msgstr ""
 
 #: assets/index.html
@@ -66,16 +75,19 @@ msgstr ""
 msgid "Edit Documents"
 msgstr ""
 
-#: assets/partials/user.html
+#: assets/partials/organisations.html
+msgid "Edit Organisation"
+msgstr ""
+
+#: assets/partials/topics.html
+msgid "Edit Topic"
+msgstr ""
+
 #: assets/partials/users.html
 msgid "Edit User"
 msgstr ""
 
-#: assets/partials/user.html
-msgid "Email"
-msgstr ""
-
-#: assets/partials/user.html
+#: assets/partials/users.html
 msgid "Email adress"
 msgstr ""
 
@@ -83,24 +95,39 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: assets/partials/user.html
-msgid "Enter description"
-msgstr ""
-
-#: assets/partials/user.html
-msgid "Enter login name"
-msgstr ""
-
-#: assets/partials/user.html
+#: assets/partials/users.html
 msgid "Enter password"
 msgstr ""
 
-#: assets/partials/user.html
+#: assets/partials/users.html
 msgid "Enter password (leave empty for no changes)"
 msgstr ""
 
 #: assets/partials/docs.html
+#: assets/partials/organisations.html
+#: assets/partials/topics.html
 msgid "Filter Date"
+msgstr ""
+
+#: assets/partials/organisations.html
+#: assets/partials/topics.html
+msgid "Filter Description"
+msgstr ""
+
+#: assets/partials/organisations.html
+msgid "Filter Full name"
+msgstr ""
+
+#: assets/partials/topics.html
+msgid "Filter Label"
+msgstr ""
+
+#: assets/partials/organisations.html
+msgid "Filter Name"
+msgstr ""
+
+#: assets/partials/topics.html
+msgid "Filter Subject"
 msgstr ""
 
 #: assets/partials/docs.html
@@ -115,8 +142,9 @@ msgstr ""
 msgid "Frontpage"
 msgstr ""
 
-#: assets/partials/user.html
-msgid "Full Name"
+#: assets/partials/organisations.html
+#: assets/partials/users.html
+msgid "Full name"
 msgstr ""
 
 #: assets/partials/start.html
@@ -132,18 +160,20 @@ msgid "Gravatar"
 msgstr ""
 
 #: assets/partials/start.html
-msgid "Hello {{account.name||account.id}}!"
+msgid "Invites"
 msgstr ""
 
-#: assets/partials/users.html
-msgid "Loading Data..."
+#: assets/partials/topics.html
+msgid "Label"
 msgstr ""
 
 #: assets/partials/docs.html
+#: assets/partials/organisations.html
+#: assets/partials/topics.html
+#: assets/partials/users.html
 msgid "Loading..."
 msgstr ""
 
-#: assets/partials/user.html
 #: assets/partials/users.html
 msgid "Location"
 msgstr ""
@@ -157,9 +187,12 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: assets/partials/user.html
 #: assets/partials/users.html
-msgid "Login Name"
+msgid "Login name"
+msgstr ""
+
+#: assets/partials/organisations.html
+msgid "Logo"
 msgstr ""
 
 #: assets/index.html
@@ -170,22 +203,33 @@ msgstr ""
 msgid "Manage Documents"
 msgstr ""
 
-#: assets/partials/start.html
+#: assets/partials/organisations.html
+msgid "Manage Organisations"
+msgstr ""
+
+#: assets/partials/topics.html
+msgid "Manage Topics"
+msgstr ""
+
 #: assets/partials/users.html
 msgid "Manage Users"
 msgstr ""
 
-#: assets/partials/user.html
+#: assets/partials/organisations.html
 #: assets/partials/users.html
 msgid "Name"
 msgstr ""
 
-#: assets/partials/users.html
-msgid "New User"
+#: assets/partials/organisations.html
+msgid "New Organisation"
 msgstr ""
 
-#: assets/partials/user.html
-msgid "OK"
+#: assets/partials/topics.html
+msgid "New Topic"
+msgstr ""
+
+#: assets/partials/users.html
+msgid "New User"
 msgstr ""
 
 #: assets/partials/docs.html
@@ -194,17 +238,37 @@ msgid_plural "{{docs.length}} documents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/partials/user.html
+#: assets/partials/organisations.html
+msgid "One organisation"
+msgid_plural "{{organisations.length}} organisations"
+msgstr[0] ""
+msgstr[1] ""
+
+#: assets/partials/topics.html
+msgid "One topic"
+msgid_plural "{{topics.length}} topics"
+msgstr[0] ""
+msgstr[1] ""
+
+#: assets/partials/users.html
+msgid "One user"
+msgid_plural "{{users.length}} users"
+msgstr[0] ""
+msgstr[1] ""
+
 #: assets/partials/users.html
 msgid "Organisation"
 msgstr ""
 
+#: assets/index.html
+#: assets/partials/start.html
+msgid "Organisations"
+msgstr ""
+
 #: assets/partials/login.html
-#: assets/partials/user.html
 msgid "Password"
 msgstr ""
 
-#: assets/partials/user.html
 #: assets/partials/users.html
 msgid "Role"
 msgstr ""
@@ -213,8 +277,8 @@ msgstr ""
 msgid "Seems like you tried accessing something you don't have access to..."
 msgstr ""
 
-#: assets/partials/login.html
-msgid "Sign in"
+#: assets/partials/topics.html
+msgid "Subject"
 msgstr ""
 
 #: assets/partials/docs.html
@@ -247,6 +311,11 @@ msgid "Topic"
 msgstr ""
 
 #: assets/index.html
+#: assets/partials/start.html
+msgid "Topics"
+msgstr ""
+
+#: assets/index.html
 msgid "Upload"
 msgstr ""
 
@@ -262,15 +331,17 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
+#: assets/index.html
+#: assets/partials/start.html
+msgid "Users"
+msgstr ""
+
 #: assets/partials/users.html
 msgid "Verified"
 msgstr ""
 
-#: assets/partials/user.html
-msgid "Website"
-msgstr ""
-
-#: assets/partials/user.html
+#: assets/partials/organisations.html
+#: assets/partials/users.html
 msgid "Website URL"
 msgstr ""
 
@@ -280,10 +351,6 @@ msgstr ""
 
 #: assets/partials/error.html
 msgid "You're not authorized to view that page!"
-msgstr ""
-
-#: assets/partials/user.html
-msgid "description"
 msgstr ""
 
 #: assets/index.html
