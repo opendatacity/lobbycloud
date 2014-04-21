@@ -25,6 +25,22 @@ module.exports = function (lobbycloud, i18n) {
 		}
 	};
 
+	var prepareClientOrganisation = function (organisation) {
+		return organisation;
+	};
+
+	/* strips down user obj to values needed by ui */
+	var prepareClientTopic = function (topic) {
+		if (!topic) return null;
+		return {
+			id: topic.id,
+			label: topic.label,
+			subject: topic.subject,
+			description: topic.description,
+			created: new Date(topic.created).valueOf()
+		}
+	};
+
 	api.features = {
 		'logout': {
 			//logout
@@ -64,7 +80,9 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				lobbycloud.topics.all(function (err, data) {
-					res.json(data);
+					res.json(data.map(function (t) {
+						return prepareClientTopic(t);
+					}));
 				});
 			}
 		},
@@ -86,7 +104,7 @@ module.exports = function (lobbycloud, i18n) {
 				if ((!req.body) || (!req.body.topic)) return res.send(400);
 				lobbycloud.topics.add(req.body.topic, function (err, topic) {
 					if (err) return res.send(400, err.message);
-					res.json(topic);
+					res.json(prepareClientTopic(topic));
 				});
 			}
 		},
@@ -97,7 +115,7 @@ module.exports = function (lobbycloud, i18n) {
 				if ((!req.body) || (!req.body.topic)) return res.send(400);
 				lobbycloud.topics.update(req.body.topic.id, req.body.topic, function (err, topic) {
 					if (err) return res.send(400, err.message);
-					res.json(topic);
+					res.json(prepareClientTopic(topic));
 				});
 			}
 		},
@@ -106,7 +124,9 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				lobbycloud.organisations.all(function (err, data) {
-					res.json(data);
+					res.json(data.map(function (t) {
+						return prepareClientOrganisation(t);
+					}));
 				});
 			}
 		},
@@ -128,7 +148,7 @@ module.exports = function (lobbycloud, i18n) {
 				if ((!req.body) || (!req.body.organisation)) return res.send(400);
 				lobbycloud.organisations.add(req.body.organisation, function (err, organisation) {
 					if (err) return res.send(400, err.message);
-					res.json(organisation);
+					res.json(prepareClientOrganisation(organisation));
 				});
 			}
 		},
@@ -139,7 +159,7 @@ module.exports = function (lobbycloud, i18n) {
 				if ((!req.body) || (!req.body.topic)) return res.send(400);
 				lobbycloud.organisations.update(req.body.organisation.id, req.body.organisation, function (err, organisation) {
 					if (err) return res.send(400, err.message);
-					res.json(organisation);
+					res.json(prepareClientOrganisation(organisation));
 				});
 			}
 		},
