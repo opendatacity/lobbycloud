@@ -99,7 +99,7 @@ var _totags = function (tags) {
 /* launch express */
 var app = express();
 
-app.configure(function () {
+app.configure(function() {
 
 	/* enable compression */
 	app.use(express.compress());
@@ -126,6 +126,9 @@ app.configure(function () {
 
 	/* serve assets */
 	app.use('/assets', express.static(path.resolve(__dirname, 'assets')));
+
+	/* serve stored files */
+	app.use('/storage', express.static(path.resolve(__dirname, config.storage)));
 
 	/* backend interface */
 	app.use('/central', express.static(__dirname + '/backend/assets'));
@@ -277,7 +280,17 @@ app.get('/profile/:user', function (req, res) {
 
 /* upload */
 app.get('/upload', function (req, res) {
-	render(req, res, 'upload', {});
+	l.queue.user(req.user.id, function(err, queue){
+		queue.map(function(item){
+			item["stage-"+item.stage] = true;
+			item.created_relative = moment(item.created).lang(req.locale||"en").fromNow();
+			item.updated_relative = moment(item.created).lang(req.locale||"en").fromNow();
+			if (item.stage === 1 || item.stage >= 3) item.processed = true;
+		});
+		render(req, res, 'upload', {
+			queue: queue
+		});
+	});
 });
 
 /**

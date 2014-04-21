@@ -60,7 +60,7 @@ module.exports = function (opts, db, es, mailqueue, i18n) {
 	/* check if user exists */
 	users.check = function (id, callback) {
 		id = slugmaker(id);
-		if (cache.hasOwnProperty(id)) return callback(null, true);
+		if (cache.hasOwnProperty(id)) return callback(null, true, id);
 		db.collection("users").find({id: id}, {_id: 1}).limit(1, function (err, result) {
 			if (err) return callback(err);
 			callback(null, (result.length > 0), id);

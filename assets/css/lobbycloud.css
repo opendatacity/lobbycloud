@@ -197,7 +197,47 @@ header {
 
 	}
 	
+		/* thumb well */
+		
+		#main .thumb-well {
+
+			display: block;
+			position: relative;
+			height: 155px;
+			overflow: hidden;
+			overflow-x: auto;
+			overflow-y: hidden;
+			padding: 10px;
+			white-space: nowrap;
+			background-color: #fcfcfc;
+			box-shadow: 0px 0px 20px -10px rgba(0,0,0,0.5) inset; 
+			border: 1px solid #ccc;
+			border-radius: 3px;
+			margin: 0px 0px 10px;
+			
+		}
+
+			#main .thumb-well img {
+				
+				display: inline-block;
+				height: 120px;
+				background-color: #fff;
+				box-shadow: 0px 0px 7px -5px rgba(0,0,0,0.5);
+				margin-right: 10px;
+				
+			}
+	
 		/* upload */
+
+		#main .review-queue {
+			
+			display: block;
+			position: relative;
+			background-color: #fff;
+			box-shadow: 0px 0px 20px -10px rgba(0,0,0,0.5);
+			padding: 20px;
+			
+		}
 		
 		#main .upload-form {
 			

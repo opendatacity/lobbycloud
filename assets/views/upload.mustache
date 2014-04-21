@@ -10,6 +10,40 @@
 		<div class="col-md-6">
 			<h2>{{#__}}Upload queue{{/__}}</h2>
 			<p>{{#__}}These are your uploaded documents waiting for processing or approval.{{/__}}</p>
+			<div class="review-queue">
+				{{^queue}}
+				<div class="alert alert-info">
+					{{#__}}You haven't uploaded any documents yet.{{/__}}
+				</div>
+				{{/queue}}
+				{{#queue}}
+				<div class="queue-item queue-item-stage-{{stage}} panel panel-default panel-{{#stage-0}}warning{{/stage-0}}{{#stage-1}}warning{{/stage-1}}{{#stage-2}}error{{/stage-2}}{{#stage-3}}success{{/stage-3}}{{#stage-4}}error{{/stage-4}}{{#stage-5}}error{{/stage-5}}">
+					<div class="panel-heading">
+						<h3 class="panel-title">{{orig}}</h3>
+					</div>
+					<div class="panel-body">
+						{{#processed}}
+						<div class="thumb-well">
+							{{#data.thumbs}}
+							<img src="{{{_url}}}/storage/{{file}}" alt="" title="">
+							{{/data.thumbs}}
+						</div>
+						{{/processed}}
+						<p>{{#__}}Uploaded{{/__}} <strong>{{created_relative}}</strong></p>
+						<p>{{#__}}Last update{{/__}} <strong>{{updated_relative}}</strong></p>
+						<p>
+							{{#__}}Processing status{{/__}}:
+							{{#stage-0}}<strong>{{#__}}Just uploaded, waiting for automated processing.{{/__}}</strong>{{/stage-0}}
+							{{#stage-1}}<strong>{{#__}}Processed and ready for review.{{/__}}</strong>{{/stage-1}}
+							{{#stage-2}}<strong>{{#__}}Processing failed.{{/__}}</strong>{{/stage-2}}
+							{{#stage-3}}<strong>{{#__}}Accepted.{{/__}}</strong>{{/stage-3}}
+							{{#stage-4}}<strong>{{#__}}Declined.{{/__}}</strong>{{/stage-4}}
+							{{#stage-5}}<strong>{{#__}}Cancelled.{{/__}}</strong>{{/stage-5}}
+						</p>
+					</div>
+				</div>
+				{{/queue}}
+			</div>
 		</div>
 		<div class="col-md-6">
 			<h2>{{#__}}Upload new documents{{/__}}</h2>

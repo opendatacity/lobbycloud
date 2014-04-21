@@ -12,6 +12,7 @@ var mongojs = require("mongojs");
 
 /* require local modules */
 var extractor = require("./extractor");
+var slugmaker = require("./slugmaker");
 
 /* get dirname of main module */
 var __root = path.dirname(process.mainModule.filename);
@@ -84,7 +85,7 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		});
 	};
 
-	/* doc: {"file","topic","organisation","tags","comment","source"; "state"} */
+	/* doc: {"file","topic","organisation","tags","comment","user","source";"state"} */
 	queue.add = function(data, callback) {
 	
 		/* 
@@ -94,6 +95,7 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 			2: extraction failed
 			3: reviewed and accepted
 			4: reviewed and declined
+			5: cancelled by user
 		*/
 	
 		var doc = {
@@ -290,6 +292,18 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		
 	};
 	
+	/* get by id */
+	queue.get = function(id, callback){
+		id = slugmaker(id);
+		if (cache.hasOwnProperty(id)) return callback(null, cache[id]);
+		db.collection("queue").findOne({id: id}, function(err, result){
+			if (err) return callback(err);
+			if (result === null) return callback(new Error("Queue item does not exist"));
+			cache[id] = result;
+			callback(null, result);
+		});
+	};
+
 	/* get complete queue by stage */
 	queue.all = function(stage, callback) {
 		
@@ -314,6 +328,7 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		/* get from collection */
 		db.collection("queue").find(find, function(err, result){
 			if (err) return callback(err);
+			var list = [];
 			result.forEach(function(r){
 				/* add to result set */
 				list.push(r);
@@ -324,6 +339,38 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		});
 		
 	};
+
+	/* get queue for user */
+	queue.user = function(user, callback) {
+
+		/* devise statement according to query */
+		if (user instanceof Array) {
+			/* get all stages */
+			var find = {"user": {"$in": user}};
+		} else if (typeof user === "string") {
+			/* get particular stage */
+			var find = {"user": user};
+		} else {
+			/* nope */
+			return callback(new Error("No user specified"));
+		}
+		
+		// FIXME: cache the result
+		
+		/* get from collection */
+		db.collection("queue").find(find, function(err, result){
+			if (err) return callback(err);
+
+			var list = [];
+			result.forEach(function(r){
+				/* add to result set */
+				list.push(r);
+				/* add to cache */
+				cache[r.id] = r;
+			});
+			callback(null, list);
+		});
+	}
 
 	return this;
 	
