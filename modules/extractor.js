@@ -144,10 +144,7 @@ module.exports = extractor = function(store){
 									});
 									if (e.data.thumbs.length === e.data.info.pages) {
 										/* thumbs are done */
-										e.data.thumbs = e.data.thumbs.sort(function(a,b){
-											return (a.page - b.page);
-										});
-										for (var p = 1; p <= e.data.info.pages; p++) {
+										for (var pp = 1; pp <= e.data.info.pages; pp++) {
 											(function(p){
 												t.thumb(file, e.data.info.pages, p, 1024, function(err, image){
 													if (err) return callback(err);
@@ -159,11 +156,14 @@ module.exports = extractor = function(store){
 														e.data.images = e.data.images.sort(function(a,b){
 															return (a.page - b.page);
 														});
+														e.data.thumbs = e.data.thumbs.sort(function(a,b){
+															return (a.page - b.page);
+														});
 														/* images are done */
 														callback(null, e.data);
 													}
 												});
-											})(p);
+											})(pp);
 										}
 									}
 								});
