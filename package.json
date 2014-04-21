@@ -24,7 +24,8 @@
 		"async": ">= 0.7.0",
 		"connect-mongo": ">= 0.4.0",
 		"elasticsearch": ">= 2.1.2",
-		"mustache": ">= 0.8.1"
+		"mustache": ">= 0.8.1",
+		"hash_file":">= 0.1.1"
 	},
 	"engines": {
 		"node": "0.10.26"
