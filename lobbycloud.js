@@ -101,9 +101,6 @@ var app = express();
 
 app.configure(function () {
 
-	/* user logger */
-	if (config.debug) app.use(express.logger("dev"));
-
 	/* enable compression */
 	app.use(express.compress());
 
@@ -132,6 +129,9 @@ app.configure(function () {
 
 	/* backend interface */
 	app.use('/central', express.static(__dirname + '/backend/assets'));
+
+	/* user logger */
+	if (config.debug) app.use(express.logger("dev"));
 
 	/* internationalization */
 	app.use(i18n.init);
@@ -254,7 +254,7 @@ app.post('/beta', function (req, res) {
 var sendProfile = function (profile, req, res) {
 	render(req, res, 'profile', {
 		"is_own": (profile) && (req.user) && (profile.id == req.user.id),
-		"profile": ((profile) ? l.users.prepareClientUser(profile) : null),
+		"profile": profile,
 		"moment": function () {
 			return function (text, render) {
 				return moment(new Date(render(text))).format("LLL");
@@ -468,7 +468,7 @@ app.post('/users/reset/:key', resetPasswordCmd);
 
 /* backend api login */
 app.post('/api/backend/login', passport.authenticate('local', {}), function (req, res) {
-	res.json(l.users.prepareClientUser(req.user));
+	l.backendapi.user(req,res);
 });
 
 /* backend api */

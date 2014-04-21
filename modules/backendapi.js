@@ -1,4 +1,4 @@
-module.exports = function (users, mockupdocs, invites, i18n) {
+module.exports = function (lobbycloud, i18n) {
 	var api = this;
 
 	var validateUser = function (res, err, user, cb) {
@@ -7,10 +7,28 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 		cb();
 	};
 
+	/* strips down user obj to values needed by ui */
+	var prepareClientUser = function (user) {
+		if (!user) return null;
+		return {
+			id: user.id,
+			name: user.name,
+			role: user.role,
+			email: user.email,
+			gravatar: user.gravatar,
+			url: user.url,
+			description: user.description,
+			organisation: user.organisation,
+			location: user.location,
+			verified: user.verified,
+			created: user.created
+		}
+	};
+
 	api.features = {
 		'logout': {
 			//logout
-			access: users.roles.user,
+			access: lobbycloud.users.roles.user,
 			execute: function (req, res) {
 				if (req.user) {
 					req.logout();
@@ -20,59 +38,142 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 		},
 		'invite.create': {
 			//returns a string with a new invite code
-			access: users.roles.editor,
+			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
-				res.json({invite: invites.create(1)[0]});
+				res.json({invite: lobbycloud.invites.create(1)[0]});
 			}
 		},
 		'docs': {
 			//returns a json with documents for the ui list
-			access: users.roles.user,
+			access: lobbycloud.users.roles.user,
 			execute: function (req, res) {
-				mockupdocs.listDocs(function (err, data) {
+				lobbycloud.mockupdocs.listDocs(function (err, data) {
 					res.json(data);
 				});
 			}
 		},
 		'user': {
 			//returns the current user as json
-			access: users.roles.user,
+			access: lobbycloud.users.roles.user,
 			execute: function (req, res) {
-				res.json(users.prepareClientUser(req.user));
+				res.json(prepareClientUser(req.user));
+			}
+		},
+		'topics': {
+			//returns a json with a topic list for the ui
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				lobbycloud.topics.all(function (err, data) {
+					res.json(data);
+				});
+			}
+		},
+		'topics.delete': {
+			//delete topic, returns nothing if successfull
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				lobbycloud.topics.delete(req.body.id, function (err) {
+					if (err) return res.json(400, err.message);
+					res.send(200);
+				});
+			}
+		},
+		'topics.add': {
+			//new topic, returns new topic as json
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.topic)) return res.send(400);
+				lobbycloud.topics.add(req.body.topic, function (err, topic) {
+					if (err) return res.send(400, err.message);
+					res.json(topic);
+				});
+			}
+		},
+		'topics.update': {
+			//change topic properties, returns changed topic as json
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.topic)) return res.send(400);
+				lobbycloud.topics.update(req.body.topic.id, req.body.topic, function (err, topic) {
+					if (err) return res.send(400, err.message);
+					res.json(topic);
+				});
+			}
+		},
+		'organisations': {
+			//returns a json with a organisation list for the ui
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				lobbycloud.organisations.all(function (err, data) {
+					res.json(data);
+				});
+			}
+		},
+		'organisations.delete': {
+			//delete organisation, returns nothing if successfull
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				lobbycloud.organisations.delete(req.body.id, function (err) {
+					if (err) return res.json(400, err.message);
+					res.send(200);
+				});
+			}
+		},
+		'organisations.add': {
+			//new organisation, returns new organisation as json
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.organisation)) return res.send(400);
+				lobbycloud.organisations.add(req.body.organisation, function (err, organisation) {
+					if (err) return res.send(400, err.message);
+					res.json(organisation);
+				});
+			}
+		},
+		'organisations.update': {
+			//change organisation properties, returns changed user as json
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.topic)) return res.send(400);
+				lobbycloud.organisations.update(req.body.organisation.id, req.body.organisation, function (err, organisation) {
+					if (err) return res.send(400, err.message);
+					res.json(organisation);
+				});
 			}
 		},
 		'users': {
-			//returns a json with user for the ui list
-			access: users.roles.editor,
+			//returns a json with a user list for the ui
+			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
-				users.list(null, null, function (err, data) {
-					var data = data.map(function (user) {
-						return users.prepareClientUser(user);
+				lobbycloud.users.list(null, null, function (err, users) {
+					var users = users.map(function (u) {
+						return prepareClientUser(u);
 					});
-					if (req.user.role !== users.roles.admin) {
+					if (req.user.role !== lobbycloud.users.roles.admin) {
 						// only admins may display & edit other admins
-						data = data.filter(function (user) {
-							return user.role !== users.role.admin;
+						users = users.filter(function (u) {
+							return u.role !== lobbycloud.users.role.admin;
 						});
 					}
-					res.json(data);
+					res.json(users);
 				});
 			}
 		},
 		'users.delete': {
 			//delete user, returns nothing if successfull
-			access: users.roles.editor,
+			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
-				users.get(req.body.id, function (err, user) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				lobbycloud.users.get(req.body.id, function (err, user) {
 					validateUser(res, err, user, function () {
-
 						//only admins may delete admins
-						if ((user.role === users.roles.admin) && (req.user.role !== users.roles.admin))
+						if ((user.role === lobbycloud.users.roles.admin) && (req.user.role !== lobbycloud.users.roles.admin))
 							return res.send(401);
-
-						users.delete(user.id, function (err) {
+						lobbycloud.users.delete(user.id, function (err) {
 							if (err) return res.json(400, err.message);
-							res.json(200);
+							res.send(200);
 						});
 					});
 				});
@@ -80,36 +181,36 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 		},
 		'users.add': {
 			//new user, returns new user as json
-			access: users.roles.editor,
+			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.user)) return res.send(400);
 
 				//only admins may add admins
-				if ((req.body.user.role === users.roles.admin) && (req.user.role !== users.roles.admin))
+				if ((req.body.user.role === lobbycloud.users.roles.admin) && (req.user.role !== lobbycloud.users.roles.admin))
 					return res.send(401);
 
-				users.add(req.body.user, function (err, user) {
+				lobbycloud.users.add(req.body.user, function (err, user) {
 					validateUser(res, err, user, function () {
-						res.json(users.prepareClientUser(user));
+						res.json(prepareClientUser(user));
 					});
 				});
 			}
 		},
 		'users.update': {
 			//change user properties, returns changed user as json
-			access: users.roles.editor,
+			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id) || (!req.body.user)) return res.send(400);
-				users.get(req.body.id, function (err, user) {
+				lobbycloud.users.get(req.body.id, function (err, user) {
 					validateUser(res, err, user, function () {
 
 						//only admins may edit admins
-						if ((req.body.user.role === users.roles.admin) && (req.user.role !== users.roles.admin))
+						if ((req.body.user.role === lobbycloud.users.roles.admin) && (req.user.role !== lobbycloud.users.roles.admin))
 							return res.send(401);
 
-						users.update(user.id, req.body.user, req.user.role, function (err, user) {
+						lobbycloud.users.update(user.id, req.body.user, req.user.role, function (err, user) {
 							validateUser(res, err, user, function () {
-								res.json(users.prepareClientUser(user));
+								res.json(prepareClientUser(user));
 							});
 						});
 					});
@@ -118,17 +219,21 @@ module.exports = function (users, mockupdocs, invites, i18n) {
 		}
 	};
 
+	api.user = function (req, res) {
+		res.json(prepareClientUser(req.user));
+	};
+
 	api.request = function (req, res) {
 		var cmd = api.features[req.params.cmd];
 		// check unknown command
 		if (!cmd) return res.send(404);
 		// check access level
-		if (req.user.role === users.roles.admin) {
+		if (req.user.role === lobbycloud.users.roles.admin) {
 			//admins go everywhere
-		} else if (req.user.role === users.roles.editor) {
-			if (cmd.access === users.roles.admin) return res.send(401);
-		} else if (req.user.role === users.roles.user) {
-			if (cmd.access !== users.roles.user) return res.send(401);
+		} else if (req.user.role === lobbycloud.users.roles.editor) {
+			if (cmd.access === lobbycloud.users.roles.admin) return res.send(401);
+		} else if (req.user.role === lobbycloud.users.roles.user) {
+			if (cmd.access !== lobbycloud.users.roles.user) return res.send(401);
 		} else {
 			return res.send(401);
 		}

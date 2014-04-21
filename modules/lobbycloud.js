@@ -44,9 +44,9 @@ var Lobbycloud = function(config){
 	this.organisations = new modules.organisations(config, db, es);
 	this.topics = new modules.topics(config, db, es);
 	this.users = new modules.users(config, db, es, this.mailqueue, i18n);
-	this.queue = new modules.queue(config, db, es, this.organisations, this.topics, this.users); 
+	this.queue = new modules.queue(config, db, es, this.organisations, this.topics, this.users);
 
-	this.backendapi = new modules.backendapi(this.users, this.mockupdocs, this.invites, i18n);
+	this.backendapi = new modules.backendapi(this, i18n);
 
 	return l;
 	
