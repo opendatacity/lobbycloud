@@ -97,11 +97,11 @@ module.exports = mailqueue = function (config, url) {
 	var queue = async.queue(function (task, callback) {
 		task.sent = new Date();
 		mailqueue.save(function () {
-			if (!config.mails.templates.hasOwnProperty(task.type)) {
+			if (!config.templates.hasOwnProperty(task.type)) {
 				console.log("[mailqueue] invalid type", task.type)
 				return callback();
 			}
-			var settings = config.mails.templates[task.type];
+			var settings = config.templates[task.type];
 			if (!settings) return callback();
 			sendmail(task, settings, function (err) {
 				//TODO: try resend and then give up FIXME:
