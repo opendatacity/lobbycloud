@@ -231,10 +231,9 @@ app.all('/signup/:invite?', function (req, res) {
 		l.invites.spend(invite);
 
 		/* send validation email */
-		l.users.send_verify_email(user);
-
-		/* show login form */
-		render(req, res, 'login', {});
+		l.users.send_mail(user, 'verify', function () {
+			render(req, res, 'login', {});
+		});
 	});
 
 });
