@@ -9,7 +9,7 @@
 		"mustache-express": ">= 1.0.1",
 		"filedump": ">= 0.0.5",
 		"pdfinfojs": ">= 0.3.5",
-		"pdftxt": ">= 0.0.2",
+		"pdftxt": ">= 0.0.4",
 		"moment": ">= 2.5.1",
 		"gm": ">= 1.14.2",
 		"mmmagic": ">= 0.3.7",
