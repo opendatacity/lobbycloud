@@ -1,4 +1,5 @@
 $(document).ready(function(e){
+
 	$('#main').css('min-height', $(window).innerHeight()-($('header').outerHeight()+$('footer').outerHeight()));
 	
 	/* strengthometer */

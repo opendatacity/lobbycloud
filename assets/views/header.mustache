@@ -73,8 +73,8 @@
 					<a class="navbar-brand" href="/"><i class="fa fa-cloud"></i> {{#__}}Lobby<strong>Cloud</strong>{{/__}}</a>
 				</div>
 				<nav role="navigation" class="collapse navbar-collapse bs-navbar-collapse">
-					{{#_user}}
-					<ul class="nav navbar-nav">
+					<ul class="nav navbar-nav navbar-main">
+						<!--
 						<li>
 							<a href="/upload">{{#__}}Upload{{/__}}</a>
 						</li>
@@ -84,28 +84,45 @@
 						<li>
 							<a href="/comment">{{#__}}Comment{{/__}}</a>
 						</li>
-						{{#_userrole.editor}}
-                        <li>
-                            <a href="/central">{{#__}}Central{{/__}}</a>
-                        </li>
-						{{/_userrole.editor}}
+						-->
+						<li>
+							<a href="{{{_url}}}/topics">{{#__}}Topics{{/__}}</a>
+						</li>
+						<li>
+							<a href="{{{_url}}}/organisations">{{#__}}Organisations{{/__}}</a>
+						</li>
+						<li>
+							<a href="{{{_url}}}/documents">{{#__}}Documents{{/__}}</a>
+						</li>
+						<li>
+							<a href="{{{_url}}}/research">{{#__}}Research{{/__}}</a>
+						</li>
+						<li>
+							<a href="{{{_url}}}/about-lobbycloud">{{#__}}About LobbyCloud{{/__}}</a>
+						</li>
 					</ul>
+					{{#_user}}
 					<ul class="nav navbar-nav navbar-right navbar-user">
 						<li>
-							<a href="/profile" class="profile"><i class="fa fa-user"></i> {{_user.name}}</a>
+							<a href="{{{_url}}}/profile" class="profile"><i class="fa fa-user"></i> {{_user.name}}</a>
 						</li>
 						<li>
-							<a href="/logout">{{#__}}Logout{{/__}}</a>
+							<a href="{{{_url}}}/logout"><i class="fa fa-sign-in"></i> {{#__}}Logout{{/__}}</a>
 						</li>
+						{{#_userrole.editor}}
+						<li>
+							<a href="{{{_url}}}/central"><i class="fa fa-wrench"></i> {{#__}}Admin{{/__}}</a>
+						</li>
+						{{/_userrole.editor}}
 					</ul>
 					{{/_user}}
 					{{^_user}}
 					<ul class="nav navbar-nav navbar-right navbar-user">
 						<li>
-							<a href="/signup">{{#__}}Signup{{/__}}</a>
+							<a href="/signup"><i class="fa fa-sign-in"></i> {{#__}}Signup{{/__}}</a>
 						</li>
 						<li>
-							<a href="/login">{{#__}}Login{{/__}}</a>
+							<a href="/login"><i class="fa fa-user"></i> {{#__}}Login{{/__}}</a>
 						</li>
 					</ul>
 					{{/_user}}

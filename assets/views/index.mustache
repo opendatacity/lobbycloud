@@ -1,44 +1,34 @@
 {{>header}}
-<div id="headline">
-	<h1>{{#__}}LobbyCloud{{/__}}</h1>
-	<h2>{{#__}}Library of influences on public policy{{/__}}</h2>
-</div>
-{{#just_in}}
-	<div id="">
-		<h3>{{#__}}Just in{{/__}}</h3>
-		<table class="table">
-			{{#document}}
-			<tr>
-				<td>
-					<a href="{{{_url}}}/document/{{slug}}">{{title}}</a>
-					{{#__}}{{age}} days ago{{/__}}, 
-					{{#__}}{{pages}} pages{{/__}},
-					{{#comments}}<span class="label">{{#__}}{{comments}} comments{{/__}}<span>{{/comments}}
-				</td>
-				<td>
-					{{#tag}}<a href="{{{_url}}}/tags/{{label}}" class="{{class}}">#{{label}}</a>{{/tag}}
-				</td>
-			</tr>
-			{{/document}}
-		</table>
-		<a href="{{{_url}}}/documents">{{#__}}more{{/__}} ...</a>
+{{>intro}}
+<div id="content" class="content">
+	<div class="row">
+		<div class="col-md-6">
+			<h2>{{#__}}Hot Topics{{/__}}</h2>
+			<p>
+				...
+			</p>
+			<p>
+				<a href="{{{_url}}}/topics" class="btn btn-primary" role="button">{{#__}}Browse topics{{/__}}</a>
+			</p>
+		</div>
+		<div class="col-md-6">
+			<h2>{{#__}}Avid Organisations{{/__}}</h2>
+			<p>
+				...
+			</p>
+			<p>
+				<a href="{{{_url}}}/organisations" class="btn btn-primary" role="button">{{#__}}Browse organisations{{/__}}</a>
+			</p>
+		</div>
 	</div>
-{{/just_in}}
-<div id="intro" class="row">
-	<div class="col-md-4">
-		<h3><i class="fa fa-cloud-upload"></i> {{#__}}Upload{{/__}}</h3>
-		<p>{{#__}}Just send us your stuff via Email, add #categories in the subject line. We'll add the documents to our repository and make it linkable en detail, cross-referencable and commentable to the public.{{/__}}</p>
-		<a href="" class="btn btn-default">{{#__}}Bring it on!{{/__}}</a>
-	</div>
-	<div class="col-md-4">
-		<h3><i class="fa fa-filter"></i> {{#__}}Research{{/__}}</h3>
-		<p>{{#__}}Whose words are they using? Whose do positions overlap? Which arguments are based on the same set of underlying facts? Navigate the deluge of position papers, proposals and white papers.{{/__}}</p>
-		<a href="" class="btn btn-default">{{#__}}Have a look!{{/__}}</a>
-	</div>
-	<div class="col-md-4">
-		<h3><i class="fa fa-bolt"></i> {{#__}}Engage{{/__}}</h3>
-		<p>{{#__}}Pinpoint key interests and stakeholders, drag backroom positions out to the public view and generate public discussions, encourage drowned out voices to be heard by making{{/__}}</p>
-		<a href="" class="btn btn-default">{{#__}}Get involved!{{/__}}</a>
+	<div class="row">
+		<div class="col-md-12">
+			<h2>{{#__}}Latest Releases{{/__}}</h2>
+			<p>
+				...
+			</p>
+			<a href="{{{_url}}}/documents" class="btn btn-primary">{{#__}}Browse documents{{/__}}</a>
+		</div>
 	</div>
 </div>
 {{>footer}}

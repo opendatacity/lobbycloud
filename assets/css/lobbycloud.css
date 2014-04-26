@@ -7,13 +7,13 @@ body {
 	margin: 0px;
 	padding: 0px;
 	font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-	background-color: #e9e9e9;
-	background-image:-webkit-radial-gradient(center, #fbfbfb, #f9f9f9);
-   background-image:-moz-radial-gradient(center, #fbfbfb, #f9f9f9);
-   background-image:radial-gradient(center, #fbfbfb, #f9f9f9);
-   
-	box-shadow: 0px 0px 200px -100px #000 inset;
+	background: #e9e9e9 url(../img/background-pattern.png) center center repeat;
 	
+	
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Roboto Slab";
 }
 
 header {
@@ -30,7 +30,7 @@ header {
 	
 		header #navbar a {
 			
-			color: #ccc;
+			color: #fff;
 			
 		}
 
@@ -38,13 +38,12 @@ header {
             color: #000;
         }
 
-		header #navbar a:focus,
-		header #navbar a:hover,
-		header #navbar a:active {
+		header #navbar nav a:focus,
+		header #navbar nav a:hover,
+		header #navbar nav a:active {
 			
 			color: #fff;
-			background-image: linear-gradient(to bottom, #88aa00 0px, #558800 100%);
-			background-repeat: repeat-x;
+			background-color: #333;
 			
 		}
 		
@@ -63,9 +62,8 @@ header {
 				color: #bd0;
 				font-weight: 500;
 			}
-
 		
-		header #navbar .navbar-nav a {
+		header #navbar .navbar-nav.navbar-main a {
 			
 			font-family: "Roboto Slab";
 			font-size: 1.2em;
@@ -81,49 +79,60 @@ header {
 		header #navbar .navbar-user {
 			
 			margin-right: 20px !important;
-			font-size: .8em;
+			font-size: .95em;
 			
 		}
 
-		header #navbar .navbar-user a {
+			header #navbar .navbar-user a {
 		
-			padding-right: 10px;
-			padding-left: 10px;
-		
-		}
-		
-		header #navbar .navbar-user li a.profile {
+				padding-right: 10px;
+				padding-left: 10px;
+				color: #999;
+
+			}
 			
-			padding: 5px 10px;
-			margin: 9px 5px;
-			line-height: 20px;
-			display: block;
-			position: relative;
-			color: #fff;
-			border-radius: 5px;
-			border: 1px solid #666;
-			
-		}
+				header #navbar .navbar-user a i {
+				
+					font-size: 1.2em;
+					margin-right: 5px;
+					color: #eee;
+				
+				}
 		
-			header #navbar .navbar-user li a.profile:hover {
-				
-				background: none;
-				
+			header #navbar .navbar-user li a.profile {
+			
+				padding: 5px 10px;
+				margin: 9px 5px;
+				line-height: 20px;
+				display: block;
+				position: relative;
+				color: #fff;
+				border-radius: 5px;
+				border: 1px solid #666;
+			
 			}
 		
-			header #navbar .navbar-user li a.profile .fa {
+				header #navbar .navbar-user li a.profile:hover {
 				
-				color: #bd0;
+					background: none;
 				
-			}
+				}
+		
+				header #navbar .navbar-user li a.profile .fa {
+				
+					color: #bd0;
+				
+				}
 		
 	
 #main {
 	
 	padding-bottom: 20px;
+	background-color: rgba(255,255,255,0.75);
 	
 }
 
+	/*
 	#headline {
 		
 		margin: 40px -10px 20px;
@@ -146,39 +155,38 @@ header {
 			margin: 0px;
 			text-shadow: 0px 0px 10px #fff;
 			
-		}
+		}*/
 	
 	#intro {
 		
-		background-color: #fff;
-		padding-bottom: 20px;
-		border-radius: 10px;
+		/* counter the containers padding to line up */
+		margin: 0px -15px;
+		box-shadow: 0px 15px 20px -20px rgba(0,0,0,0.2);
 		
 	}
 	
-	#main h2 {
-		
-		font-family: "Roboto Slab";
-		font-size: 1.4em;
-		text-shadow: 0px 0px 10px #fff;
-		
-	}
+		#intro .jumbotron {
+			
+			background: rgba(255,255,255,0.1) url(../img/intro-pattern.png) center center repeat;
+			
+		}
 	
-	#main h3 {
+		#intro .jumbotron h1 {
+			
+			color: #fff;
+			
+		}
+
+		#intro .white-box {
+			
+			background-color: #fff;
+			margin-top: -30px;
+			margin-bottom: -20px;
+			padding: 0px 40px 20px;
+			box-shadow: 0px -15px 20px -20px rgba(0,0,0,0.2);
+			
+		}
 		
-		font-family: "Roboto Slab";
-		font-size: 1.2em;
-		text-shadow: 0px 0px 10px #fff;
-		
-	}
-	
-	#main .white-box {
-		background-color: #fff;
-		padding-bottom: 20px;
-		border-radius: 10px;
-		margin-bottom: 20px;
-	}
-	
 	#main .password-progress {
 		
 		height: 14px;
@@ -372,16 +380,23 @@ header {
 				#main .upload-form .upload-area .upload-queue li.error p {
 					color:red;
 				}
+	
+	#main .content {
+		
+		padding: 20px;
+		
+	}
 			
 		
 footer {
 	
-	background-color: #333;
+	background-color: #444;
 	color: #fff;
 	margin: 0px;
-	padding: 19px 10px;
+	padding: 10px 10px;
 	line-height: 22px;
 	text-align: center;
+	z-index: 999;
 	
 }
 
