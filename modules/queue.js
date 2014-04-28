@@ -169,6 +169,7 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 				if (data.hasOwnProperty("tags")) {
 					if (data.tags instanceof Array) {
 						/* everything is fine */
+						doc.tags = data.tags;
 					} else if (data.tags instanceof String) {
 						if (data.tags === "") {
 							doc.tags = [];
