@@ -1,0 +1,44 @@
+{{>header}}
+<div id="content" class="content">
+	{{#topics}}
+	<div class="row">
+		{{#features}}
+		<div class="col-md-12">
+			<h2>{{label}}</h2>
+			<p><strong>{{subject}}</strong></p>
+			<p>[FIXME: topic image here]</p>
+			<p>
+				{{description}}
+			</p>
+			<p>
+				<a href="{{{_url}}}/topics/{{id}}" class="btn btn-primary" role="button">{{#__}}Details{{/__}}</a>
+			</p>
+		</div>
+		{{/features}}
+		{{#list}}
+		<div class="col-md-6">
+			<h2>{{label}}</h2>
+			<p><strong>{{subject}}</strong></p>
+			<p>
+				{{description}}
+			</p>
+			<p>
+				<a href="{{{_url}}}/topics/{{id}}" class="btn btn-primary" role="button">{{#__}}Details{{/__}}</a>
+			</p>
+		</div>
+		{{/list}}
+		[FIXME: pagination here]
+	</div>
+	{{/topics}}
+	{{#topic}}
+	<div class="row">
+		<div class="col-md-12">
+			<h2>topic, yay!</h2>
+			<p>
+				...
+			</p>
+		</div>
+	</div>
+	{{/topic}}
+</div>
+{{>footer}}

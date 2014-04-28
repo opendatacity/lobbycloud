@@ -120,7 +120,9 @@ app.configure(function() {
 	}));
 
 	/* use mustache as view engine */
-	app.engine("mustache", mustache());
+	var _mustache = mustache();
+	if (config.debug) _mustache.cache = false;
+	app.engine("mustache", _mustache);
 	app.set("view engine", "mustache");
 	app.set("views", path.resolve(__dirname, "assets/views"));
 
@@ -275,6 +277,57 @@ app.get('/profile/:user', function (req, res) {
 	l.users.get(req.param("user"), function (err, profile) {
 		sendProfile(profile, req, res);
 	});
+});
+
+/* browse documents */
+app.get('/imprint', function (req, res) {
+	render(req, res, 'imprint', {});
+});
+
+/* engage */
+app.get('/engage', function (req, res) {
+	render(req, res, 'engage', {});
+});
+
+/* browse documents */
+app.get('/about', function (req, res) {
+	render(req, res, 'about', {});
+});
+
+/* browse documents */
+app.get('/documents', function (req, res) {
+	render(req, res, 'documents', {});
+});
+
+/* document */
+app.get('/documents/:id', function (req, res) {
+	render(req, res, 'documents', {});
+});
+
+/* browse topics */
+app.get('/topics', function (req, res) {
+	l.topics.all(function(err, topics){
+		render(req, res, 'topics', {
+			topics: {
+				list: topics //FIXME: limits, etc
+			}
+		});
+	})
+});
+
+/* topic */
+app.get('/topics/:id', function (req, res) {
+	render(req, res, 'topics', {});
+});
+
+/* browse organisations */
+app.get('/organistions', function (req, res) {
+	render(req, res, 'organistions', {});
+});
+
+/* organisation */
+app.get('/organistions/:id', function (req, res) {
+	render(req, res, 'organistions', {});
 });
 
 /* upload */
