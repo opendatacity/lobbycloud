@@ -300,6 +300,108 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		
 	};
 	
+	/* update (status) of queue element */
+	/* updatable data: stage, tags, topic, organisation, lang, comment; only if stage <2 */
+	queue.update = function(id, data, callback) {
+		id = slugmaker(id);
+		
+		/* check if queue item exists */
+		queue.check(id, function(err, exists){
+			if (err || !exists) return callback((err || new Error("Thie queue item does not exist")));
+			
+			/* get doc to check stage */
+			queue.get(id, function(err, doc){
+				if (err) return callback(err);
+				
+				/* check stage */
+				if (doc.stage > 1) return callback(new Error("The document can not be updated"));
+				
+				var update = {};
+								
+				/* check stage */
+				if (data.hasOwnProperty("stage")) {
+					data.stage = parseInt(data.stage,10);
+					if (data.stage > 0 && data.stage <= 5) {
+						update.stage = data.stage;
+					}
+				}
+				
+				/* check tags */
+				if (data.hasOwnProperty("tags")) {
+					if (data.tags instanceof Array) {
+						/* everything is fine */
+						update.tags = data.tags;
+					} else if (data.tags instanceof String) {
+						if (data.tags !== "") {
+							/* split by linefeeds, returns, pounds, commas and semicolons */
+							update.tags = data.tags.split(/[,;\r\n\#]+/g).map(function(tag){ return tag.replace(/^\s+|\s+$/g,'') });
+							/* if there is only one tag, this wasn't effective. split by any whitespace then */
+							if (update.tags.length === 1) update.tags = update.tags[0].split(/\s+/g);
+						}
+					}
+				}
+
+				/* check for language */
+				if (data.hasOwnProperty("lang") && typeof data.lang === "string" && data.lang !== "" && l.lang.check(data.lang)) {
+					update.lang = data.lang;
+				}
+
+				/* check for comment */
+				if (data.hasOwnProperty("comment") && typeof data.comment === "string" && data.comment !== "") {
+					update.comment = data.comment;
+				}
+
+				/* check if an organisation exists */
+				var check_organisation = function(_callback) {
+					if (!data.hasOwnPropery("organisation") === null) return _callback();
+					organisations.check(data.organisation, function(err, exists, org_id){
+						if (err) return _callback();
+						if (exists) {
+							update.organisation = {"id": org_id};
+						} else {
+							update.organisation = {"new": doc.organisation};
+						}
+						_callback();
+					});
+				}
+		
+				/* check if a topic exists */
+				var check_topic = function(_callback) {
+					if (data.topic === null) return _callback();
+					topics.check(doc.topic, function(err, exists, topic_id){
+						if (err) return _callback();
+						if (exists) {
+							update.topic = {"id": topic_id};
+						} else {
+							update.topic = {"new": doc.topic};
+						}
+						_callback();
+					});
+				}
+		
+				check_organisation(function(){
+					check_topic(function(){
+
+						db.collection("queue").findAndModify({"query":{"id":id},"update":{"$set":update},"new":true}, function(err, doc){
+							if (err) return callback(err);
+
+							/* update cache */
+							cache[id] = doc;
+
+							/* call back */
+							callback(null, doc);
+
+						});
+
+					});
+				});
+				
+			});
+			
+		});
+		
+	};
+
 	/* don't use this un public, update queue element to stage 4 or 5 instead */
 	queue.delete = function(id, callback) {
 		queue.get(id, function(err, doc){
