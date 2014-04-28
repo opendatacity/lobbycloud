@@ -1,47 +1,47 @@
 {{>header}}
 <div class="container">
-    <div class="row">
-        <div class="col-md-5 col-md-offset-3">
-            <div class="tab-content">
-                <div class="tab-pane active" id="login">
-                    <div id="headline">
-                        <h1>{{#__}}Login{{/__}}</h1>
-                    </div>
-                    <form class="form form-signin" role="form" action="{{_url}}/login" method="post">
-                        <div class="form-group input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                            <input id="login-user" type="text" name="username" placeholder="{{#__}}Username{{/__}}" class="form-control input-block-level" required>
-                        </div>
-                        <div class="form-group input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                            <input id="login-pass" type="password" name="password" placeholder="{{#__}}Password{{/__}}" class="form-control input-block-level" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="hidden" type="text" id="login-redirect" name="redirect" value="{{redirect}}">
-                            <button class="btn btn-lg btn-primary btn-block" type="submit">{{#__}}Login{{/__}}</button>
-                        </div>
-                    </form>
-                    <a class="pull-right" href="#reset" data-toggle="tab">{{#__}}Can't remember the password{{/__}}</a>
-                </div>
-                <div class="tab-pane" id="reset">
-                    <div id="headline">
-                        <h1>{{#__}}Password Reset{{/__}}</h1>
-                    </div>
-                    <form class="form form-reset" role="form" action="{{_url}}/users/reset/request" method="post">
-                        <div class="form-group input-group">
-                            <span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
-                            <input id="reset-email" type="email" name="email" placeholder="{{#__}}Mail adress{{/__}}" class="form-control input-block-level" required>
-                        </div>
-                        <div class="form-group">
-                            <button class="btn btn-lg btn-primary btn-block" type="submit">{{#__}}Request{{/__}}</button>
-                        </div>
-                    </form>
-
-                    <a class="pull-right" href="#login" data-toggle="tab">{{#__}}Nevermind, now I remember.{{/__}}</a>
+	<div class="row">
+		<div class="col-md-5 col-md-offset-3">
+			<div class="tab-content">
+				<div class="tab-pane active" id="login">
+					<div id="headline">
+						<h1>{{#__}}Login{{/__}}</h1>
+					</div>
+					<form class="form form-signin" role="form" action="{{_url}}/login" method="post">
+						<div class="form-group input-group">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+							<input id="login-user" type="text" name="username" placeholder="{{#__}}Username{{/__}}" class="form-control input-block-level" required>
+						</div>
+						<div class="form-group input-group">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+							<input id="login-pass" type="password" name="password" placeholder="{{#__}}Password{{/__}}" class="form-control input-block-level" required>
+						</div>
+						<div class="form-group">
+							<input type="hidden" type="text" id="login-redirect" name="redirect" value="{{redirect}}">
+							<button class="btn btn-lg btn-primary btn-block" type="submit">{{#__}}Login{{/__}}</button>
+						</div>
+					</form>
+					<a class="pull-right" href="#reset" data-toggle="tab">{{#__}}Can't remember the password{{/__}}</a>
 				</div>
-            </div>
-        </div>
-    </div>
+				<div class="tab-pane" id="reset">
+					<div id="headline">
+						<h1>{{#__}}Password Reset{{/__}}</h1>
+					</div>
+					<form class="form form-reset" role="form" action="{{_url}}/users/reset/request" method="post">
+						<div class="form-group input-group">
+							<span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+							<input id="reset-email" type="email" name="email" placeholder="{{#__}}Mail adress{{/__}}" class="form-control input-block-level" required>
+						</div>
+						<div class="form-group">
+							<button class="btn btn-lg btn-primary btn-block" type="submit">{{#__}}Request{{/__}}</button>
+						</div>
+					</form>
+
+					<a class="pull-right" href="#login" data-toggle="tab">{{#__}}Nevermind, now I remember.{{/__}}</a>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 {{>footer}}
