@@ -185,6 +185,7 @@ app.post('/login', function (req, res, next) {
 		if (!user) return res.redirect('/login' + (redirect ? '?redirect=' + redirect : ''));
 		req.logIn(user, function (err) {
 			if (err) return next(err);
+			// FIXME: check redirect target
 			res.redirect(redirect ? redirect : '/');
 		});
 	})(req, res, next);
@@ -330,11 +331,17 @@ app.get('/organistions/:id', function (req, res) {
 	render(req, res, 'organistions', {});
 });
 
+// if (!user) return 
+
+
 /* upload */
 app.get('/upload', function (req, res) {
+	if (!req.user) return res.redirect('/login?redirect=/upload');
 	l.queue.user(req.user.id, function(err, queue){
 		queue.map(function(item){
 			item["stage-"+item.stage] = true;
+			item["cancelable"] = (item.stage < 3);
+			item.created_formatted = moment(item.created).lang(req.locale||"en").format("YY-MM-DD HH:mm:ss");
 			item.created_relative = moment(item.created).lang(req.locale||"en").fromNow();
 			item.updated_relative = moment(item.created).lang(req.locale||"en").fromNow();
 			if (item.stage === 1 || item.stage >= 3) item.processed = true;

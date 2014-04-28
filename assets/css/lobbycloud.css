@@ -247,11 +247,101 @@ header {
 			
 			display: block;
 			position: relative;
-			background-color: #fff;
-			box-shadow: 0px 0px 20px -10px rgba(0,0,0,0.5);
-			padding: 20px;
+			padding: 0px 14px;
+			margin: 0px -15px;
 			
 		}
+
+			#main .review-queue .folder {
+				
+				margin-bottom: 10px;
+				border-color: #ccc;
+				
+			}
+			
+				#main .review-queue .folder .panel-heading {
+					border-color: #ccc;
+				}
+
+				#main .review-queue .folder.folder-closed .panel-heading {
+					border-width: 0px;
+				}
+
+				#main .review-queue .folder.panel-warning .panel-heading {
+					background-color: #fc0;
+				}
+
+				#main .review-queue .folder.panel-success .panel-heading {
+					background-color: #bd0;
+				}
+			
+				#main .review-queue .folder.panel-error .panel-heading {
+					background-color: #f63;
+				}
+			
+				#main .review-queue .panel-heading {
+					
+					position: relative;
+					cursor: pointer;
+					
+				}
+					
+					#main .review-queue .panel-heading h3 {
+				
+						margin-right: 25px;
+						white-space: nowrap;
+				
+					}
+					
+						#main .review-queue .panel-heading h3 .label {
+							font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+							font-size: .8em;
+							position: relative;
+							margin-left: 3px;
+							background: rgba(255,255,255,0.2);
+						}
+
+					#main .review-queue .panel-heading .cancel {
+						display: block;
+						position: absolute;
+						right: 30px;
+						top: 0px;
+						bottom: 0px;
+						width: 30px;
+						font-size: 20px;
+						font-weight: bold;
+						text-align: center;
+						padding-left: 2px;
+						line-height: 38px;
+						color: #333;
+						background-color: rgba(255,255,255,0.3);
+					}
+					
+						#main .review-queue .panel-heading .cancel:hover {
+							background-color: #f00;
+							color: #fff;
+						}
+
+					#main .review-queue .panel-heading .folder-toggle {
+						display: block;
+						position: absolute;
+						right: 0px;
+						top: 0px;
+						bottom: 0px;
+						width: 30px;
+						font-size: 20px;
+						font-weight: bold;
+						text-align: center;
+						line-height: 38px;
+						color: #333;
+						background-color: rgba(255,255,255,0.1);
+					}
+
+				#main .review-queue .folder-closed {}
+
+					#main .review-queue .folder-closed .panel-body {
+						display: none;
+					}
 		
 		#main .upload-form {
 			
@@ -260,6 +350,7 @@ header {
 			background-color: #fff;
 			box-shadow: 0px 0px 20px -10px rgba(0,0,0,0.5);
 			padding: 20px;
+			margin: 0px -15px;
 			
 		}
 		

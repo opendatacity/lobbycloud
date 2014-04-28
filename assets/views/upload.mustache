@@ -1,112 +1,127 @@
 {{>header}}
-<div class="container">
-	<div id="headline">
-		<h1>{{#__}}Upload{{/__}}</h1>
-	</div>
-	<p>
-		{{#__}}Lorem Ipsum{{/__}}
-	</p>
-	<div class="row">
-		<div class="col-md-6">
-			<h2>{{#__}}Upload queue{{/__}}</h2>
-			<p>{{#__}}These are your uploaded documents waiting for processing or approval.{{/__}}</p>
-			<div class="review-queue">
-				{{^queue}}
-				<div class="alert alert-info">
-					{{#__}}You haven't uploaded any documents yet.{{/__}}
-				</div>
-				{{/queue}}
-				{{#queue}}
-				<div class="queue-item queue-item-stage-{{stage}} panel panel-default panel-{{#stage-0}}warning{{/stage-0}}{{#stage-1}}warning{{/stage-1}}{{#stage-2}}error{{/stage-2}}{{#stage-3}}success{{/stage-3}}{{#stage-4}}error{{/stage-4}}{{#stage-5}}error{{/stage-5}}">
-					<div class="panel-heading">
-						<h3 class="panel-title">{{orig}}</h3>
-					</div>
-					<div class="panel-body">
-						{{#processed}}
-						<div class="thumb-well">
-							{{#data.thumbs}}
-							<img src="{{{_url}}}/storage/{{file}}" alt="" title="">
-							{{/data.thumbs}}
+<div id="headline">
+	<h1>{{#__}}Upload{{/__}}</h1>
+</div>
+<p>
+	{{#__}}Lorem Ipsum{{/__}}
+</p>
+<div class="row">
+	<div class="col-md-6">
+		<h2>{{#__}}Upload new documents{{/__}}</h2>
+		<p>{{#__}}Upload your documents here.{{/__}} [FIXME: link some guidelines]</p>
+		<div class="upload-form">
+			<form id="upload" method="post" action="{{{_url}}}/api/upload" enctype="multipart/form-data" role="form">
+				<div class="form-group form-topic prop-select" data-prop="topic">
+					<label for="document-topic">{{#__}}Topic{{/__}}</label>
+					<div class="input-group">
+						<div class="input-group-btn dropdown-action">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No topic{{/__}}</span> <span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="javascript:;" data-action="disabled">{{#__}}No topic{{/__}}</a></li>
+								<li class="divider"></li>
+								<li><a href="javascript:;" data-action="select">{{#__}}Select topic{{/__}}</a></li>
+								<li><a href="javascript:;" data-action="suggest">{{#__}}Suggest new topic{{/__}}</a></li>
+							</ul>
 						</div>
-						{{/processed}}
-						<p>{{#__}}Uploaded{{/__}} <strong>{{created_relative}}</strong></p>
-						<p>{{#__}}Last update{{/__}} <strong>{{updated_relative}}</strong></p>
-						<p>
-							{{#__}}Processing status{{/__}}:
-							{{#stage-0}}<strong>{{#__}}Just uploaded, waiting for automated processing.{{/__}}</strong>{{/stage-0}}
-							{{#stage-1}}<strong>{{#__}}Processed and ready for review.{{/__}}</strong>{{/stage-1}}
-							{{#stage-2}}<strong>{{#__}}Processing failed.{{/__}}</strong>{{/stage-2}}
-							{{#stage-3}}<strong>{{#__}}Accepted.{{/__}}</strong>{{/stage-3}}
-							{{#stage-4}}<strong>{{#__}}Declined.{{/__}}</strong>{{/stage-4}}
-							{{#stage-5}}<strong>{{#__}}Cancelled.{{/__}}</strong>{{/stage-5}}
-						</p>
+						<input type="hidden" class="form-control" id="document-topic-search" name="topic-query" placeholder="{{#__}}Search for topics{{/__}}">
+						<input type="text" class="form-control" id="document-topic" name="topic" disabled="disabled" placeholder="{{#__}}Topic{{/__}}">
 					</div>
 				</div>
-				{{/queue}}
-			</div>
+				<div class="form-group form-organisation prop-select" data-prop="organisation">
+					<label for="document-organisation">{{#__}}Organisation{{/__}}</label>
+					<div class="input-group">
+						<div class="input-group-btn dropdown-action">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No organisation{{/__}}</span> <span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="javascript:;" data-action="disabled">{{#__}}No organisation{{/__}}</a></li>
+								<li class="divider"></li>
+								<li><a href="javascript:;" data-action="select">{{#__}}Select organisation{{/__}}</a></li>
+								<li><a href="javascript:;" data-action="suggest">{{#__}}Suggest new organisation{{/__}}</a></li>
+							</ul>
+						</div>
+						<input type="hidden" class="form-control" id="document-organisation-search" name="organisation-query" placeholder="{{#__}}Search for organisations{{/__}}">
+						<input type="text" class="form-control" id="document-organisation" name="organisation" disabled="disabled" placeholder="{{#__}}Organisation{{/__}}">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="document-tags">{{#__}}Tags, separated by comma{{/__}}</label>
+					<input type="text" class="form-control" id="document-tags" name="tags" data-role="tagsinput" placeholder="{{#__}}Tags{{/__}}">
+				</div>
+				
+				<div class="form-group">
+					<label for="document-comment">{{#__}}Comment for the review{{/__}}</label>
+					<textarea id="document-comment" name="comment" class="form-control" rows="3"></textarea>
+				</div>
+
+				<div class="form-group">
+					<label for="document-comment">{{#__}}Uplaod files{{/__}}</label>
+					<div class="upload-area">
+						<div id="drop" class="upload-area-drop">
+							<span class="txt">{{#__}}Drop files here{{/__}}</span>
+							<a class="btn btn-primary">{{#__}}Choose files{{/__}}</a>
+							<input type="file" id="document-upload" name="_upload" multiple />
+						</div>
+						<ul class="upload-queue"></ul>
+					</div>
+				</div>
+			</form>
 		</div>
-		<div class="col-md-6">
-			<h2>{{#__}}Upload new documents{{/__}}</h2>
-			<p>{{#__}}Lorem Ipsum{{/__}}</p>
-			<div class="upload-form">
-				<form id="upload" method="post" action="{{{_url}}}/api/upload" enctype="multipart/form-data" role="form">
-					<div class="form-group form-topic prop-select" data-prop="topic">
-						<label for="document-topic">{{#__}}Topic{{/__}}</label>
-						<div class="input-group">
-							<div class="input-group-btn dropdown-action">
-								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No topic{{/__}}</span> <span class="caret"></span></button>
-								<ul class="dropdown-menu">
-									<li><a href="javascript:;" data-action="disabled">{{#__}}No topic{{/__}}</a></li>
-									<li class="divider"></li>
-									<li><a href="javascript:;" data-action="select">{{#__}}Select topic{{/__}}</a></li>
-									<li><a href="javascript:;" data-action="suggest">{{#__}}Suggest new topic{{/__}}</a></li>
-								</ul>
-							</div>
-							<input type="hidden" class="form-control" id="document-topic-search" name="topic-query" placeholder="{{#__}}Search for topics{{/__}}">
-							<input type="text" class="form-control" id="document-topic" name="topic" disabled="disabled" placeholder="{{#__}}Topic{{/__}}">
-						</div>
-					</div>
-
-					<div class="form-group form-organisation prop-select" data-prop="organisation">
-						<label for="document-organisation">{{#__}}Organisation{{/__}}</label>
-						<div class="input-group">
-							<div class="input-group-btn dropdown-action">
-								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No organisation{{/__}}</span> <span class="caret"></span></button>
-								<ul class="dropdown-menu">
-									<li><a href="javascript:;" data-action="disabled">{{#__}}No organisation{{/__}}</a></li>
-									<li class="divider"></li>
-									<li><a href="javascript:;" data-action="select">{{#__}}Select organisation{{/__}}</a></li>
-									<li><a href="javascript:;" data-action="suggest">{{#__}}Suggest new organisation{{/__}}</a></li>
-								</ul>
-							</div>
-							<input type="hidden" class="form-control" id="document-organisation-search" name="organisation-query" placeholder="{{#__}}Search for organisations{{/__}}">
-							<input type="text" class="form-control" id="document-organisation" name="organisation" disabled="disabled" placeholder="{{#__}}Organisation{{/__}}">
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="document-tags">{{#__}}Tags, separated by comma{{/__}}</label>
-						<input type="text" class="form-control" id="document-tags" name="tags" data-role="tagsinput" placeholder="{{#__}}Tags{{/__}}">
-					</div>
-					
-					<div class="form-group">
-						<label for="document-comment">{{#__}}Comment for the review{{/__}}</label>
-						<textarea id="document-comment" name="comment" class="form-control" rows="3"></textarea>
-					</div>
-
-					<div class="form-group">
-						<label for="document-comment">{{#__}}Uplaod files{{/__}}</label>
-						<div class="upload-area">
-							<div id="drop" class="upload-area-drop">
-								<span class="txt">{{#__}}Drop files here{{/__}}</span>
-								<a class="btn btn-primary">{{#__}}Choose files{{/__}}</a>
-								<input type="file" id="document-upload" name="_upload" multiple />
-							</div>
-							<ul class="upload-queue"></ul>
-						</div>
-					</div>
-				</form>
+	</div>
+	<div class="col-md-6">
+		<h2>{{#__}}Upload queue{{/__}}</h2>
+		<p>{{#__}}These are your uploaded documents waiting for processing or approval.{{/__}}</p>
+		<div class="review-queue">
+			{{^queue}}
+			<div class="alert alert-info">
+				{{#__}}You haven't uploaded any documents yet.{{/__}}
 			</div>
+			{{/queue}}
+			{{#queue}}
+			<div class="queue-item queue-item-stage-{{stage}} panel panel-default panel-{{#stage-0}}warning{{/stage-0}}{{#stage-1}}warning{{/stage-1}}{{#stage-2}}error{{/stage-2}}{{#stage-3}}success{{/stage-3}}{{#stage-4}}error{{/stage-4}}{{#stage-5}}error{{/stage-5}} folder folder-closed">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						{{id}}
+						<span class="label">
+							{{#stage-0}}<strong>{{#__}}UPLOADED{{/__}}</strong>{{/stage-0}}
+							{{#stage-1}}<strong>{{#__}}PROCESSED{{/__}}</strong>{{/stage-1}}
+							{{#stage-2}}<strong>{{#__}}FAILED{{/__}}</strong>{{/stage-2}}
+							{{#stage-3}}<strong>{{#__}}ACCEPTED{{/__}}</strong>{{/stage-3}}
+							{{#stage-4}}<strong>{{#__}}DECLINED{{/__}}</strong>{{/stage-4}}
+							{{#stage-5}}<strong>{{#__}}CANCELLED{{/__}}</strong>{{/stage-5}}
+						</span>
+						<span class="label">{{created_formatted}}</span>
+					</h3>
+					{{#cancelable}}
+					<a href="javascript:;" class="cancel" data-toggle="tooltip" data-placement="left" title="{{#__}}Cancel publishing{{/__}}"><i class="fa fa-times-circle"></i></a>
+					{{/cancelable}}
+					<a href="javascript:;" class="folder-toggle"><i class="fa fa-angle-down"></i></a>
+				</div>
+				<div class="panel-body">
+					<p>
+						{{#__}}Original Filename{{/__}} {{orig}}
+					</p>
+					{{#processed}}
+					<div class="thumb-well">
+						{{#data.thumbs}}
+						<img src="{{{_url}}}/storage/{{file}}" alt="" title="">
+						{{/data.thumbs}}
+					</div>
+					{{/processed}}
+					<p>{{#__}}Uploaded{{/__}} <strong>{{created_relative}}</strong></p>
+					<p>{{#__}}Last update{{/__}} <strong>{{updated_relative}}</strong></p>
+					<p>
+						{{#__}}Processing status{{/__}}:
+						{{#stage-0}}<strong>{{#__}}Just uploaded, waiting for automated processing.{{/__}}</strong>{{/stage-0}}
+						{{#stage-1}}<strong>{{#__}}Processed and ready for review.{{/__}}</strong>{{/stage-1}}
+						{{#stage-2}}<strong>{{#__}}Processing failed.{{/__}}</strong>{{/stage-2}}
+						{{#stage-3}}<strong>{{#__}}Accepted.{{/__}}</strong>{{/stage-3}}
+						{{#stage-4}}<strong>{{#__}}Declined.{{/__}}</strong>{{/stage-4}}
+						{{#stage-5}}<strong>{{#__}}Cancelled.{{/__}}</strong>{{/stage-5}}
+					</p>
+				</div>
+			</div>
+			{{/queue}}
 		</div>
 	</div>
 </div>

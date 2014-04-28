@@ -108,7 +108,7 @@
 	"Search for organisations": "Search for organisations",
 	"Uplaod files": "Uplaod files",
 	"Upload queue": "Upload queue",
-	"These are your uploaded documents waiting for processing or approval.": "Dies sind die von Dir hochgeladenen Dokumente, die auf Verarbeitung oder Freigabe warten.",
+	"These are your uploaded documents waiting for processing or approval.": "Deine hochgeladenen Dokumente, die auf Verarbeitung oder Freigabe warten.",
 	"Upload new documents": "Neue Dokumente hochladen",
 	"You haven't uploaded any documents yet.": "Du hast noch keine Dokumente hochgeladen.",
 	"Processed and ready for review.": "Verarbeitet und bereit für die Begutachtung.",
@@ -150,5 +150,11 @@
 	"procurator": "procurator",
 	"Responsibility for this websites according to §55.2 RStV and/or §5 TMG lies with": "Responsibility for this websites according to §55.2 RStV and/or §5 TMG lies with",
 	"and": "and",
-	"Details": "Details"
+	"Details": "Details",
+	"Upload your documents here.": "Upload your documents here.",
+	"Original Filename": "Original Filename",
+	"PROCESSED": "PROCESSED",
+	"Cancel": "Cancel",
+	"Cancel publishing of this document.": "Cancel publishing of this document.",
+	"Cancel publishing": "Cancel publishing"
 }

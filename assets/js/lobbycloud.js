@@ -2,6 +2,23 @@ $(document).ready(function(e){
 
 	$('#main').css('min-height', $(window).innerHeight()-($('header').outerHeight()+$('footer').outerHeight()));
 	
+	/* folder toggle */
+	$(".folder").each(function(idx,f){
+		var $f = $(f);
+		$(".cancel", $f).tooltip().click(function(e){
+			e.stopPropagation();
+			e.preventDefault();
+			$(this).blur();
+			// FIXME: cancel
+		});
+		$(".panel-heading", $f).click(function(e){
+			e.preventDefault();
+			$f.toggleClass("folder-closed");
+			$(".folder-toggle i", $f).toggleClass("fa-angle-down").toggleClass("fa-angle-up");
+			$(".folder-toggle", $f).blur();
+		});
+	})
+	
 	/* strengthometer */
 	$("input[type=password].strengthometer").each(function(idx,e){
 		var $i = $(e);
