@@ -124,7 +124,7 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 				doc.file = data.file;
 
 				/* check for original filename */
-				if (data.hasOwnProperty("orig") && typeof data.source === "orig" || data.source !== "") {
+				if (data.hasOwnProperty("orig") && typeof data.orig === "string" && data.orig !== "") {
 					doc.orig = data.orig;
 				} else {
 					doc.orig = null;
@@ -138,28 +138,28 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 				}
 
 				/* check for source */
-				if (data.hasOwnProperty("source") && typeof data.source === "string" || data.source !== "") {
+				if (data.hasOwnProperty("source") && typeof data.source === "string" && data.source !== "") {
 					doc.source = data.source;
 				} else {
 					doc.source = null;
 				}
 
 				/* check for topic */
-				if (data.hasOwnProperty("topic") && typeof data.topic === "string" || data.topic !== "") {
+				if (data.hasOwnProperty("topic") && typeof data.topic === "string" && data.topic !== "") {
 					doc.topic = data.topic;
 				} else {
 					doc.topic = null;
 				}
 		
 				/* check for organisation */
-				if (data.hasOwnProperty("organisation") && typeof data.organisation === "string" || data.organisation !== "") {
+				if (data.hasOwnProperty("organisation") && typeof data.organisation === "string" && data.organisation !== "") {
 					doc.organisation = data.organisation;
 				} else {
 					doc.organisation = null;
 				}
 		
 				/* check for comment */
-				if (data.hasOwnProperty("comment") && typeof data.comment === "string" || data.comment !== "") {
+				if (data.hasOwnProperty("comment") && typeof data.comment === "string" && data.comment !== "") {
 					doc.comment = data.comment;
 				} else {
 					doc.comment = null;
