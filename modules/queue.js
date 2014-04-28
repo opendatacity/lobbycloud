@@ -299,6 +299,44 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		
 	};
 	
+	/* don't use this un public, update queue element to stage 4 or 5 instead */
+	queue.delete = function(id, callback) {
+		queue.get(id, function(err, doc){
+			if (err) return callback(err);
+			/* get all files to delete */
+			var files = [];
+			files.push(doc.file);
+			files.push(doc.data.hashthumb);
+			doc.data.thumbs.forEach(function(thumb){
+				files.push(thumb.file);
+			});
+			doc.data.thumbs.forEach(function(thumb){
+				files.push(thumb.file);
+			});
+			doc.data.images.forEach(function(image){
+				files.push(image.file);
+			});
+			/* delete from mongodb */
+			db.collection("queue").remove({id: id}, true, function(err, res){
+				if (err) return callback(err);
+				/* delete from cache */
+				if (cache.hasOwnProperty(id)) delete cache[id];
+				/* delete files */
+				var counter = files.length;
+				files.forEach(function(file){
+					fs.unlink(fs.path.resolve(__root, config.storage, file), function(err){
+						if (err) console.log("[queue]","could not delete", file, err); // FIXME: deal with undeleted files
+						counter--;
+						if (counter === 0) {
+							/* call back */
+							callback(null);
+						}
+					});
+				});
+			});
+		});
+	};
+	
 	/* get by id */
 	queue.get = function(id, callback){
 		id = slugmaker(id);
