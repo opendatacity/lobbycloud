@@ -256,6 +256,11 @@ app.post('/beta', function (req, res) {
 	});
 });
 
+var send404 = function(req, res) {
+	res.status(404);
+	render(req, res, '404', {});
+}
+
 var sendProfile = function (profile, req, res) {
 	render(req, res, 'profile', {
 		"is_own": (profile) && (req.user) && (profile.id == req.user.id),
@@ -276,6 +281,7 @@ app.get('/profile', function (req, res) {
 /* user profile */
 app.get('/profile/:user', function (req, res) {
 	l.users.get(req.param("user"), function (err, profile) {
+		if (!profile) return send404(req, res);
 		sendProfile(profile, req, res);
 	});
 });
@@ -441,6 +447,7 @@ app.post('/users/verification/request', function (req, res) {
 });
 
 var render = function (req, res, name, opt) {
+	var opt = (opt || {});
 	opt._user = req.user;
 	opt._url = config.url;
 	opt._userrole = {};
