@@ -101,7 +101,6 @@ module.exports = orgs = function(opts, db, es){
 			if (err) return callback(err);
 			if (!exists) return callback(null); // be graceful
 		
-
 			db.collection("organisations").remove({id: id}, true, function(err, res){
 				if (err) return callback(err);
 
