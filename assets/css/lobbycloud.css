@@ -66,9 +66,16 @@ header {
 		header #navbar .navbar-nav.navbar-main a {
 			
 			font-family: "Roboto Slab";
-			font-size: 1.2em;
+			font-size: 1.1em;
+			padding: 15px 9px;
 			
 		}
+
+			header #navbar .navbar-nav.navbar-main .dropdown-menu a {
+			
+				padding: 5px 9px;
+			
+			}
 		
 		header #navbar .navbar-toggle span {
 			
@@ -78,7 +85,6 @@ header {
 		
 		header #navbar .navbar-user {
 			
-			margin-right: 20px !important;
 			font-size: .95em;
 			
 		}
