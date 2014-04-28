@@ -55,6 +55,14 @@
 				</div>
 
 				<div class="form-group">
+					<label for="document-lang">{{#__}}Language of the document{{/__}}</label>
+					<select id="document-lang" name="lang" class="form-control" size="1">
+						<option value=""></option>
+						{{>lang-options}}
+					</select>
+				</div>
+
+				<div class="form-group">
 					<label for="document-comment">{{#__}}Uplaod files{{/__}}</label>
 					<div class="upload-area">
 						<div id="drop" class="upload-area-drop">

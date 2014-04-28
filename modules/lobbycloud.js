@@ -17,7 +17,8 @@ var modules = {
 	invites: require("./invites"),
 	topics: require("./topics"),
 	users: require("./users"),
-	queue: require("./queue")
+	queue: require("./queue"),
+	lang: require("./lang")
 };
 
 /* get dirname of main module */
@@ -33,6 +34,9 @@ var Lobbycloud = function(config){
 	
 	/* set up elasticsearch connection */
 	var es = new elasticsearch.Client(config.elasticsearch.connect);
+	
+	/* languages helper module */
+	this.lang = new modules.lang();
 	
 	/* set up exported objects */
 	this.invites = new modules.invites(path.resolve(__root, config.invitedb));

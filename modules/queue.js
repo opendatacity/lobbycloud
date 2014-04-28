@@ -130,6 +130,13 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 					doc.orig = null;
 				}
 
+				/* check for language */
+				if (data.hasOwnProperty("lang") && typeof data.lang === "string" && data.lang !== "" && l.lang.check(data.lang)) {
+					doc.lang = data.lang;
+				} else {
+					doc.lang = null;
+				}
+
 				/* check for source */
 				if (data.hasOwnProperty("source") && typeof data.source === "string" || data.source !== "") {
 					doc.source = data.source;
