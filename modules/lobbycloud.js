@@ -38,7 +38,7 @@ var Lobbycloud = function(config){
 	var es = new elasticsearch.Client(config.elasticsearch.connect);
 
 	/* set up elasticsearch helper */
-	l.elastic = new modules.elastic(es);
+	l.elastic = new modules.elastic(config.elasticsearch, es);
 
 	/* languages helper module */
 	l.lang = new modules.lang();

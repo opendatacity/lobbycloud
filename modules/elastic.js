@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-module.exports = function (es) {
+module.exports = function (config, es) {
 	var me = this;
 
 	me.create = function (type, obj, columns, callback) {
