@@ -437,6 +437,11 @@ module.exports = queue = function(config, db, es, organisations, topics, users){
 		});
 	};
 	
+	/* clean accepted, cancelled and declined elements from queue */
+	queue.clean = function(callback) {
+		callback(true); // FIXME: implement this for realz
+	}
+
 	/* get by id */
 	queue.get = function(id, callback){
 		id = slugmaker(id);
