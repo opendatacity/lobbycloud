@@ -16,10 +16,11 @@ var modules = {
 	mailqueue: require("./mailqueue"),
 	documents: require("./documents"),
 	invites: require("./invites"),
+	elastic: require("./elastic"),
 	topics: require("./topics"),
 	users: require("./users"),
 	queue: require("./queue"),
-	lang: require("./lang")
+	lang: require("./lang"),
 };
 
 /* get dirname of main module */
@@ -29,13 +30,16 @@ var __root = path.dirname(process.mainModule.filename);
 var Lobbycloud = function(config){
 
 	var l = this;
-		
+			
 	/* set up mongodb connection */
 	var db = new mongojs(config.db);
-	
+
 	/* set up elasticsearch connection */
 	var es = new elasticsearch.Client(config.elasticsearch.connect);
-	
+
+	/* set up elasticsearch helper */
+	l.elastic = new modules.elastic(es);
+
 	/* languages helper module */
 	l.lang = new modules.lang();
 	
@@ -43,16 +47,12 @@ var Lobbycloud = function(config){
 	l.invites = new modules.invites(path.resolve(__root, config.invitedb));
 	l.mailqueue = new modules.mailqueue(config.mails, config.url);
 	l.mockupdocs = new modules.mockupdocs();
-
-	/* FIXME: this is a bit ridiculous, future plan: pass this and use that. */
-
-	l.organisations = new modules.organisations(config, db, es);
-	l.topics = new modules.topics(config, db, es);
-	l.users = new modules.users(config, db, es, this.mailqueue, i18n);
-	l.queue = new modules.queue(config, db, es, this.organisations, this.topics, this.users);
+	l.organisations = new modules.organisations(config, db, l.elastic);
+	l.topics = new modules.topics(config, db, l.elastic);
+	l.users = new modules.users(config, db, l.elastic, l.mailqueue, i18n);
+	l.queue = new modules.queue(config, db, l.elastic, l.organisations, l.topics, l.users);
 	l.documents = new modules.documents(config, db, es, l);
-
-	this.backendapi = new modules.backendapi(this, i18n);
+	l.backendapi = new modules.backendapi(l, i18n);
 
 	return l;
 	

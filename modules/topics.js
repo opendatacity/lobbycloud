@@ -6,7 +6,9 @@ var slugmaker = require("./slugmaker");
 module.exports = function(opts, db, es){
 
 	var topics = this;
-	
+
+	var es_store = ["label", "subject", "description", "created"];
+
 	var cache = {};
 
 	db.collection("topics").ensureIndex("id", {"unique": true, "background": true, "dropDups": true});
@@ -53,18 +55,7 @@ module.exports = function(opts, db, es){
 				//do not wait for elasticsearch and ignore it's errors
 				callback(null, result);
 
-				/* add to elasticsearch */
-				es.create({
-					index: opts.elasticsearch.index,
-					type: 'topic',
-					id: topic.id,
-					body: {
-						label: data.label,
-						subject: data.subject
-					}
-				}, function (err, resp) {
-					if (err) return console.log(err); //TODO: better logging
-				});
+				es.create('topic', result, es_store);
 			});
 		});
 	};
@@ -87,14 +78,7 @@ module.exports = function(opts, db, es){
 				//do not wait for elasticsearch and ignore it's errors
 				callback(null);
 
-				/* remove from elasticsearch */
-				es.delete({
-					index: opts.elasticsearch.index,
-					type: 'topic',
-					id: id
-				}, function (err, resp) {
-					if (err) return console.log(err); //TODO: better logging
-				});
+				es.delete('topic', id);
 			});
 		});
 	};
@@ -130,20 +114,7 @@ module.exports = function(opts, db, es){
 				/* check if elasticsearch doesn't need an update */
 				if (!update.hasOwnProperty("label") && !update.hasOwnProperty("subject")) return;
 
-				/* update elasticsearch index */
-				es.update({
-					index: opts.elasticsearch.index,
-					type: 'topic',
-					id: id,
-					body: {
-						doc: {
-							label: update.label,
-							subject: update.subject
-						}
-					}
-				}, function (err, resp) {
-					if (err) return console.log(err); //TODO: better logging
-				});
+				es.update('topic', id, doc, es_store);
 			});
 		});
 		
@@ -201,34 +172,19 @@ module.exports = function(opts, db, es){
 
 	/* find topics by a query on label and subject */
 	topics.find = function(q, callback){
-		es.search({
-			q: q,
-			index: opts.elasticsearch.index,
-			type: 'topic',
-		}, function (err, result) {
+		es.search('topic', q, ['label','subject'], function(err, hits){
 			if (err) return callback(err);
-			if (result.hits.total === 0) return callback(null, []);
-
-			var hits = {};
-			result.hits.hits.forEach(function(hit){
-				hits[hit._id] = hit._score;
-			});
-			
-			topics.list(Object.keys(hits), function(err, result){
-
+			var ids = Object.keys(hits);
+			if (ids.length === 0) return callback(null, []);
+			topics.list(ids, function(err, result){
 				if (err) return callback(err);
-
 				/* add score to result */
 				result.map(function(r){ r.score = hits[r.id]; });
-				
 				/* sort by score */
 				result.sort(function(a,b){ return (b.score-a.score) });
-				
 				/* call back */
 				callback(null, result);
-				
 			});
-			
 		});
 	};
 

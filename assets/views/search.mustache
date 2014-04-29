@@ -1,0 +1,31 @@
+{{>header}}
+<div class="container">
+    <div id="headline">
+        <h1>{{#__}}Search (Topics){{/__}}</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 white-box">
+            <form action="{{{_url}}}/search" method="post" class="form-inline" role="form">
+                <div class="form-group">
+                    <input type="text" name="query" class="form-control" id="query" value="{{query}}" placeholder="{{#__}}Your search query{{/__}}">
+                </div>
+                <button type="submit" class="btn btn-primary">{{#__}}Search{{/__}}</button>
+            </form>
+        </div>
+    </div>
+	{{#items}}
+   		 <div class="row">
+			<div class="col-md-12">
+				<h2>{{label}}</h2>
+				<p><strong>{{subject}}</strong></p>
+				<p>
+					{{description}}
+				</p>
+			</div>
+        </div>
+	{{/items}}
+	{{^items}}
+		No results :.(
+	{{/items}}
+</div>
+{{>footer}}

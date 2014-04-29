@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 /* require npm modules */
-var elasticsearch = require("elasticsearch");
 var validator = require("validator");
 var mongojs = require("mongojs");
 var _ = require("underscore");
@@ -10,6 +9,8 @@ var _ = require("underscore");
 var slugmaker = require("./slugmaker");
 
 module.exports = orgs = function(opts, db, es){
+
+	var es_store = ["name", "fullname", "description", "created"];
 
 	var organisations = this;
 
@@ -27,7 +28,7 @@ module.exports = orgs = function(opts, db, es){
 			callback(null, (result.length > 0), id);
 		});
 	};
-	
+
 	/* add an organisation */
 	organisations.add = function(data, callback){
 
@@ -35,7 +36,7 @@ module.exports = orgs = function(opts, db, es){
 
 		/* check if name was specified */
 		if (!data.hasOwnProperty("name") || typeof data.name !== "string" || data.name === "") return callback(new Error("Organisation has no name"));
-		
+
 		/* check supplied url */
 		if (data.url && !data.url.match(/^(http|https):\/\//)) data.url = "http://"+data.url;
 		if (data.url && !validator.isURL(data.url, {
@@ -51,7 +52,7 @@ module.exports = orgs = function(opts, db, es){
 			require_tld: true,
 			require_protocol: true
 		})) data.logo = false;
-		
+
 		var org = {
 			id: slugmaker(data.name),
 			name: data.name,
@@ -61,11 +62,11 @@ module.exports = orgs = function(opts, db, es){
 			logo: data.logo,
 			created: (new Date())
 		};
-		
+
 		organisations.check(org.id, function(err, exists){
 			if (err) return callback(err);
 			if (exists) return callback(new Error("Organisation already exists"));
-			
+
 			/* insert organisation to database */
 			db.collection("organisations").save(org, function(err, result){
 				if (err) return callback(err);
@@ -76,18 +77,7 @@ module.exports = orgs = function(opts, db, es){
 				//do not wait for elasticsearch and ignore it's errors
 				callback(null, result);
 
-				/* add to elasticsearch */
-				es.create({
-					index: opts.elasticsearch.index,
-					type: 'organisation',
-					id: org.id,
-					body: {
-						name: data.name,
-						fullname: data.fullname
-					}
-				}, function (err, resp) {
-					if (err) return console.log(err);
-				});
+				es.create('organisation', data, es_store);
 			});
 		});
 	};
@@ -100,7 +90,7 @@ module.exports = orgs = function(opts, db, es){
 		organisations.check(id, function(err, exists){
 			if (err) return callback(err);
 			if (!exists) return callback(null); // be graceful
-		
+
 			db.collection("organisations").remove({id: id}, true, function(err, res){
 				if (err) return callback(err);
 
@@ -110,14 +100,7 @@ module.exports = orgs = function(opts, db, es){
 				//do not wait for elasticsearch and ignore it's errors
 				callback(null);
 
-				/* remove from elasticsearch */
-				es.delete({
-					index: opts.elasticsearch.index,
-					type: 'organisation',
-					id: id,
-				}, function (err, resp) {
-					if (err) return console.log(err);
-				});
+				es.delete('organisation', id);
 			});
 		});
 	};
@@ -136,12 +119,12 @@ module.exports = orgs = function(opts, db, es){
 
 		/* check if nothing to update */
 		if (Object.keys(update).length === 0) return callback(null);
-		
+
 		/* check if organisation exists */
 		organisations.check(id, function(err, exists){
 			if (err) return callback(err);
 			if (!exists) return callback(new Error("Organisation does not exists"));
-		
+
 			/* update database */
 			db.collection("organisations").findAndModify({"query":{"id":id},"update":{"$set":update},"new":true}, function(err, doc){
 				if (err) return callback(err);
@@ -154,24 +137,13 @@ module.exports = orgs = function(opts, db, es){
 
 				/* check if elasticsearch doesn't need an update */
 				if (!update.hasOwnProperty("name") && !update.hasOwnProperty("fullname")) return;
-				
+
 				/* update elasticsearch index */
-				es.update({
-					index: opts.elasticsearch.index,
-					type: 'organisation',
-					id: id,
-					body: {
-						doc: {
-							name: update.name,
-							fullname: update.fullname
-						}
-					}
-				}, function (err, resp) {
-					if (err) return console.log(err);
-				});
+				es.update('organisation', doc, es_store);
+
 			});
 		});
-		
+
 	};
 
 	/* get an organisation by id */
@@ -210,7 +182,7 @@ module.exports = orgs = function(opts, db, es){
 			});
 			callback(null, list);
 		});
-		
+
 	};
 
 	/* get all organisations — rather don't use this */
@@ -226,34 +198,19 @@ module.exports = orgs = function(opts, db, es){
 
 	/* find organisations by a query on name and fullname */
 	organisations.find = function(q, callback){
-		es.search({
-			q: q,
-			index: opts.elasticsearch.index,
-			type: 'organisation',
-		}, function (err, result) {
+		es.search('organisation', q, ['name','fullname'], function(err, hits){
 			if (err) return callback(err);
-			if (result.hits.total === 0) return callback(null, []);
-
-			var hits = {};
-			result.hits.hits.forEach(function(hit){
-				hits[hit._id] = hit._score;
-			});
-			
-			organisations.list(Object.keys(hits), function(err, result){
-
+			var ids = Object.keys(hits);
+			if (ids.length === 0) return callback(null, []);
+			organisations.list(ids, function(err, result){
 				if (err) return callback(err);
-
 				/* add score to result */
 				result.map(function(r){ r.score = hits[r.id]; });
-				
 				/* sort by score */
 				result.sort(function(a,b){ return (b.score-a.score) });
-				
 				/* call back */
 				callback(null, result);
-				
 			});
-			
 		});
 	};
 
