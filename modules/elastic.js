@@ -3,34 +3,32 @@
 module.exports = function (config, es) {
 	var me = this;
 
-	me.create = function (type, obj, columns, callback) {
+	me.es = es;
+
+	/* strips down an obj to the specified properties */
+	me.prepareFieldsObj = function (obj, fields) {
 		var doc = obj;
-		if (columns) {
+		if (fields) {
 			doc = {};
-			columns.forEach(function (c) {
+			fields.forEach(function (c) {
 				doc[c] = obj[c];
 			});
 		}
-		es.create({
-			index: config.index,
-			type: type,
-			id: obj.id,
-			body: doc
-		}, function (err, resp) {
-			if (err) console.log(err);
-			if (callback) callback(err, resp);
-		});
+		return doc;
 	};
 
-	me.update = function (type, id, obj, columns, callback) {
-		var doc = obj;
-		if (columns) {
-			doc = {};
-			columns.forEach(function (c) {
-				doc[c] = obj[c];
-			});
+	/* checks if obj has min one field for the search */
+	me.hasUpdateField = function (obj, fields) {
+		for (var i = 0; i < fields.length; i++) {
+			if (obj.hasOwnProperty(fields[i]))
+				return true;
 		}
-		es.update({
+		return false;
+	};
+
+	/* creates an es search entry */
+	me.create = function (type, id, obj, callback) {
+		es.create({
 			index: config.index,
 			type: type,
 			id: id,
@@ -41,6 +39,43 @@ module.exports = function (config, es) {
 		});
 	};
 
+	/* upserts the properties of an es search entry */
+	/* data is ONLY inserted if no entry exists. no updating fields is performed */
+	me.upsert = function (type, id, obj, callback) {
+		console.log(type, config.index, id, obj);
+		es.update({
+			index: config.index,
+			type: type,
+			id: id,
+			body: {upsert: obj}
+		}, function (err, resp) {
+			if (err) console.log(err);
+			if (callback) callback(err, resp);
+		});
+	};
+
+	/* updates the properties of an es search entry, if the entry does not exists, one will be created */
+	me.update = function (type, id, obj, callback) {
+		es.update({
+			index: config.index,
+			type: type,
+			id: id,
+			body: {doc: obj}
+		}, function (err, resp) {
+			if (err) {
+				if (err.status == 404) {
+					me.create(type, id, obj, callback);
+				} else {
+					console.log(err);
+					callback(err);
+				}
+			} else if (callback) {
+				callback(err, resp);
+			}
+		});
+	};
+
+	/* deletes an es search entry */
 	me.delete = function (type, id, callback) {
 		/* remove from elasticsearch */
 		es.delete({
@@ -53,6 +88,7 @@ module.exports = function (config, es) {
 		});
 	};
 
+	/* fuzzy search by type, text in the specified es search entry properties */
 	me.search = function (type, query, fields, callback) {
 
 		var queries = [
