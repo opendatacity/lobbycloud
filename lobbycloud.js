@@ -328,13 +328,13 @@ app.get('/topics/:id', function (req, res) {
 });
 
 /* browse organisations */
-app.get('/organistions', function (req, res) {
-	render(req, res, 'organistions', {});
+app.get('/organisations', function (req, res) {
+	render(req, res, 'organisations', {});
 });
 
 /* organisation */
-app.get('/organistions/:id', function (req, res) {
-	render(req, res, 'organistions', {});
+app.get('/organisations/:id', function (req, res) {
+	render(req, res, 'organisations', {});
 });
 
 /* upload */
