@@ -57,6 +57,11 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider, $location
 			templateUrl: 'partials/docs.html',
 			controller: 'DocsController'
 		})
+		.state('queue', {
+			url: '/queue',
+			templateUrl: 'partials/queue.html',
+			controller: 'QueueController'
+		})
 		.state('topics', {
 			url: '/topics',
 			templateUrl: 'partials/topics.html',

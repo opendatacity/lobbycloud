@@ -134,6 +134,18 @@ app.factory('DocsService', function ($resource) {
 	);
 });
 
+app.factory('QueueService', function ($resource) {
+	'use strict';
+	return $resource('/api/backend/:cmd', {}, {
+			list: {
+				method: 'POST',
+				params: {cmd: 'queue'},
+				isArray: true
+			}
+		}
+	);
+});
+
 app.factory('TopicsService', function ($resource) {
 	'use strict';
 	return $resource('/api/backend/:cmd', {}, {

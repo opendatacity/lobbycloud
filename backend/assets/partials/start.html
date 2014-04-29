@@ -4,12 +4,13 @@
 
 <!--<h2 translate>Hello {{account.name||account.id}}!</h2>-->
 
-<div id="intro" class="row">
+<div class="row">
 
     <div class="col-md-4">
         <h3 translate>Documents</h3>
         <a class="btn btn-link" href="javascript:;" ui-sref="upload"><i class="fa fa-upload"></i><span translate>Upload Documents</span></a><br/>
-        <a class="btn btn-link" href="javascript:;" ui-sref="docs"><i class="fa fa-files-o"></i><span translate>Edit Documents</span></a>
+        <a class="btn btn-link" href="javascript:;" ui-sref="docs"><i class="fa fa-files-o"></i><span translate>Edit Documents</span></a><br/>
+        <a class="btn btn-link" href="javascript:;" ui-sref="queue"><i class="fa fa-file"></i><span translate>Edit Queue</span></a>
     </div>
 
     <div ng-show="access(accessLevels.editor)" class="col-md-4">

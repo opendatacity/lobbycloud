@@ -185,6 +185,100 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 
 });
 
+app.controller('QueueController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, QueueService) {
+	'use strict';
+
+	var reloadTable = function (o, n) {
+		if ((!$scope.loading) && ($scope.tableParams) && (n !== undefined) && (o !== undefined) && (o !== n)) {
+			$scope.tableParams.reload();
+		}
+	};
+
+	$scope.initData = function (data) {
+		//init filter
+		var min = null;
+		var max = 0;
+		data.forEach(function (doc) {
+			min = min ? Math.min(doc.uploaded, min) : doc.uploaded;
+			max = Math.max(doc.uploaded, max);
+		});
+		$scope.filter = {
+			title: '',
+			range: {
+				startDate: moment(min ? min : (new Date())),
+				endDate: moment(max ? max : (new Date()))
+			},
+			range_enabled: false
+		};
+		$scope.$watch("filter.range", function (o, n) {
+			if ($scope.filter.range_enabled)
+				reloadTable(o, n);
+		});
+		$scope.$watch("filter.range_enabled", reloadTable);
+		$scope.$watch("filter.title", reloadTable);
+
+		//init table
+		$scope.tableParams = new ngTableParams({
+			page: 1,
+			count: 10,
+			sorting: {name: 'asc'}
+		}, {
+			total: data.length,
+			getData: function ($defer, params) {
+				var orderedData = data;
+				orderedData = $scope.filter.title ? $filter('filter')(orderedData, {'title': $scope.filter.title}) : orderedData;
+				if ($scope.filter.range && $scope.filter.range_enabled) {
+					var startDate = new Date($scope.filter.range.startDate).valueOf();
+					var endDate = new Date($scope.filter.range.endDate).valueOf();
+					orderedData = $filter('filter')(orderedData, function (value) {
+						return (value.uploaded >= startDate) && (value.uploaded <= endDate);
+					});
+				}
+				orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
+				params.total(orderedData.length);
+				$scope.docs = orderedData;
+				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+			}
+//				,groupBy: function(item) {
+//					return 'First letter "' + item.title[0] + '"';
+//				}
+		});
+	};
+
+	$scope.selectRow = function (clickdoc) {
+		if (clickdoc.$selected) {
+			clickdoc.$selected = false;
+			$scope.doc = null;
+		} else {
+			if ($scope.doc) {
+				$scope.doc.$selected = false;
+			}
+			clickdoc.$selected = true;
+			$scope.doc = clickdoc;
+		}
+	};
+
+	$scope.load = function () {
+		$scope.loading = true;
+		QueueService.list({},
+			function (fulldata) {
+				$scope.initData(fulldata);
+				$scope.loading = false;
+
+			},
+			function (err) {
+				$scope.loading = false;
+				if (err.status == 401) {
+					AuthenticationService.reset();
+					$state.go('login');
+				}
+			});
+	};
+
+	$scope.load();
+
+});
+
 app.controller('DocsUploadController', function ($scope) {
 	'use strict';
 	//we use the components from the front end

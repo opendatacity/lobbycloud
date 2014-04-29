@@ -62,7 +62,8 @@
             </div>
             <nav role="navigation" class="collapse navbar-collapse bs-navbar-collapse">
                 <ul id="nav-site" class="nav navbar-nav" ng-class="{ hidden: !isLoggedIn()}">
-                    <li ui-sref-active="active"><a ui-sref="upload" translate>Upload</a></li>
+                    <!--<li ui-sref-active="active"><a ui-sref="upload" translate>Upload</a></li>-->
+                    <li ui-sref-active="active"><a ui-sref="queue" translate>Queue</a></li>
                     <li ui-sref-active="active"><a ui-sref="docs" translate>Documents</a></li>
                     <li class="dropdown" ng-show="access(accessLevels.editor)">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">

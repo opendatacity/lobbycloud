@@ -49,6 +49,23 @@ module.exports = function (lobbycloud, i18n) {
 			created: new Date(topic.created).valueOf()
 		}
 	};
+	/* strips down queue obj to values needed by ui */
+	var prepareClientQueue = function (topic) {
+		if (!topic) return null;
+		return {
+			id: topic.id,
+			user: topic.user,
+			file: topic.file,
+			orig: topic.orig,
+			lang: topic.lang,
+			source: topic.source,
+			topic: topic.topic,
+			organisation: topic.organisation,
+			comment: topic.comment,
+			tags: topic.tags,
+			created: new Date(topic.created).valueOf()
+		}
+	};
 
 	api.features = {
 		'logout': {
@@ -125,6 +142,17 @@ module.exports = function (lobbycloud, i18n) {
 				lobbycloud.topics.update(req.body.topic.id, req.body.topic, function (err, topic) {
 					if (err) return res.send(400, err.message);
 					res.json(prepareClientTopic(topic));
+				});
+			}
+		},
+		'queue': {
+			//returns a json with a organisation list for the ui
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				lobbycloud.queue.all(function (err, data) {
+					res.json(data.map(function (t) {
+						return prepareClientQueue(t);
+					}));
 				});
 			}
 		},
