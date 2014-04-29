@@ -133,7 +133,7 @@
 	"Topics": "Topics",
 	"Organisations": "Organisations",
 	"Documents": "Documents",
-	"About LobbyCloud": "About LobbyCloud",
+	"About LobbyCloud": "Über LobbyCloud",
 	"Browse": "Browse",
 	"Contribute": "Contribute",
 	"About": "About",
@@ -146,10 +146,9 @@
 	"VAT ID": "VAT ID",
 	"is represened by": "is represened by",
 	"director": "director",
-	"und": "und",
 	"procurator": "procurator",
 	"Responsibility for this websites according to §55.2 RStV and/or §5 TMG lies with": "Responsibility for this websites according to §55.2 RStV and/or §5 TMG lies with",
-	"and": "and",
+	"and": "und",
 	"Details": "Details",
 	"Upload your documents here.": "Upload your documents here.",
 	"Original Filename": "Original Filename",
@@ -159,5 +158,10 @@
 	"Cancel publishing": "Cancel publishing",
 	"This profile does not exist.": "This profile does not exist.",
 	"This page does not exist.": "This page does not exist.",
-	"Language of the document": "Language of the document"
+	"Language of the document": "Language of the document",
+	"FAILED": "FAILED",
+	"Processing failed.": "Processing failed.",
+	"ACCEPTED": "ACCEPTED",
+	"Accepted.": "Accepted.",
+	"UPLOADED": "UPLOADED"
 }
