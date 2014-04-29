@@ -14,6 +14,7 @@ var modules = {
 	backendapi: require("./backendapi"),
 	mockupdocs: require("./mockdocs"),
 	mailqueue: require("./mailqueue"),
+	documents: require("./documents"),
 	invites: require("./invites"),
 	topics: require("./topics"),
 	users: require("./users"),
@@ -36,19 +37,20 @@ var Lobbycloud = function(config){
 	var es = new elasticsearch.Client(config.elasticsearch.connect);
 	
 	/* languages helper module */
-	this.lang = new modules.lang();
+	l.lang = new modules.lang();
 	
 	/* set up exported objects */
-	this.invites = new modules.invites(path.resolve(__root, config.invitedb));
-	this.mailqueue = new modules.mailqueue(config.mails, config.url);
-	this.mockupdocs = new modules.mockupdocs();
+	l.invites = new modules.invites(path.resolve(__root, config.invitedb));
+	l.mailqueue = new modules.mailqueue(config.mails, config.url);
+	l.mockupdocs = new modules.mockupdocs();
 
 	/* FIXME: this is a bit ridiculous, future plan: pass this and use that. */
 
-	this.organisations = new modules.organisations(config, db, es);
-	this.topics = new modules.topics(config, db, es);
-	this.users = new modules.users(config, db, es, this.mailqueue, i18n);
-	this.queue = new modules.queue(config, db, es, this.organisations, this.topics, this.users);
+	l.organisations = new modules.organisations(config, db, es);
+	l.topics = new modules.topics(config, db, es);
+	l.users = new modules.users(config, db, es, this.mailqueue, i18n);
+	l.queue = new modules.queue(config, db, es, this.organisations, this.topics, this.users);
+	l.documents = new modules.documents(config, db, es, l);
 
 	this.backendapi = new modules.backendapi(this, i18n);
 
