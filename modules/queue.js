@@ -7,9 +7,6 @@ var fs = require("fs");
 var path = require("path");
 var crypto = require("crypto");
 
-/* require npm modules */
-var mongojs = require("mongojs");
-
 /* require local modules */
 var extractor = require("./extractor");
 var slugmaker = require("./slugmaker");
