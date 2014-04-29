@@ -4,7 +4,6 @@
 var path = require("path");
 
 /* require npm modules */
-var elasticsearch = require("elasticsearch");
 var mongojs = require("mongojs");
 var i18n = require("i18n");
 
@@ -18,7 +17,8 @@ var modules = {
 	topics: require("./topics"),
 	users: require("./users"),
 	queue: require("./queue"),
-	lang: require("./lang")
+	lang: require("./lang"),
+	elastic: require("./elastic")
 };
 
 /* get dirname of main module */
@@ -31,10 +31,10 @@ var Lobbycloud = function(config){
 		
 	/* set up mongodb connection */
 	var db = new mongojs(config.db);
-	
-	/* set up elasticsearch connection */
-	var es = new elasticsearch.Client(config.elasticsearch.connect);
-	
+
+	/* set up elasticsearch helper */
+	this.elastic = new modules.elastic(config.elasticsearch);
+
 	/* languages helper module */
 	this.lang = new modules.lang();
 	
@@ -45,10 +45,10 @@ var Lobbycloud = function(config){
 
 	/* FIXME: this is a bit ridiculous, future plan: pass this and use that. */
 
-	this.organisations = new modules.organisations(config, db, es);
-	this.topics = new modules.topics(config, db, es);
-	this.users = new modules.users(config, db, es, this.mailqueue, i18n);
-	this.queue = new modules.queue(config, db, es, this.organisations, this.topics, this.users);
+	this.organisations = new modules.organisations(config, db, this.elastic);
+	this.topics = new modules.topics(config, db, this.elastic);
+	this.users = new modules.users(config, db, this.elastic, this.mailqueue, i18n);
+	this.queue = new modules.queue(config, db, this.elastic, this.organisations, this.topics, this.users);
 
 	this.backendapi = new modules.backendapi(this, i18n);
 

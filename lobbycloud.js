@@ -337,9 +337,6 @@ app.get('/organistions/:id', function (req, res) {
 	render(req, res, 'organistions', {});
 });
 
-// if (!user) return 
-
-
 /* upload */
 app.get('/upload', function (req, res) {
 	if (!req.user) return res.redirect('/login?redirect=/upload');
@@ -564,92 +561,44 @@ app.get('/api/whatever', function (req, res) {
 	res.json("not implemented");
 });
 
+/* search */
+app.all('/search', function (req, res) {
+	var q = (req.body.query || req.query.query || "").replace(/\*/g,'');
+	if (q === null || q === "") return render(req, res, 'search', {});
+	l.topics.find(q, function(err, result){
+		render(req, res, 'search', {
+			query: q,
+			items: result
+		})
+	});
+});
+
 /* topic suggestions */
 app.all('/api/topic/suggest', function (req, res) {
-	
-	// FIXME: let this be done by someone who truly understands elasticsearch
-	
-	var q = (req.body.q || req.query.q || null).replace(/\*/g,'');
-	
+	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
 	if (q === null || q === "") return res.json([]);
-
-	/* first just the query */
 	l.topics.find(q, function(err, result){
-
-		if (err) return res.json([]);
-	
-		if (result.length > 0) return res.json(result.map(function(r){
-			return { id: r.id, label: r.label };
-		}));
-		
-		/* then word beginning wildcard i guess */
-		l.topics.find(q+"*", function(err, result){
-
-			if (err) return res.json([]);
-	
-			if (result.length > 0) return res.json(result.map(function(r){
+		if (result.length > 0) {
+			return res.json(result.map(function(r){
 				return { id: r.id, label: r.label };
 			}));
-		
-			/* finally wildcard yay! */
-			l.topics.find("*"+q+"*", function(err, result){
-				if (err) return res.json([]);
-				if (result.length === 0) return res.json([]);
-
-				return res.json(result.map(function(r){
-					return { id: r.id, label: r.label };
-				}));
-
-			});
-
-		});
-				
+		}
+		res.json([]);
 	});
-	
 });
 
 /* topic suggestions */
 app.all('/api/organisation/suggest', function (req, res) {
-	
-	// FIXME: let this be done by someone who truly understands elasticsearch
-	
-	var q = (req.body.q || req.query.q || null).replace(/\*/g,'');
-	
+	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
 	if (q === null || q === "") return res.json([]);
-
-	/* first just the query */
 	l.organisations.find(q, function(err, result){
-
-		if (err) return res.json([]);
-	
-		if (result.length > 0) return res.json(result.map(function(r){
-			return { id: r.id, label: [r.name, r.fullname].join(" - ") };
-		}));
-		
-		/* then word beginning wildcard i guess */
-		l.organisations.find(q+"*", function(err, result){
-
-			if (err) return res.json([]);
-	
-			if (result.length > 0) return res.json(result.map(function(r){
+		if (result.length > 0) {
+			return res.json(result.map(function(r){
 				return { id: r.id, label: [r.name, r.fullname].join(" - ") };
 			}));
-		
-			/* finally wildcard yay! */
-			l.organisations.find("*"+q+"*", function(err, result){
-				if (err) return res.json([]);
-				if (result.length === 0) return res.json([]);
-
-				return res.json(result.map(function(r){
-					return { id: r.id, label: [r.name, r.fullname].join(" - ") };
-				}));
-
-			});
-
-		});
-				
+		}
+		res.json([]);
 	});
-	
 });
 
 /* default */
