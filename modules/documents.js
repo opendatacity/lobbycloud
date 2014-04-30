@@ -21,10 +21,12 @@ module.exports = documents = function(config, db, es, l){
 	db.collection("documents").ensureIndex("created", {"background": true});
 	/* waaaay more indexes! */
 
+	/* check a document id */
 	documents.checkid = function(id) {
 		return /^([a-z0-9]{8})$/.test(id);
 	};
 
+	/* import a document from the queue */
 	documents.import = function(id, callback) {
 		if (!documents.checkid(id)) return callback(new Error("invaild id"));
 		l.queue.check(id, function(err, exists){
@@ -78,8 +80,8 @@ module.exports = documents = function(config, db, es, l){
 							orig: doc.orig,
 							lang: doc.lang,
 							tags: doc.tags,
-							topic: (doc.topic.id || null),
-							organisation: (doc.organisation.id || null),
+							topic: ((doc.topic && doc.topic.hasOwnProperty("id")) ? doc.topic.id : null),
+							organisation: ((doc.organisation && doc.organisation.hasOwnProperty("id")) ? doc.organisation.id : null),
 							comments: [], // comments without places
 							notes: [], // comments with places
 							changesets: [], // for lobbyplag
