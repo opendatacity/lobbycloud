@@ -141,6 +141,11 @@ app.factory('QueueService', function ($resource) {
 				method: 'POST',
 				params: {cmd: 'queue'},
 				isArray: true
+			},
+			item: {
+				method: 'POST',
+				params: {cmd: 'queue.get'},
+				isArray: false
 			}
 		}
 	);

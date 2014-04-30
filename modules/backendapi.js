@@ -25,6 +25,7 @@ module.exports = function (lobbycloud, i18n) {
 		}
 	};
 
+	/* strips down organisation obj to values needed by ui */
 	var prepareClientOrganisation = function (organisation) {
 		if (!organisation) return null;
 		return {
@@ -156,6 +157,57 @@ module.exports = function (lobbycloud, i18n) {
 				});
 			}
 		},
+		'queue.get': {
+			//returns a json with a organisation list for the ui
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				lobbycloud.queue.get(req.body.id, function (err, data) {
+						if (err) return res.send(400, err.message);
+						var qitem = prepareClientQueue(data);
+
+						var fillOrganisation = function (cb) {
+							if (qitem.organisation && qitem.organisation.id) {
+								organisations.get(data.organisation.id, function (err, org) {
+									if ((!err) && org) {
+										qitem.organisation.id = org.id;
+										qitem.organisation.label = org.name;
+									}
+									cb();
+								});
+							} else {
+								cb();
+							}
+						};
+
+						var fillTopic = function (cb) {
+							if (qitem.topic && qitem.topic.id) {
+								topics.get(data.topic.id, function (err, org) {
+									if ((!err) && org) {
+										qitem.topic.id = org.id;
+										qitem.topic.label = org.name;
+									}
+									cb();
+								});
+							} else {
+								if ((qitem.topic) && (qitem.topic.new)) {
+									qitem.topic = {
+										label: data.topic.new
+									};
+								}
+								cb();
+							}
+						};
+
+						fillTopic(function(){
+							fillOrganisation(function(){
+								res.json(qitem);
+							})
+						});
+					}
+				);
+			}
+		},
 		'organisations': {
 			//returns a json with a organisation list for the ui
 			access: lobbycloud.users.roles.editor,
@@ -274,7 +326,8 @@ module.exports = function (lobbycloud, i18n) {
 				});
 			}
 		}
-	};
+	}
+	;
 
 	api.user = function (req, res) {
 		res.json(prepareClientUser(req.user));
@@ -300,4 +353,5 @@ module.exports = function (lobbycloud, i18n) {
 
 	return api;
 
-};
+}
+;

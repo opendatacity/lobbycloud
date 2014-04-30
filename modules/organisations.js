@@ -77,7 +77,7 @@ module.exports = orgs = function (opts, db, es) {
 				//do not wait for elasticsearch and ignore it's errors
 				callback(null, result);
 
-				es.create('organisation', org.id, es.prepareFieldObj(data, es_store));
+				es.create('organisation', org.id, es.prepareFieldsObj(data, es_store));
 			});
 		});
 	};
