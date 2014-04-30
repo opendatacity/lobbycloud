@@ -432,6 +432,14 @@ app.get('/api/test/invites/:create?', function (req, res) {
 	res.json(l.invites.all());
 });
 
+/* accept testing endpoint REMOVEME */
+app.get('/api/test/accept/:id', function (req, res) {
+	l.queue.accept(req.param("id"), function(err){
+		if (err) return res.json({"error": err.toString()});
+		res.json({"id": req.param("id")});
+	});
+});
+
 /* manual validation e-mail request */
 app.post('/users/verification/request', function (req, res) {
 	// only logged-in users may request a confirmation mail
