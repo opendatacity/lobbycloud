@@ -140,7 +140,7 @@ module.exports = queue = function(config, db, l){
 				} else {
 					doc.lang = null;
 				}
-
+				
 				/* check for source */
 				if (data.hasOwnProperty("source") && typeof data.source === "string" && data.source !== "") {
 					doc.source = data.source;

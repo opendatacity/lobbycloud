@@ -1,6 +1,13 @@
 $(document).ready(function(e){
 
+	/* fix height */
+	$('header').css('min-height', $('#navbar').height());
 	$('#main').css('min-height', $(window).innerHeight()-($('header').outerHeight()+$('footer').outerHeight()));
+	
+	$(window).resize(function(e){
+		$('header').css('min-height', $('#navbar').height());
+		$('#main').css('min-height', $(window).innerHeight()-($('header').outerHeight()+$('footer').outerHeight()));
+	});
 	
 	/* folder toggle */
 	$(".folder").each(function(idx,f){
@@ -97,8 +104,4 @@ $(document).ready(function(e){
 		
 	});
 	
-});
-
-$(window).resize(function(e){
-	$('#main').css('min-height', $(window).innerHeight()-($('header').outerHeight()+$('footer').outerHeight()));
 });

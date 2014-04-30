@@ -613,7 +613,7 @@ app.all('/api/organisation/suggest', function (req, res) {
 
 /* default */
 app.all('*', function (req, res) {
-	res.redirect('/');
+	send404(req, res);
 });
 
 /* listen */
