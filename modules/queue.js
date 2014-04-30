@@ -1,6 +1,17 @@
 #!/usr/bin/env node
 
-/** a queue for uploaded or received documents **/
+/* 
+ *	a queue for uploaded or received documents
+ *
+ *	stages: 
+ *	0: new, just received
+ *	1: extracted ready for review
+ *	2: extraction failed
+ *	3: reviewed and accepted
+ *	4: reviewed and declined
+ *	5: cancelled by user
+ *
+ */
 
 /* require node modules */
 var fs = require("fs");
@@ -90,17 +101,7 @@ module.exports = queue = function(config, db, l){
 
 	/* doc: {"file","topic","organisation","tags","comment","user","source";"state"} */
 	queue.add = function(data, callback) {
-	
-		/* 
-			stages: 
-			0: new, just received
-			1: extracted ready for review
-			2: extraction failed
-			3: reviewed and accepted
-			4: reviewed and declined
-			5: cancelled by user
-		*/
-	
+		
 		var doc = {
 			"stage": 0,
 			"data": {},
@@ -471,6 +472,23 @@ module.exports = queue = function(config, db, l){
 				queue.update(id, {stage: 4}, function(err, doc){
 					if (err) return callback(err);
 					if (config.debug) console.log("[queue] declined", id);
+					callback(null, id);
+				});
+			});
+		});
+	};
+
+	/* cancel */
+	queue.cancel = function(id, callback) {
+		queue.check(id, function(err, exists){
+			if (err) return callback(err);
+			if (!exists) return callback(new Error("this queue element does not exist"));
+			queue.get(id, function(err, doc){
+				if (err) return callback(err);
+				if (doc.stage >= 3) return callback("this queue element cannot be cancelled");
+				queue.update(id, {stage: 5}, function(err, doc){
+					if (err) return callback(err);
+					if (config.debug) console.log("[queue] cancelled", id);
 					callback(null, id);
 				});
 			});
