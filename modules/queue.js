@@ -14,9 +14,15 @@ var slugmaker = require("./slugmaker");
 /* get dirname of main module */
 var __root = path.dirname(process.mainModule.filename);
 
-module.exports = queue = function(config, db, es, organisations, topics, users){
+module.exports = queue = function(config, db, l){
 	
 	var queue = this;
+
+	/* other modules */
+	var organisations = l.organisations;
+	var documents = l.documents;
+	var topics = l.topics;
+	var users = l.users;
 
 	/* set up extractor */
 	var ex = extractor(path.resolve(__root, config.storage));
