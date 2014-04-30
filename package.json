@@ -1,10 +1,10 @@
 {
 	"private": true,
 	"name": "lobbycloud",
-	"version": "0.0.7",
+	"version": "0.1.0",
 	"description": "all the source for lobbycloud.eu",
 	"dependencies": {
-		"express": ">= 3.5.1 < 4", 
+		"express": ">= 3.5.1 < 4",
 		"sqlite3": ">= 2.2.0",
 		"mustache-express": ">= 1.0.1",
 		"filedump": ">= 0.0.5",
@@ -25,7 +25,8 @@
 		"connect-mongo": ">= 0.4.0",
 		"elasticsearch": ">= 2.1.2",
 		"mustache": ">= 0.8.1",
-		"hash_file":">= 0.1.1"
+		"hash_file": ">= 0.1.1",
+		"filesize": ">= 2.0.3"
 	},
 	"engines": {
 		"node": "0.10.26"
