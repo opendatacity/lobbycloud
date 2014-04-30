@@ -10,6 +10,7 @@ var passportlocal = require("passport-local");
 var connectmongo = require("connect-mongo");
 var mustache = require("mustache-express");
 var filedump = require("filedump");
+var filesize = require("filesize");
 var passport = require("passport");
 var sqlite3 = require("sqlite3");
 var mmmagic = require("mmmagic");
@@ -315,8 +316,18 @@ app.get('/documents', function (req, res) {
 });
 
 /* document */
-app.get('/documents/:id', function (req, res) {
-	render(req, res, 'documents', {});
+app.get('/document/:id', function (req, res) {
+	l.documents.get(req.param("id"), function(err, doc){
+		if (err) return send404(req, res);
+		doc.data.info.size_readable = filesize(doc.data.info.size);
+		doc.data.info.creationdate_readable = moment(doc.data.info.creationdate).lang(req.locale||"en").format("LLL");
+		doc.data.info.moddate_readable = moment(doc.data.info.moddate).lang(req.locale||"en").format("LLL");
+
+		render(req, res, 'document', {
+			error: err,
+			document: doc
+		});
+	});
 });
 
 /* browse topics */

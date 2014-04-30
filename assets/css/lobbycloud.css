@@ -523,6 +523,32 @@ header {
 			font-size: 3em;
 
 		}
+
+	#main .document {}
+
+		#main .document .viewer {
+			
+			display: block;
+			position: relative;
+			border: 1px solid #eee;
+			max-height: 500px;
+			overflow: hidden;
+			overflow-x: hidden;
+			overflow-y: scroll;
+			padding: 20px;
+			box-shadow: 0px 0px 20px -15px rgba(0,0,0,0.25) inset;
+			
+		}
+		
+			#main .document .viewer img {
+				
+				max-width: 100%;
+				border: 1px solid #f9f9f9;
+				background-color: #fff;
+				box-shadow: 0px 0px 20px -15px rgba(0,0,0,0.25);
+				margin-bottom: 20px;
+				
+			}
 	
 	#main .documents {}
 

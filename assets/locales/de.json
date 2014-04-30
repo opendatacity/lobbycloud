@@ -165,5 +165,16 @@
 	"Accepted.": "Accepted.",
 	"UPLOADED": "UPLOADED",
 	"Search (Topics)": "Search (Topics)",
-	"Your search query": "Your search query"
+	"Your search query": "Your search query",
+	"Document": "Document",
+	"Error": "Error",
+	"Document Info": "Document Info",
+	"Created": "Created",
+	"Last Modified": "Last Modified",
+	"Encrypted": "Encrypted",
+	"Dimensions": "Dimensions",
+	"Filesize": "Filesize",
+	"SHA1 Hash": "SHA1 Hash",
+	"No": "No",
+	"Short Link": "Short Link"
 }

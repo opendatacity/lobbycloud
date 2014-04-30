@@ -1,0 +1,90 @@
+{{>header}}
+<div id="content" class="content document">
+	{{#document}}
+	<h1>{{#__}}Document{{/__}} <strong>{{id}}</strong></h1>
+	<p>&lt;3</p>
+	<div class="row">
+		<div class="col-md-8">
+			<div class="viewer">
+				{{#data.images}}
+					<img src="{{_url}}/{{_storage}}/{{file}}" />
+				{{/data.images}}
+			</div>
+		</div>
+		<div class="col-md-4">
+
+			<div class="btn-group btn-group-justified">
+				<a href="{{_url}}/{{_storage}}/{{file}}" class="btn btn-primary btn-lg"><i class="fa fa-download"></i> Download PDF</a>
+			</div>
+
+			<h3>{{#__}}Short Link{{/__}}</h3>
+			<div class="shortlink">
+				<code>lby.cl/{{id}}</code>
+			</div>
+			
+			<h3>{{#__}}Document Info{{/__}}</h3>
+			<ul class="list-group">
+				{{#data.info.title}}
+				<li class="list-group-item clearfix">
+					{{#__}}Title{{/__}}: 
+					<strong class="pull-right">{{data.info.title}}</strong>
+				</li>
+				{{/data.info.title}}
+				{{#data.info.subject}}
+				<li class="list-group-item clearfix">
+					{{#__}}Subject{{/__}}: 
+					<strong class="pull-right">{{data.info.subject}}</strong>
+				</li>
+				{{/data.info.subject}}
+				{{#data.info.author}}
+				<li class="list-group-item clearfix">
+					{{#__}}Author{{/__}}: 
+					<strong class="pull-right">{{data.info.author}}</strong>
+				</li>
+				{{/data.info.author}}
+				{{#data.info.keywords}}
+				<li class="list-group-item clearfix">
+					{{#__}}Keywords{{/__}}: 
+					<strong class="pull-right">{{data.info.keywords}}</strong>
+				</li>
+				{{/data.info.keywords}}
+				<li class="list-group-item clearfix">
+					{{#__}}Created{{/__}}: 
+					<strong class="pull-right">{{data.info.creationdate_readable}}</strong>
+				</li>
+				<li class="list-group-item clearfix">
+					{{#__}}Last Modified{{/__}}: 
+					<strong class="pull-right">{{data.info.moddate_readable}}</strong>
+				</li>
+				<li class="list-group-item clearfix">
+					{{#__}}Pages{{/__}}: 
+					<strong class="pull-right">{{data.info.pages}}</strong>
+				</li>
+				<li class="list-group-item clearfix">
+					{{#__}}Encrypted{{/__}}: 
+					<strong class="pull-right">
+						{{#data.info.encrypted}}{{#__}}Yes{{/__}}{{/data.info.encrypted}}
+						{{^data.info.encrypted}}{{#__}}No{{/__}}{{/data.info.encrypted}}
+					</strong>
+				</li>
+				<li class="list-group-item clearfix">
+					{{#__}}Dimensions{{/__}}: 
+					<strong class="pull-right">{{data.info.width}} &times; {{data.info.height}}</strong>
+				</li>
+				<li class="list-group-item clearfix">
+					{{#__}}Filesize{{/__}}: 
+					<strong class="pull-right">{{data.info.size_readable}}</strong>
+				</li>
+				<li class="list-group-item clearfix">
+					{{#__}}SHA1 Hash{{/__}}: 
+					<strong class="pull-right">{{data.hash}}</strong>
+				</li>
+			</ul>
+		</div>
+	</div>
+	{{/document}}
+</div>
+{{>footer}}
+
+
+
