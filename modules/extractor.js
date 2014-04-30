@@ -102,6 +102,33 @@ module.exports = extractor = function(store){
 			});
 		});
 	};
+	
+	t.resize = function(file, pages, page, dim, callback) {
+		var file = path.resolve(file);
+		
+		/* check for pages argument since it is crucial due to imagemagick behaviour */
+		if (typeof pages !== "number") return callback(new Error("invalid argument: pages."));
+
+		/* set page 1 as default */
+		if (typeof page === "function") {
+			var callback = page;
+			var page = 1;
+		} else if (typeof page !== "number") {
+			var page = 1;
+		}
+
+		/* hint: if a pdf has just one page, imagemagick fails on bracket notation */
+		if (page > pages) return callback(new Error("page out of range"));
+
+		var page = (pages === 1) ? "" : "["+(page-1)+"]";
+
+		t.filedump.prepare("png", function(err, filename){
+			gm(file+page).density(300, 300).background('white').resize(dim,dim,"^").write(path.resolve(t.store, filename), function(err){
+				if (err) return callback(err);
+				callback(null, filename);
+			});
+		});
+	};
 
 	/* everything */
 	t.extract = function(file, callback) {
@@ -146,7 +173,7 @@ module.exports = extractor = function(store){
 										/* thumbs are done */
 										for (var pp = 1; pp <= e.data.info.pages; pp++) {
 											(function(p){
-												t.thumb(file, e.data.info.pages, p, 1024, function(err, image){
+												t.resize(file, e.data.info.pages, p, 800, function(err, image){
 													if (err) return callback(err);
 													e.data.images.push({
 														"page": p,
