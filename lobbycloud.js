@@ -404,6 +404,7 @@ app.post('/api/upload', function (req, res) {
 				topic: (req.body.topic || null),
 				organisation: (req.body.organisation || null),
 				tags: (req.body.tags || null),
+				lang: (req.body.lang || null),
 				comment: (req.body.comment || null),
 				source: "upload,"+(req.headers['x-original-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress),
 				user: req.user.id
