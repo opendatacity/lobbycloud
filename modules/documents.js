@@ -68,7 +68,7 @@ module.exports = documents = function(config, db, es, l){
 						if (err) return callback(err);
 
 						/* save */
-						db.collection("queue").save({
+						db.collection("documents").save({
 							id: doc.id,
 							indexed: false,
 							user: doc.user,
