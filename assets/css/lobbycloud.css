@@ -526,7 +526,7 @@ header {
 	
 	#main .documents {}
 
-		#main .documents .document {
+		#main .documents .doc {
 			
 			display: block;
 			position: relative;
@@ -539,13 +539,13 @@ header {
 			
 		}
 		
-			#main .documents .document:hover {
+			#main .documents .doc:hover {
 				
 				background-color: #fcfcfc;
 				
 			}
 		
-			#main .documents .document .thumb {
+			#main .documents .doc .thumb {
 				
 				display: block;
 				position: absolute;
@@ -559,7 +559,7 @@ header {
 
 			}
 			
-				#main .documents .document .thumb img {
+				#main .documents .doc .thumb img {
 					
 					display: block;
 					max-height: 210px;
@@ -570,7 +570,7 @@ header {
 					
 				}
 				
-			#main .documents .document .id {
+			#main .documents .doc .id {
 				
 				display: block;
 				position: absolute;
@@ -581,7 +581,7 @@ header {
 				
 			}
 			
-				#main .documents .document .id a {
+				#main .documents .doc .id a {
 					
 					display: block;
 					position: relative;
@@ -607,7 +607,7 @@ header {
 					
 				}
 		
-				#main .documents .document:hover .id a {
+				#main .documents .doc:hover .id a {
 
 					background-color: #fcfcfc;
 
