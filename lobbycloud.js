@@ -575,6 +575,7 @@ app.all('/search', function (req, res) {
 
 /* topic suggestions */
 app.all('/api/topic/suggest', function (req, res) {
+	res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
 	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
 	if (q === null || q === "") return res.json([]);
 	l.topics.find(q, function(err, result){
@@ -589,6 +590,7 @@ app.all('/api/topic/suggest', function (req, res) {
 
 /* topic suggestions */
 app.all('/api/organisation/suggest', function (req, res) {
+	res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
 	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
 	if (q === null || q === "") return res.json([]);
 	l.organisations.find(q, function(err, result){
