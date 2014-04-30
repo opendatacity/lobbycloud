@@ -113,6 +113,7 @@ module.exports = documents = function(config, db, es, l){
 
 	/* create elastic search index for document */
 	documents.index = function(id, callback) {
+		if (typeof callback !== "function") var callback = function(){};
 		if (!documents.checkid(id)) return callback(new Error("invaild id"));
 		return callback(new Error("not implemented yet"));
 		documents.get(id, function(err, doc){
