@@ -9,7 +9,7 @@
 </div>
 
 <div ng-show="!loading">
-    <div class="row">
+    <div class="row hidden">
         <form class="form" role="form">
             <div class="form-group col-md-6">
                 <label translate>Filter Filename</label>
@@ -38,7 +38,7 @@
                     'sort-asc': tableParams.isSortBy('title', 'asc'),
                     'sort-desc': tableParams.isSortBy('title', 'desc')}"
                         ng-click="tableParams.sorting({'title' : tableParams.isSortBy('title', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Dateiname</div>
+                        <div translate>Filename</div>
                     </th>
                     <th class="sortable" ng-class="{
                     'sort-asc': tableParams.isSortBy('uploaded', 'asc'),
@@ -52,7 +52,7 @@
                         <!--ng-click="tableParams.sorting({'tags' : tableParams.isSortBy('tags', 'asc') ? 'desc' : 'asc'})">-->
                         <!--<div translate>Tags</div>-->
                     <!--</th>-->
-                    <!--<th translate>Actions</th>-->
+                    <th translate>Actions</th>
                 </tr>
                 </thead>
 
@@ -60,15 +60,15 @@
                     <td filter="{ 'title': 'text' }" sortable="'title'">{{doc.orig}}</td>
                     <td sortable="'uploaded'">{{doc.created | amDateFormat:'LLL'}}</td>
                     <!--<td sortable="'tags'">{{doc.tags.join(',')}}</td>-->
-                    <!--<td>-->
-                        <!--<div ng-show="doc.$processing">-->
-                            <!--<i class="fa fa-spinner fa-spin"></i>-->
-                        <!--</div>-->
-                        <!--<div ng-show="!doc.$processing">-->
-                            <!--<i class="btn btn-default fa fa-edit" title="{{'Edit Document'|translate}}" ng-click="showEditDialog()"/>-->
+                    <td>
+                        <div ng-show="doc.$processing">
+                            <i class="fa fa-spinner fa-spin"></i>
+                        </div>
+                        <div ng-show="!doc.$processing">
+                            <i class="btn btn-default fa fa-edit" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)" />
                             <!--<i class="btn btn-default fa fa-trash-o" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(user.id)"/>-->
-                        <!--</div>-->
-                    <!--</td>-->
+                        </div>
+                    </td>
                 </tr>
 
             </table>

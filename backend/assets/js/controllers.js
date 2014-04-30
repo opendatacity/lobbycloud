@@ -15,7 +15,7 @@ app.controller('BodyController', function ($scope, $state, $window, Authenticati
 			$state.go($state.$current, null, { reload: true });
 	};
 
-	$scope.setLang('de_DE', true);
+//	$scope.setLang('de_DE', true);
 
 	$scope.isActiveLang = function (lng) {
 		return gettextCatalog.currentLanguage == lng;
@@ -263,6 +263,56 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 		QueueService.list({},
 			function (fulldata) {
 				$scope.initData(fulldata);
+				$scope.loading = false;
+
+			},
+			function (err) {
+				$scope.loading = false;
+				if (err.status == 401) {
+					AuthenticationService.reset();
+					$state.go('login');
+				}
+			});
+	};
+
+	$scope.load();
+
+});
+
+app.controller('QueueItemController', function ($scope, $state, $stateParams, $timeout, AuthenticationService, QueueService) {
+	'use strict';
+
+	var dataset = function (prop) {
+		return {
+			prop: prop,
+			displayKey: "label",
+			source: function (query, callback) {
+				$.get("/api/" + prop + "/suggest", {q: query}, callback, "json");
+			}
+		};
+	};
+
+	$scope.typeaheadOptions = {
+		minLength: 3,
+		highlight: true
+	};
+	$scope.datasetOrganisation = dataset('organisation');
+	$scope.datasetTopic = dataset('topic');
+
+	var select = function (sender, object, suggestion, daset) {
+		$scope.item[daset.prop] = suggestion;
+	};
+	$scope.$on("typeahead:selected", select);
+	$scope.$on("typeahead:autocompleted", select);
+	$scope.$on("typeahead:changed", function(sender,value,daset){
+		$scope.item[daset.prop].id = '';
+	});
+
+	$scope.load = function () {
+		$scope.loading = true;
+		QueueService.item({id: $stateParams.id},
+			function (data) {
+				$scope.item = data;
 				$scope.loading = false;
 
 			},
