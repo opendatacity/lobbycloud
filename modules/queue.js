@@ -405,6 +405,78 @@ module.exports = queue = function(config, db, l){
 		
 	};
 
+	/* accept */
+	queue.accept = function(id, callback) {
+		queue.check(id, function(err, exists){
+			if (err) return callback(err);
+			if (!exists) return callback(new Error("this queue element does not exist"));
+			queue.get(id, function(err, doc){
+				if (err) return callback(err);
+				
+				/* check for stage */
+				if (doc.stage !== 1) return callback(new Error("this queue element cannot be accepted"));
+				
+				/* check if organisation is an id */
+				if (!doc.hasOwnProperty("organisation") || doc.organisation !== null && !doc.organisation.hasOwnProperty("id")) return callback(new Error("organisation must be specified"));
+
+				/* check if topic is an id */
+				if (!doc.hasOwnProperty("topic") || doc.topic !== null && !doc.topic.hasOwnProperty("id")) return callback(new Error("topic must be specified"));
+								
+				/* update to stage 3 */
+				queue.update(id, {stage: 3}, function(err, doc){
+					if (err) return callback(err);
+
+					/* import document */
+					l.documents.import(id, function(err){
+						if (err) {
+							/* roll back stage */
+							if (config.debug) console.log("[queue] failed accepting", id);
+							if (config.debug) console.log("[queue]", err);
+							// FIXME: update manually
+							
+							return db.collection("queue").findAndModify({"query":{"id":id},"update":{"$set":{"stage":1}},"new":true}, function(_err, doc){
+								if (_err) {
+									/* we are in deep trouble now */
+									console.error("[queue]", "could not roll back stage for queue item", id)
+									console.error("[queue]", _err);
+									return callback(_err); 
+								}
+								/* update cache */
+								cache[id] = doc;
+
+								/* call back with original error */
+								callback(err);
+
+							});
+							
+						};
+						
+						/* yay */
+						if (config.debug) console.log("[queue] accepted", id);
+						callback(null, id);
+					});
+				});
+			});
+		});
+	};
+	
+	/* decline */
+	queue.decline = function(id, callback) {
+		queue.check(id, function(err, exists){
+			if (err) return callback(err);
+			if (!exists) return callback(new Error("this queue element does not exist"));
+			queue.get(id, function(err, doc){
+				if (err) return callback(err);
+				if (doc.stage >= 3) return callback("this queue element cannot be declined");
+				queue.update(id, {stage: 4}, function(err, doc){
+					if (err) return callback(err);
+					if (config.debug) console.log("[queue] declined", id);
+					callback(null, id);
+				});
+			});
+		});
+	};
+
 	/* don't use this un public, update queue element to stage 4 or 5 instead */
 	queue.delete = function(id, callback) {
 		queue.get(id, function(err, doc){
