@@ -12,6 +12,7 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 * Log
 * Indexer and Garbage Collection
 * /api/*/suggest must match substring [as]
+* `lang` is not saved to queue
 
 ## Views
 
@@ -23,6 +24,7 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 * Contribute
 * My (ppublished) Documents
 * Revamp Upload to All-Page-Dragndrop
+* Pagination
 
 ## Content
 
