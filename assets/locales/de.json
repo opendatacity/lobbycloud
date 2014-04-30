@@ -163,5 +163,7 @@
 	"Processing failed.": "Processing failed.",
 	"ACCEPTED": "ACCEPTED",
 	"Accepted.": "Accepted.",
-	"UPLOADED": "UPLOADED"
+	"UPLOADED": "UPLOADED",
+	"Search (Topics)": "Search (Topics)",
+	"Your search query": "Your search query"
 }
