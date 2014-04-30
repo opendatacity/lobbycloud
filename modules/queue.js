@@ -173,7 +173,7 @@ module.exports = queue = function(config, db, l){
 					if (data.tags instanceof Array) {
 						/* everything is fine */
 						doc.tags = data.tags;
-					} else if (data.tags instanceof String) {
+					} else if (typeof data.tags === "string") {
 						if (data.tags === "") {
 							doc.tags = [];
 						} else {
@@ -356,7 +356,7 @@ module.exports = queue = function(config, db, l){
 
 				/* check if an organisation exists */
 				var check_organisation = function(_callback) {
-					if (!data.hasOwnPropery("organisation") === null) return _callback();
+					if (!data.hasOwnProperty("organisation")) return _callback();
 					organisations.check(data.organisation, function(err, exists, org_id){
 						if (err) return _callback();
 						if (exists) {
@@ -370,7 +370,7 @@ module.exports = queue = function(config, db, l){
 		
 				/* check if a topic exists */
 				var check_topic = function(_callback) {
-					if (data.topic === null) return _callback();
+					if (!data.hasOwnProperty("topic")) return _callback();
 					topics.check(doc.topic, function(err, exists, topic_id){
 						if (err) return _callback();
 						if (exists) {
