@@ -523,7 +523,96 @@ header {
 			font-size: 3em;
 
 		}
+	
+	#main .documents {}
+
+		#main .documents .document {
 			
+			display: block;
+			position: relative;
+			max-width: 260px;
+			height: 260px;
+			background-color: #fff;
+			border-radius: 4px;
+			box-shadow: 0px 0px 10px -5px rgba(0,0,0,0.25);
+			margin-bottom: 30px;
+			
+		}
+		
+			#main .documents .document:hover {
+				
+				background-color: #fcfcfc;
+				
+			}
+		
+			#main .documents .document .thumb {
+				
+				display: block;
+				position: absolute;
+				bottom: 30px;
+				left: 0px;
+				right: 0px;
+				max-height: 220px;
+				margin: 0px auto;
+				padding: 0px 15px;
+				overflow: hidden;
+
+			}
+			
+				#main .documents .document .thumb img {
+					
+					display: block;
+					max-height: 210px;
+					max-width: 100%;
+					background-color: #fff;
+					margin: 5px auto;
+					box-shadow: 0px 0px 7px -5px rgba(0,0,0,0.5);
+					
+				}
+				
+			#main .documents .document .id {
+				
+				display: block;
+				position: absolute;
+				bottom: 5px;
+				left: 0px;
+				right: 0px;
+				height: 30px;
+				
+			}
+			
+				#main .documents .document .id a {
+					
+					display: block;
+					position: relative;
+					
+					font-size: 1.4em;
+					line-height: 30px;
+					line-height: 30px;
+
+					width: 120px;
+					
+					text-align: center;
+					border-radius: 8px;
+
+					margin: 0px auto;
+
+					font-family: "Roboto Slab";
+					
+					color: #333;
+					text-decoration: none;
+					font-weight: bold;
+					background-color: #fff;
+					box-shadow: 0px -2px 3px -2px rgba(0,0,0,0.2);
+					
+				}
+		
+				#main .documents .document:hover .id a {
+
+					background-color: #fcfcfc;
+
+				}
+		
 		
 footer {
 	

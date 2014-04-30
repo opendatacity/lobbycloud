@@ -1,3 +1,39 @@
 {{>header}}
-...
+<div id="content" class="content documents">
+	<h1>{{#__}}Documents{{/__}}</h1>
+	<div class="row">
+		{{^documents}}
+		{{^error}}
+		<div class="col-md-12">
+			<h2>Nothing to see yet</h2>
+			<p>{{#__}}No documents have been released yet.{{/__}}</p>
+		</div>
+		{{/error}}
+		{{#error}}
+		<div class="col-md-12">
+			<h2>{{#__}}Error{{/__}}</h2>
+			<p>{{error}}</p>
+		</div>
+		{{/error}}
+		{{/documents}}
+		{{#documents}}
+		<div class="col-md-3 col-sm-4 col-xs-12">
+			<div class="document">
+				<div class="thumb">
+					<a href="{{_url}}/document/{{id}}"><img src="{{_url}}/{{_storage}}/{{thumb}}" class="responsive-image"></a>
+				</div>
+				<p class="id"><a href="{{_url}}/document/{{id}}">{{id}}</a></p>
+				<!-- 
+				<div class="badges">
+					{{#stats.comments}}<span class="comments">{{stats.comments}} {{#__}}Comments{{/__}}</span>{{/stats.comments}}
+					{{#stats.notes}}<span class="notes">{{stats.notes}} {{#__}}Notes{{/__}}</span>{{/stats.notes}}
+				</div>
+				<p class="lang">{{lang}}</p>
+				<p class="created">{{created_ago}}</p>
+				-->
+			</div>
+		</div>
+		{{/documents}}
+	</div>
+</div>
 {{>footer}}

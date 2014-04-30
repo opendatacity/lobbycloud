@@ -303,7 +303,15 @@ app.get('/about', function (req, res) {
 
 /* browse documents */
 app.get('/documents', function (req, res) {
-	render(req, res, 'documents', {});
+	l.documents.all(function(err, documents){
+		documents.map(function(doc){
+			doc.created_ago = moment(doc.created).lang(req.locale||"en").calendar(true);
+		});
+		render(req, res, 'documents', {
+			error: err,
+			documents: documents
+		});
+	});
 });
 
 /* document */
@@ -456,6 +464,7 @@ var render = function (req, res, name, opt) {
 	var opt = (opt || {});
 	opt._user = req.user;
 	opt._url = config.url;
+	opt._storage = config.storage;
 	opt._userrole = {};
 	if (req.user) {
 		opt._userrole[opt._user.role] = true;
