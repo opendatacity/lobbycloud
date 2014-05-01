@@ -38,6 +38,16 @@ module.exports = function(){
 	lang.get = function(l) {
 		return langs[l];
 	};
-	
+
+	lang.all = function() {
+		var result= [];
+		for (var key in langs) {
+			if (langs.hasOwnProperty(key)) {
+				result.push({id: key, label: langs[key]});
+			}
+		}
+		return result;
+	};
+
 	return this;
 }

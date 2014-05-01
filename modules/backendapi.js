@@ -50,22 +50,65 @@ module.exports = function (lobbycloud, i18n) {
 			created: new Date(topic.created).valueOf()
 		}
 	};
+
 	/* strips down queue obj to values needed by ui */
-	var prepareClientQueue = function (topic) {
-		if (!topic) return null;
-		return {
+	var prepareClientQueue = function (topic, callback) {
+
+		if (!topic) return callback(null);
+
+		var qitem = {
 			id: topic.id,
 			user: topic.user,
 			file: topic.file,
 			orig: topic.orig,
 			lang: topic.lang,
+			stage: topic.stage,
 			source: topic.source,
 			topic: topic.topic,
 			organisation: topic.organisation,
 			comment: topic.comment,
 			tags: topic.tags,
 			created: new Date(topic.created).valueOf()
-		}
+		};
+
+		var fillOrganisation = function (cb) {
+			if (qitem.organisation && qitem.organisation.id) {
+				lobbycloud.organisations.get(qitem.organisation.id, function (err, org) {
+					if ((!err) && org) {
+						qitem.organisation.id = org.id;
+						qitem.organisation.label = org.name;
+					}
+					cb();
+				});
+			} else {
+				cb();
+			}
+		};
+
+		var fillTopic = function (cb) {
+			if (qitem.topic && qitem.topic.id) {
+				lobbycloud.topics.get(qitem.topic.id, function (err, topic) {
+					if ((!err) && topic) {
+						qitem.topic.id = topic.id;
+						qitem.topic.label = topic.label;
+					}
+					cb();
+				});
+			} else {
+				if ((qitem.topic) && (qitem.topic.new)) {
+					qitem.topic = {
+						label: qitem.topic.new
+					};
+				}
+				cb();
+			}
+		};
+
+		fillTopic(function () {
+			fillOrganisation(function () {
+				callback(qitem);
+			})
+		});
 	};
 
 	api.features = {
@@ -77,6 +120,13 @@ module.exports = function (lobbycloud, i18n) {
 					req.logout();
 				}
 				res.send(200);
+			}
+		},
+		'langs': {
+			//langs
+			access: lobbycloud.users.roles.user,
+			execute: function (req, res) {
+				res.json(lobbycloud.lang.all());
 			}
 		},
 		'invite.create': {
@@ -151,59 +201,56 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				lobbycloud.queue.all(function (err, data) {
-					res.json(data.map(function (t) {
-						return prepareClientQueue(t);
-					}));
+					var result = [];
+					var prepare = function (index) {
+						if (index >= data.length) {
+							return res.json(result);
+						}
+						prepareClientQueue(data[index], function (t) {
+							result.push(t);
+							prepare(index + 1);
+						});
+					};
+					prepare(0);
 				});
 			}
 		},
 		'queue.get': {
-			//returns a json with a organisation list for the ui
+			//returns a json with a queue item for the ui
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.queue.get(req.body.id, function (err, data) {
 						if (err) return res.send(400, err.message);
-						var qitem = prepareClientQueue(data);
-
-						var fillOrganisation = function (cb) {
-							if (qitem.organisation && qitem.organisation.id) {
-								organisations.get(data.organisation.id, function (err, org) {
-									if ((!err) && org) {
-										qitem.organisation.id = org.id;
-										qitem.organisation.label = org.name;
-									}
-									cb();
-								});
-							} else {
-								cb();
-							}
-						};
-
-						var fillTopic = function (cb) {
-							if (qitem.topic && qitem.topic.id) {
-								topics.get(data.topic.id, function (err, org) {
-									if ((!err) && org) {
-										qitem.topic.id = org.id;
-										qitem.topic.label = org.name;
-									}
-									cb();
-								});
-							} else {
-								if ((qitem.topic) && (qitem.topic.new)) {
-									qitem.topic = {
-										label: data.topic.new
-									};
-								}
-								cb();
-							}
-						};
-
-						fillTopic(function(){
-							fillOrganisation(function(){
-								res.json(qitem);
-							})
+						prepareClientQueue(data, function (qitem) {
+							res.json(qitem);
 						});
+					}
+				);
+			}
+		},
+		'queue.update': {
+			//updates a queue item & returns json with the changed
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id) || (!req.body.item)) return res.send(400);
+				lobbycloud.queue.update(req.body.id, req.body.item, function (err, data) {
+						if (err) return res.send(400, err.message);
+						prepareClientQueue(data, function (qitem) {
+							res.json(qitem);
+						});
+					}
+				);
+			}
+		},
+		'queue.delete': {
+			//deletes a queue item
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				lobbycloud.queue.delete(req.body.id, function (err, data) {
+						if (err) return res.send(400, err.message);
+						res.send(200);
 					}
 				);
 			}
@@ -326,8 +373,7 @@ module.exports = function (lobbycloud, i18n) {
 				});
 			}
 		}
-	}
-	;
+	};
 
 	api.user = function (req, res) {
 		res.json(prepareClientUser(req.user));
