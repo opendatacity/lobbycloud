@@ -46,11 +46,17 @@
                         ng-click="tableParams.sorting({'uploaded' : tableParams.isSortBy('uploaded', 'asc') ? 'desc' : 'asc'})">
                         <div translate>Uploaded</div>
                     </th>
+                    <th class="sortable" ng-class="{
+                    'sort-asc': tableParams.isSortBy('stage', 'asc'),
+                    'sort-desc': tableParams.isSortBy('stage', 'desc')}"
+                        ng-click="tableParams.sorting({'stage' : tableParams.isSortBy('stage', 'asc') ? 'desc' : 'asc'})">
+                        <div translate>Stage</div>
+                    </th>
                     <!--<th class="sortable" ng-class="{-->
                     <!--'sort-asc': tableParams.isSortBy('tags', 'asc'),-->
                     <!--'sort-desc': tableParams.isSortBy('tags', 'desc')}"-->
-                        <!--ng-click="tableParams.sorting({'tags' : tableParams.isSortBy('tags', 'asc') ? 'desc' : 'asc'})">-->
-                        <!--<div translate>Tags</div>-->
+                    <!--ng-click="tableParams.sorting({'tags' : tableParams.isSortBy('tags', 'asc') ? 'desc' : 'asc'})">-->
+                    <!--<div translate>Tags</div>-->
                     <!--</th>-->
                     <th translate>Actions</th>
                 </tr>
@@ -59,13 +65,14 @@
                 <tr ng-repeat="doc in $data" ng-class="{'selected': doc.$selected}" ng-click="selectRow(doc)">
                     <td filter="{ 'title': 'text' }" sortable="'title'">{{doc.orig}}</td>
                     <td sortable="'uploaded'">{{doc.created | amDateFormat:'LLL'}}</td>
+                    <td sortable="'stage'">{{doc.stage}}</td>
                     <!--<td sortable="'tags'">{{doc.tags.join(',')}}</td>-->
                     <td>
                         <div ng-show="doc.$processing">
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
                         <div ng-show="!doc.$processing">
-                            <i class="btn btn-default fa fa-edit" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)" />
+                            <i class="btn btn-default fa fa-edit" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"/>
                             <!--<i class="btn btn-default fa fa-trash-o" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(user.id)"/>-->
                         </div>
                     </td>

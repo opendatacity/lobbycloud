@@ -36,6 +36,19 @@ module.exports = function (grunt) {
 			}
 		},
 
+		concat: {
+			options: {
+				separator: ''
+			},
+			dist: {
+				src: [
+					'assets/libs/ng-table/ng-table.css',
+					'assets/libs/bootstrap-daterangepicker/daterangepicker-bs3.css'
+				],
+				dest: 'assets/libs/components.min.css'
+			}
+		},
+
 		nggettext_extract: {
 			pot: {
 				files: {
@@ -54,6 +67,7 @@ module.exports = function (grunt) {
 	});
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-angular-gettext');
-	grunt.registerTask('default', ['uglify', 'nggettext_extract', 'nggettext_compile']);
+	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.registerTask('default', ['uglify', 'concat', 'nggettext_extract', 'nggettext_compile']);
 
 };

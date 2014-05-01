@@ -134,6 +134,18 @@ app.factory('DocsService', function ($resource) {
 	);
 });
 
+app.factory('LangsService', function ($resource) {
+	'use strict';
+	return $resource('/api/backend/:cmd', {}, {
+			list: {
+				method: 'POST',
+				params: {cmd: 'langs'},
+				isArray: true
+			}
+		}
+	);
+});
+
 app.factory('QueueService', function ($resource) {
 	'use strict';
 	return $resource('/api/backend/:cmd', {}, {
@@ -144,8 +156,15 @@ app.factory('QueueService', function ($resource) {
 			},
 			item: {
 				method: 'POST',
-				params: {cmd: 'queue.get'},
-				isArray: false
+				params: {cmd: 'queue.get'}
+			},
+			update: {
+				method: 'POST',
+				params: {cmd: 'queue.update'}
+			},
+			delete: {
+				method: 'POST',
+				params: {cmd: 'queue.delete'}
 			}
 		}
 	);

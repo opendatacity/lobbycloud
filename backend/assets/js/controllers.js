@@ -279,7 +279,7 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 
 });
 
-app.controller('QueueItemController', function ($scope, $state, $stateParams, $timeout, AuthenticationService, QueueService) {
+app.controller('QueueItemController', function ($scope, $state, $stateParams, $timeout, AuthenticationService, QueueService, LangsService) {
 	'use strict';
 
 	var dataset = function (prop) {
@@ -296,6 +296,10 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 		minLength: 3,
 		highlight: true
 	};
+	$scope.typeaheadOptions2 = {
+		minLength: 1,
+		highlight: true
+	};
 	$scope.datasetOrganisation = dataset('organisation');
 	$scope.datasetTopic = dataset('topic');
 
@@ -304,13 +308,70 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 	};
 	$scope.$on("typeahead:selected", select);
 	$scope.$on("typeahead:autocompleted", select);
-	$scope.$on("typeahead:changed", function(sender,value,daset){
+	$scope.$on("typeahead:changed", function (sender, value, daset) {
 		$scope.item[daset.prop].id = '';
 	});
 
+	$scope.langs = [];
+
+	$scope.datasetLangs = {
+		prop: 'lang',
+		displayKey: "label",
+		source: function (query, callback) {
+			query = query.toLowerCase();
+			callback($scope.langs.filter(function (l) {
+				return (query == l.id) || (l.label.toLowerCase().indexOf(query) >= 0);
+			}));
+		}
+	};
+
 	$scope.load = function () {
+
+		var noneLang = {id: '', label: 'None'};
+		var loadLangs = function (cb) {
+			LangsService.list({},
+				function (data) {
+					data.unshift(noneLang);
+					$scope.langs = data;
+					cb();
+				},
+				function (err) {
+					cb();
+				});
+		};
+
 		$scope.loading = true;
-		QueueService.item({id: $stateParams.id},
+		loadLangs(function () {
+			QueueService.item({id: $stateParams.id},
+				function (data) {
+					$scope.langs.forEach(function (l) {
+						if (l.id === data.lang) {
+							$scope.lang = l.label;
+						}
+					});
+					data.tags = data.tags ? data.tags.join(',') : '';
+					$scope.item = data;
+					$scope.loading = false;
+
+				},
+				function (err) {
+					$scope.loading = false;
+					if (err.status == 401) {
+						AuthenticationService.reset();
+						$state.go('login');
+					}
+				});
+		});
+	};
+
+	$scope.load();
+
+	$scope.ok = function () {
+		$scope.loading = true;
+		var update = angular.copy($scope.item);
+		update.lang = update.lang.id;
+		update.tags = update.tags.split(',');
+		QueueService.update({id: $stateParams.id, item: update},
 			function (data) {
 				$scope.item = data;
 				$scope.loading = false;
@@ -321,11 +382,11 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 				if (err.status == 401) {
 					AuthenticationService.reset();
 					$state.go('login');
+				} else if (err.status == 400) {
+					$scope.errormessage = err.data;
 				}
 			});
 	};
-
-	$scope.load();
 
 });
 

@@ -184,3 +184,4 @@ app.directive('ngtypeahead', function () {
 		}
 	};
 });
+

@@ -5,6 +5,7 @@ msgstr ""
 
 #: assets/partials/docs.html
 #: assets/partials/organisations.html
+#: assets/partials/queue.html
 #: assets/partials/topics.html
 #: assets/partials/users.html
 msgid "Actions"
@@ -18,12 +19,17 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
+#: assets/partials/queueitem.html
 #: assets/js/directives.js
 msgid "Cancel"
 msgstr ""
 
 #: assets/partials/upload.html
 msgid "Choose files"
+msgstr ""
+
+#: assets/partials/queueitem.html
+msgid "Comment"
 msgstr ""
 
 #: assets/partials/upload.html
@@ -37,6 +43,7 @@ msgid "Created"
 msgstr ""
 
 #: assets/partials/docs.html
+#: assets/partials/queue.html
 msgid "Delete Document"
 msgstr ""
 
@@ -68,6 +75,7 @@ msgid "Drop files here"
 msgstr ""
 
 #: assets/partials/docs.html
+#: assets/partials/queue.html
 msgid "Edit Document"
 msgstr ""
 
@@ -79,8 +87,16 @@ msgstr ""
 msgid "Edit Organisation"
 msgstr ""
 
+#: assets/partials/start.html
+msgid "Edit Queue"
+msgstr ""
+
 #: assets/partials/topics.html
 msgid "Edit Topic"
+msgstr ""
+
+#: assets/partials/queueitem.html
+msgid "Edit Upload"
 msgstr ""
 
 #: assets/partials/users.html
@@ -103,8 +119,13 @@ msgstr ""
 msgid "Enter password (leave empty for no changes)"
 msgstr ""
 
+#: assets/partials/queue.html
+msgid "Filename"
+msgstr ""
+
 #: assets/partials/docs.html
 #: assets/partials/organisations.html
+#: assets/partials/queue.html
 #: assets/partials/topics.html
 msgid "Filter Date"
 msgstr ""
@@ -112,6 +133,10 @@ msgstr ""
 #: assets/partials/organisations.html
 #: assets/partials/topics.html
 msgid "Filter Description"
+msgstr ""
+
+#: assets/partials/queue.html
+msgid "Filter Filename"
 msgstr ""
 
 #: assets/partials/organisations.html
@@ -131,6 +156,7 @@ msgid "Filter Subject"
 msgstr ""
 
 #: assets/partials/docs.html
+#: assets/partials/queue.html
 msgid "Filter Title"
 msgstr ""
 
@@ -167,8 +193,14 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
+#: assets/partials/queueitem.html
+msgid "Language"
+msgstr ""
+
 #: assets/partials/docs.html
 #: assets/partials/organisations.html
+#: assets/partials/queue.html
+#: assets/partials/queueitem.html
 #: assets/partials/topics.html
 #: assets/partials/users.html
 msgid "Loading..."
@@ -207,6 +239,10 @@ msgstr ""
 msgid "Manage Organisations"
 msgstr ""
 
+#: assets/partials/queue.html
+msgid "Manage Queue"
+msgstr ""
+
 #: assets/partials/topics.html
 msgid "Manage Topics"
 msgstr ""
@@ -232,7 +268,12 @@ msgstr ""
 msgid "New User"
 msgstr ""
 
+#: assets/partials/queueitem.html
+msgid "OK"
+msgstr ""
+
 #: assets/partials/docs.html
+#: assets/partials/queue.html
 msgid "One document"
 msgid_plural "{{docs.length}} documents"
 msgstr[0] ""
@@ -256,6 +297,7 @@ msgid_plural "{{users.length}} users"
 msgstr[0] ""
 msgstr[1] ""
 
+#: assets/partials/queueitem.html
 #: assets/partials/users.html
 msgid "Organisation"
 msgstr ""
@@ -269,6 +311,10 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+#: assets/index.html
+msgid "Queue"
+msgstr ""
+
 #: assets/partials/users.html
 msgid "Role"
 msgstr ""
@@ -277,15 +323,21 @@ msgstr ""
 msgid "Seems like you tried accessing something you don't have access to..."
 msgstr ""
 
+#: assets/partials/queue.html
+msgid "Stage"
+msgstr ""
+
 #: assets/partials/topics.html
 msgid "Subject"
 msgstr ""
 
 #: assets/partials/docs.html
+#: assets/partials/queueitem.html
 #: assets/partials/upload.html
 msgid "Tags"
 msgstr ""
 
+#: assets/partials/queueitem.html
 #: assets/partials/upload.html
 msgid "Tags, separated by comma"
 msgstr ""
@@ -306,6 +358,7 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr ""
 
+#: assets/partials/queueitem.html
 #: assets/partials/upload.html
 msgid "Topic"
 msgstr ""
@@ -315,15 +368,12 @@ msgstr ""
 msgid "Topics"
 msgstr ""
 
-#: assets/index.html
-msgid "Upload"
-msgstr ""
-
 #: assets/partials/start.html
 msgid "Upload Documents"
 msgstr ""
 
 #: assets/partials/docs.html
+#: assets/partials/queue.html
 msgid "Uploaded"
 msgstr ""
 

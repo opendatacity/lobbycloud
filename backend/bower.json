@@ -1,31 +1,32 @@
 {
-  "name": "LobbyCloudCentral",
-  "version": "0.0.1",
-  "main": "index.htm",
-  "private": true,
-  "directory": "assets/libs",
-  "dependencies": {
-    "moment": "*",
-    "angular": "1.2.16",
-    "angular-cookies": "*",
-    "angular-gettext": "*",
-    "angular-moment": "*",
-    "angular-resource": "*",
-    "angular-sanitize": "*",
-    "angular-bootstrap": "*",
-    "bootstrap-daterangepicker": "*",
-    "ng-table": "*",
-    "angular-ui-router": "*"
-  },
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "libs",
-    "test",
-    "tests"
-  ],
-  "resolutions": {
-    "angular": "1.2.16"
-  }
+	"name": "LobbyCloudCentral",
+	"version": "0.0.1",
+	"main": "index.htm",
+	"private": true,
+	"directory": "assets/libs",
+	"dependencies": {
+		"moment": "*",
+		"bootstrap-daterangepicker": "*",
+		"ng-table": "*",
+		"angular": "1.2.16",
+		"angular-ui-router": "*",
+		"angular-cookies": "*",
+		"angular-gettext": "*",
+		"angular-moment": "*",
+		"angular-resource": "*",
+		"angular-sanitize": "*",
+		"angular-bootstrap": "*",
+		"bootstrap-select": "*"
+	},
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"libs",
+		"test",
+		"tests"
+	],
+	"resolutions": {
+		"angular": "1.2.16"
+	}
 }

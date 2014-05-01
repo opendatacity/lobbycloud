@@ -12,12 +12,14 @@
 
     <div class="row">
         <div class="col-md-12">
-            <label>Uploaded</label>
-            <span>{{item.created | amDateFormat:'LLL'}}</span>
-            <label>Uploaded by</label>
-            <span>{{item.user}}</span>
-            <label>Filename</label>
-            <span>{{item.orig}}</span>
+            <div class="queue-header">
+                <label>Uploaded</label>
+                <span>{{item.created | amDateFormat:'LLL'}}</span>
+                <label>Uploaded by</label>
+                <span>{{item.user}}</span>
+                <label>Filename</label>
+                <span>{{item.orig}}</span>
+            </div>
 
             <form role="form" name="form">
 
@@ -32,7 +34,7 @@
                     </div>
                     <div class="form-group col-sm-2">
                         <label translate>Language</label>
-                        <input type="text" class="form-control" placeholder="{{'Language'|translate}}" ng-model="item.lang">
+                        <input type="text" class="form-control" options="typeaheadOptions2" datasets="datasetLangs" ng-model="lang" ngtypeahead>
                     </div>
                 </div>
 
@@ -45,12 +47,22 @@
 
                 <div class="row">
                     <div class="form-group col-sm-12">
-                        <label translate>Tags</label>
-                        <input type="text" class="form-control" placeholder="{{'Tags'|translate}}" ng-model="item.tags">
+                        <label translate>Tags, separated by comma</label>
+                        <input type="text" class="form-control" data-role="tagsinput" placeholder="{{'Tags'|translate}}" ng-model="item.tags">
                     </div>
                 </div>
 
             </form>
+
+            <div class="alert alert-danger" ng-show="errormessage">
+                <button type="button" class="close" ng-click="errormessage=null">×</button>
+                {{errormessage}}
+            </div>
+
+            <div class="pull-right">
+                <button class="btn btn-primary" ng-click="ok()" translate>OK</button>
+                <button class="btn btn-warning" ui-sref="queue" translate>Cancel</button>
+            </div>
             {{item}}
         </div>
     </div>
