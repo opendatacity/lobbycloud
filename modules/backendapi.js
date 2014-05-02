@@ -51,62 +51,102 @@ module.exports = function (lobbycloud, i18n) {
 		}
 	};
 
-	/* strips down queue obj to values needed by ui */
-	var prepareClientQueue = function (topic, callback) {
-
-		if (!topic) return callback(null);
-
-		var qitem = {
-			id: topic.id,
-			user: topic.user,
-			file: topic.file,
-			orig: topic.orig,
-			lang: topic.lang,
-			stage: topic.stage,
-			source: topic.source,
-			topic: topic.topic,
-			organisation: topic.organisation,
-			comment: topic.comment,
-			tags: topic.tags,
-			created: new Date(topic.created).valueOf()
-		};
-
-		var fillOrganisation = function (cb) {
-			if (qitem.organisation && qitem.organisation.id) {
-				lobbycloud.organisations.get(qitem.organisation.id, function (err, org) {
-					if ((!err) && org) {
-						qitem.organisation.id = org.id;
-						qitem.organisation.label = org.name;
-					}
-					cb();
-				});
-			} else {
-				cb();
-			}
-		};
-
-		var fillTopic = function (cb) {
-			if (qitem.topic && qitem.topic.id) {
-				lobbycloud.topics.get(qitem.topic.id, function (err, topic) {
-					if ((!err) && topic) {
-						qitem.topic.id = topic.id;
-						qitem.topic.label = topic.label;
-					}
-					cb();
-				});
-			} else {
-				if ((qitem.topic) && (qitem.topic.new)) {
-					qitem.topic = {
-						label: qitem.topic.new
-					};
+	var fillOrganisation = function (item, cb) {
+		if (item.organisation && item.organisation.id) {
+			lobbycloud.organisations.get(item.organisation.id, function (err, org) {
+				if ((!err) && org) {
+					item.organisation.id = org.id;
+					item.organisation.label = org.name;
 				}
 				cb();
+			});
+		} else {
+			if ((item.organisation) && (item.organisation.new)) {
+				item.organisation = {
+					label: item.organisation.new
+				};
 			}
+			cb();
+		}
+	};
+
+	var fillTopic = function (item, cb) {
+		if (item.topic && item.topic.id) {
+			lobbycloud.topics.get(item.topic.id, function (err, topic) {
+				if ((!err) && topic) {
+					item.topic.id = topic.id;
+					item.topic.label = topic.label;
+				}
+				cb();
+			});
+		} else {
+			if ((item.topic) && (item.topic.new)) {
+				item.topic = {
+					label: item.topic.new
+				};
+			}
+			cb();
+		}
+	};
+
+	/* strips down queue obj to values needed by ui */
+	var prepareClientQueue = function (item, full, callback) {
+
+		if (!item) return callback(null);
+		var qitem = {
+			id: item.id,
+			user: item.user,
+			orig: item.orig,
+			lang: item.lang,
+			stage: item.stage,
+			topic: item.topic,
+			organisation: item.organisation,
+			comment: item.comment,
+			tags: item.tags,
+			created: new Date(item.created).valueOf(),
+			info: (item.data ? item.data.info : null),
+			thumbs: (item.data ? item.data.thumbs : null),
+			images: (full && item.data ? item.data.images : null),
+			text: (full && item.data ? item.data.text : null)
 		};
 
-		fillTopic(function () {
-			fillOrganisation(function () {
+		fillTopic(qitem, function () {
+			fillOrganisation(qitem, function () {
 				callback(qitem);
+			})
+		});
+	};
+
+
+	/* strips down document obj to values needed by ui */
+	var prepareClientDoc = function (doc, full, callback) {
+		if (!doc) return callback(null);
+		var d = {
+			id: doc.id,
+			user: doc.user,
+			created: new Date(doc.created).valueOf(),
+			updated: new Date(doc.updated).valueOf(),
+			orig: doc.orig,
+			lang: doc.lang,
+			tags: doc.tags,
+			topic: {id: doc.topic},
+			organisation: {id: doc.organisation},
+			stats: doc.stats,
+			indexed: doc.indexed,
+			stage: doc.stage,
+			thumb: doc.thumb,
+			info: (doc.data ? doc.data.info : null),
+			thumbs: (doc.data ? doc.data.thumbs : null),
+			images: (full && doc.data ? doc.data.images : null),
+			text: (full && doc.data ? doc.data.text : null),
+			changesets: (full && doc.changesets.length > 0 ? doc.changesets : null),
+			comments: (full && doc.comments.length > 0 ? doc.comments : null),
+			notes: (full && doc.notes.length > 0 ? doc.notes : null)
+		};
+
+		fillTopic(d, function () {
+			fillOrganisation(d, function () {
+				callback(d);
 			})
 		});
 	};
@@ -140,8 +180,18 @@ module.exports = function (lobbycloud, i18n) {
 			//returns a json with documents for the ui list
 			access: lobbycloud.users.roles.user,
 			execute: function (req, res) {
-				lobbycloud.mockupdocs.listDocs(function (err, data) {
-					res.json(data);
+				lobbycloud.documents.all(function (err, data) {
+					var result = [];
+					var prepare = function (index) {
+						if (index >= data.length) {
+							return res.json(result);
+						}
+						prepareClientDoc(data[index], false, function (d) {
+							result.push(d);
+							prepare(index + 1);
+						});
+					};
+					prepare(0);
 				});
 			}
 		},
@@ -206,7 +256,9 @@ module.exports = function (lobbycloud, i18n) {
 						if (index >= data.length) {
 							return res.json(result);
 						}
-						prepareClientQueue(data[index], function (t) {
+						if (data[index].stage !== 1)
+							return prepare(index + 1);
+						prepareClientQueue(data[index], false, function (t) {
 							result.push(t);
 							prepare(index + 1);
 						});
@@ -222,7 +274,7 @@ module.exports = function (lobbycloud, i18n) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.queue.get(req.body.id, function (err, data) {
 						if (err) return res.send(400, err.message);
-						prepareClientQueue(data, function (qitem) {
+						prepareClientQueue(data, true, function (qitem) {
 							res.json(qitem);
 						});
 					}
@@ -233,12 +285,27 @@ module.exports = function (lobbycloud, i18n) {
 			//updates a queue item & returns json with the changed
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
-				if ((!req.body) || (!req.body.id) || (!req.body.item)) return res.send(400);
-				lobbycloud.queue.update(req.body.id, req.body.item, function (err, data) {
+				if ((!req.body) || (!req.body.id) || (!req.body.doc)) return res.send(400);
+				//TODO: update method awaits id & label mixed, better use subobject as delivered
+				req.body.doc.topic = req.body.doc.topic ? (req.body.doc.topic.id || req.body.doc.topic.new) : null;
+				req.body.doc.organisation = req.body.doc.organisation ? (req.body.doc.organisation.id || req.body.doc.organisation.new) : null;
+				lobbycloud.queue.update(req.body.id, req.body.doc, function (err, data) {
 						if (err) return res.send(400, err.message);
-						prepareClientQueue(data, function (qitem) {
+						prepareClientQueue(data, true, function (qitem) {
 							res.json(qitem);
 						});
+					}
+				);
+			}
+		},
+		'queue.accept': {
+			//updates a queue item & returns json with the changed
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				lobbycloud.queue.accept(req.body.id, function (err, data) {
+						if (err) return res.send(400, err.message);
+						res.send(200);
 					}
 				);
 			}

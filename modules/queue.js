@@ -363,7 +363,7 @@ module.exports = queue = function(config, db, l){
 						if (exists) {
 							update.organisation = {"id": org_id};
 						} else {
-							update.organisation = {"new": doc.organisation};
+							update.organisation = {"new": data.organisation};
 						}
 						_callback();
 					});
@@ -372,12 +372,12 @@ module.exports = queue = function(config, db, l){
 				/* check if a topic exists */
 				var check_topic = function(_callback) {
 					if (!data.hasOwnProperty("topic")) return _callback();
-					topics.check(doc.topic, function(err, exists, topic_id){
+					topics.check(data.topic, function(err, exists, topic_id){
 						if (err) return _callback();
 						if (exists) {
 							update.topic = {"id": topic_id};
 						} else {
-							update.topic = {"new": doc.topic};
+							update.topic = {"new": data.topic};
 						}
 						_callback();
 					});
@@ -506,9 +506,6 @@ module.exports = queue = function(config, db, l){
 			doc.data.thumbs.forEach(function(thumb){
 				files.push(thumb.file);
 			});
-			doc.data.thumbs.forEach(function(thumb){
-				files.push(thumb.file);
-			});
 			doc.data.images.forEach(function(image){
 				files.push(image.file);
 			});
@@ -520,7 +517,7 @@ module.exports = queue = function(config, db, l){
 				/* delete files */
 				var counter = files.length;
 				files.forEach(function(file){
-					fs.unlink(fs.path.resolve(__root, config.storage, file), function(err){
+					fs.unlink(path.resolve(__root, config.storage, file), function(err){
 						if (err) console.log("[queue]","could not delete", file, err); // FIXME: deal with undeleted files
 						counter--;
 						if (counter === 0) {

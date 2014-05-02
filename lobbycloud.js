@@ -670,7 +670,7 @@ app.all('/api/topic/suggest', function (req, res) {
 	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
 	if (q === null || q === "") return res.json([]);
 	l.topics.find(q, function(err, result){
-		if (result.length > 0) {
+		if (result && (result.length > 0)) {
 			return res.json(result.map(function(r){
 				return { id: r.id, label: r.label };
 			}));
@@ -685,7 +685,7 @@ app.all('/api/organisation/suggest', function (req, res) {
 	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
 	if (q === null || q === "") return res.json([]);
 	l.organisations.find(q, function(err, result){
-		if (result.length > 0) {
+		if (result && (result.length > 0)) {
 			return res.json(result.map(function(r){
 				return { id: r.id, label: [r.name, r.fullname].join(" - ") };
 			}));
