@@ -506,9 +506,6 @@ module.exports = queue = function(config, db, l){
 			doc.data.thumbs.forEach(function(thumb){
 				files.push(thumb.file);
 			});
-			doc.data.thumbs.forEach(function(thumb){
-				files.push(thumb.file);
-			});
 			doc.data.images.forEach(function(image){
 				files.push(image.file);
 			});
@@ -520,7 +517,7 @@ module.exports = queue = function(config, db, l){
 				/* delete files */
 				var counter = files.length;
 				files.forEach(function(file){
-					fs.unlink(fs.path.resolve(__root, config.storage, file), function(err){
+					fs.unlink(path.resolve(__root, config.storage, file), function(err){
 						if (err) console.log("[queue]","could not delete", file, err); // FIXME: deal with undeleted files
 						counter--;
 						if (counter === 0) {
