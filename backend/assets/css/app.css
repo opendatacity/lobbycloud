@@ -72,6 +72,52 @@
     margin-right: 6px;
 }
 
-.queue-header span {
+/* queue item edit */
+
+
+/* queue list */
+
+.queue-item td:first-of-type {
+    cursor: pointer;
+}
+
+.queue-item td img.thumb {
+    height: 26px;
+}
+
+.queue-item td.queue-actions {
+    padding: 4px 0 0;
+}
+
+.queue-item td .carousel-indicators {
+    bottom: 10px;
+    color: #000;
+}
+
+.queue-item td .carousel-caption {
+    bottom: 0;
+    color: #000;
+    padding-bottom: 4px;
+}
+
+.queue-item td .queue-info {
+    margin-top: 10px;
+}
+
+.queue-item td .queue-info span {
+    text-align: right;
+    margin-right: 6px;
+    font-weight: bold;
+    display: inline-block;
+    width: 100px;
+}
+
+.queue-item td .queue-info .thumbnails {
+    width: 260px;
+    max-width: 260px;
     margin-right: 20px;
+}
+
+.queue-item td .queue-info .slide img {
+    margin: auto;
 }

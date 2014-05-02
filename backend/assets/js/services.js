@@ -23,7 +23,6 @@ app.factory('AuthenticationService', function ($http, $rootScope, $cookieStore) 
 	function setCurrentUser(user) {
 		user.role = userRoles[user.role];
 		if (!user.role) {
-			console.log('Unknown user role, assuming user');
 			user.role = userRoles.user;
 		}
 		changeUser(user);
@@ -161,6 +160,10 @@ app.factory('QueueService', function ($resource) {
 			update: {
 				method: 'POST',
 				params: {cmd: 'queue.update'}
+			},
+			accept: {
+				method: 'POST',
+				params: {cmd: 'queue.accept'}
 			},
 			delete: {
 				method: 'POST',

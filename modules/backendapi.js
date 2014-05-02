@@ -90,23 +90,26 @@ module.exports = function (lobbycloud, i18n) {
 	};
 
 	/* strips down queue obj to values needed by ui */
-	var prepareClientQueue = function (topic, callback) {
+	var prepareClientQueue = function (item, full, callback) {
 
-		if (!topic) return callback(null);
-
+		if (!item) return callback(null);
 		var qitem = {
-			id: topic.id,
-			user: topic.user,
-			file: topic.file,
-			orig: topic.orig,
-			lang: topic.lang,
-			stage: topic.stage,
-			source: topic.source,
-			topic: topic.topic,
-			organisation: topic.organisation,
-			comment: topic.comment,
-			tags: topic.tags,
-			created: new Date(topic.created).valueOf()
+			id: item.id,
+			user: item.user,
+			file: item.file,
+			orig: item.orig,
+			lang: item.lang,
+			stage: item.stage,
+			source: item.source,
+			topic: item.topic,
+			organisation: item.organisation,
+			comment: item.comment,
+			tags: item.tags,
+			created: new Date(item.created).valueOf(),
+			info: (item.data ? item.data.info : null),
+			thumbs: (item.data ? item.data.thumbs : null),
+			images: (full && item.data ? item.data.images : null),
+			text: (full && item.data ? item.data.text : null)
 		};
 
 		fillTopic(qitem, function () {
@@ -254,7 +257,7 @@ module.exports = function (lobbycloud, i18n) {
 						if (index >= data.length) {
 							return res.json(result);
 						}
-						prepareClientQueue(data[index], function (t) {
+						prepareClientQueue(data[index], false, function (t) {
 							result.push(t);
 							prepare(index + 1);
 						});
@@ -270,7 +273,7 @@ module.exports = function (lobbycloud, i18n) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.queue.get(req.body.id, function (err, data) {
 						if (err) return res.send(400, err.message);
-						prepareClientQueue(data, function (qitem) {
+						prepareClientQueue(data, true, function (qitem) {
 							res.json(qitem);
 						});
 					}
@@ -281,10 +284,13 @@ module.exports = function (lobbycloud, i18n) {
 			//updates a queue item & returns json with the changed
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
-				if ((!req.body) || (!req.body.id) || (!req.body.item)) return res.send(400);
-				lobbycloud.queue.update(req.body.id, req.body.item, function (err, data) {
+				if ((!req.body) || (!req.body.id) || (!req.body.doc)) return res.send(400);
+				//TODO: update method awaits id & label mixed, better use subobject as delivered
+				req.body.doc.topic = req.body.doc.topic.id || req.body.doc.topic.new;
+				req.body.doc.organisation = req.body.doc.organisation.id || req.body.doc.organisation.new;
+				lobbycloud.queue.update(req.body.id, req.body.doc, function (err, data) {
 						if (err) return res.send(400, err.message);
-						prepareClientQueue(data, function (qitem) {
+						prepareClientQueue(data, true, function (qitem) {
 							res.json(qitem);
 						});
 					}

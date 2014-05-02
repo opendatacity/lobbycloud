@@ -201,6 +201,11 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 		data.forEach(function (doc) {
 			min = min ? Math.min(doc.uploaded, min) : doc.uploaded;
 			max = Math.max(doc.uploaded, max);
+			if (doc.thumbs) {
+				doc.thumbs.forEach(function (thumb) {
+					thumb.file = '../storage/' + thumb.file;
+				})
+			}
 		});
 		$scope.filter = {
 			title: '',
@@ -277,6 +282,10 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 
 	$scope.load();
 
+	$scope.deleteDialog = function (doc) {
+
+	};
+
 });
 
 app.controller('QueueItemController', function ($scope, $state, $stateParams, $timeout, AuthenticationService, QueueService, LangsService) {
@@ -304,12 +313,12 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 	$scope.datasetTopic = dataset('topic');
 
 	var select = function (sender, object, suggestion, daset) {
-		$scope.item[daset.prop] = suggestion;
+		$scope.doc[daset.prop] = suggestion;
 	};
 	$scope.$on("typeahead:selected", select);
 	$scope.$on("typeahead:autocompleted", select);
 	$scope.$on("typeahead:changed", function (sender, value, daset) {
-		$scope.item[daset.prop].id = '';
+		$scope.doc[daset.prop].id = '';
 	});
 
 	$scope.langs = [];
@@ -323,6 +332,21 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 				return (query == l.id) || (l.label.toLowerCase().indexOf(query) >= 0);
 			}));
 		}
+	};
+
+	$scope.initData = function (data) {
+		$scope.langs.forEach(function (l) {
+			if (l.id === data.lang) {
+				$scope.lang = l.label;
+			}
+		});
+		data.tags = data.tags ? data.tags.join(',') : '';
+		if (data.images) {
+			data.images.forEach(function (i) {
+				i.file = '../storage/' + i.file;
+			})
+		}
+		$scope.doc = data;
 	};
 
 	$scope.load = function () {
@@ -344,15 +368,8 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 		loadLangs(function () {
 			QueueService.item({id: $stateParams.id},
 				function (data) {
-					$scope.langs.forEach(function (l) {
-						if (l.id === data.lang) {
-							$scope.lang = l.label;
-						}
-					});
-					data.tags = data.tags ? data.tags.join(',') : '';
-					$scope.item = data;
+					$scope.initData(data);
 					$scope.loading = false;
-
 				},
 				function (err) {
 					$scope.loading = false;
@@ -366,14 +383,41 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 
 	$scope.load();
 
-	$scope.ok = function () {
+	$scope.buildPostData = function () {
+		var update = {
+			tags: $scope.doc.tags.split(','),
+			organisation: ($scope.doc.organisation.id ? {id: $scope.doc.organisation.id} : {new: $scope.doc.organisation.label.toString()}),
+			topic: ($scope.doc.topic.id ? {id: $scope.doc.topic.id} : {new: $scope.doc.topic.label.toString()}),
+			comment: $scope.doc.comment,
+			lang: $scope.doc.lang.id
+		};
+		return update;
+	};
+
+	$scope.update = function () {
 		$scope.loading = true;
-		var update = angular.copy($scope.item);
-		update.lang = update.lang.id;
-		update.tags = update.tags.split(',');
-		QueueService.update({id: $stateParams.id, item: update},
+		QueueService.update({id: $stateParams.id, doc: buildPostData()},
 			function (data) {
-				$scope.item = data;
+				$scope.initData(data);
+				$scope.loading = false;
+
+			},
+			function (err) {
+				$scope.loading = false;
+				if (err.status == 401) {
+					AuthenticationService.reset();
+					$state.go('login');
+				} else if (err.status == 400) {
+					$scope.errormessage = err.data;
+				}
+			});
+	};
+
+	$scope.accept = function () {
+		$scope.loading = true;
+		QueueService.update({id: $stateParams.id, doc: buildPostData()},
+			function (data) {
+				$state.go('queue');
 				$scope.loading = false;
 
 			},
