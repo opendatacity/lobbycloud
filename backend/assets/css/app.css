@@ -7,10 +7,8 @@
 }
 
 .doc-view {
-    background-color: #333;
     border: solid #ececec 1px;
     min-height: 400px;
-    color: #fff;
     padding: 20px;
 }
 
@@ -100,11 +98,11 @@
     padding-bottom: 4px;
 }
 
-.queue-item td .queue-info {
+.doc-info {
     margin-top: 10px;
 }
 
-.queue-item td .queue-info span {
+.doc-info span {
     text-align: right;
     margin-right: 6px;
     font-weight: bold;
@@ -112,12 +110,12 @@
     width: 100px;
 }
 
-.queue-item td .queue-info .thumbnails {
+.doc-info .thumbnails {
     width: 260px;
     max-width: 260px;
     margin-right: 20px;
 }
 
-.queue-item td .queue-info .slide img {
+.doc-info .slide img {
     margin: auto;
 }

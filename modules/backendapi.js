@@ -96,11 +96,9 @@ module.exports = function (lobbycloud, i18n) {
 		var qitem = {
 			id: item.id,
 			user: item.user,
-			file: item.file,
 			orig: item.orig,
 			lang: item.lang,
 			stage: item.stage,
-			source: item.source,
 			topic: item.topic,
 			organisation: item.organisation,
 			comment: item.comment,
@@ -121,28 +119,29 @@ module.exports = function (lobbycloud, i18n) {
 
 
 	/* strips down document obj to values needed by ui */
-	var prepareClientDoc = function (doc, callback) {
-
+	var prepareClientDoc = function (doc, full, callback) {
 		if (!doc) return callback(null);
-
 		var d = {
 			id: doc.id,
 			user: doc.user,
-			source: doc.source,
 			created: new Date(doc.created).valueOf(),
 			updated: new Date(doc.updated).valueOf(),
 			orig: doc.orig,
 			lang: doc.lang,
 			tags: doc.tags,
-			topic: doc.topic,
-			organisation: doc.organisation,
-			comments: doc.comments,
-			notes: doc.notes,
+			topic: {id: doc.topic},
+			organisation: {id: doc.organisation},
 			stats: doc.stats,
-			file: doc.file,
 			indexed: doc.indexed,
 			stage: doc.stage,
-			thumb: doc.thumb
+			thumb: doc.thumb,
+			info: (doc.data ? doc.data.info : null),
+			thumbs: (doc.data ? doc.data.thumbs : null),
+			images: (full && doc.data ? doc.data.images : null),
+			text: (full && doc.data ? doc.data.text : null),
+			changesets: (full && doc.changesets.length > 0 ? doc.changesets : null),
+			comments: (full && doc.comments.length > 0 ? doc.comments : null),
+			notes: (full && doc.notes.length > 0 ? doc.notes : null)
 		};
 
 		fillTopic(d, function () {
@@ -187,7 +186,7 @@ module.exports = function (lobbycloud, i18n) {
 						if (index >= data.length) {
 							return res.json(result);
 						}
-						prepareClientDoc(data[index], function (d) {
+						prepareClientDoc(data[index], false, function (d) {
 							result.push(d);
 							prepare(index + 1);
 						});

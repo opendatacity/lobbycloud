@@ -107,6 +107,11 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 		data.forEach(function (doc) {
 			min = min ? Math.min(doc.uploaded, min) : doc.uploaded;
 			max = Math.max(doc.uploaded, max);
+			if (doc.thumbs) {
+				doc.thumbs.forEach(function (thumb) {
+					thumb.file = '../storage/' + thumb.file;
+				})
+			}
 		});
 		$scope.filter = {
 			title: '',

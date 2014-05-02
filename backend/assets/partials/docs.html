@@ -10,8 +10,8 @@
 
 <div ng-show="!loading">
     <div class="row">
-        <div class="col-md-9">
-            <div class="row">
+        <div class="col-md-12">
+            <div class="row hidden">
                 <form class="form" role="form">
                     <div class="form-group col-md-6">
                         <label translate>Filter Title</label>
@@ -49,10 +49,28 @@
                                 <div translate>Uploaded</div>
                             </th>
                             <th class="sortable" ng-class="{
+                    'sort-asc': tableParams.isSortBy('topic', 'asc'),
+                    'sort-desc': tableParams.isSortBy('topic', 'desc')}"
+                                ng-click="tableParams.sorting({'topic' : tableParams.isSortBy('topic', 'asc') ? 'desc' : 'asc'})">
+                                <div translate>Topic</div>
+                            </th>
+                            <th class="sortable" ng-class="{
+                    'sort-asc': tableParams.isSortBy('organisation', 'asc'),
+                    'sort-desc': tableParams.isSortBy('organisation', 'desc')}"
+                                ng-click="tableParams.sorting({'organisation' : tableParams.isSortBy('organisation', 'asc') ? 'desc' : 'asc'})">
+                                <div translate>Organisation</div>
+                            </th>
+                            <th class="sortable" ng-class="{
                     'sort-asc': tableParams.isSortBy('tags', 'asc'),
                     'sort-desc': tableParams.isSortBy('tags', 'desc')}"
                                 ng-click="tableParams.sorting({'tags' : tableParams.isSortBy('tags', 'asc') ? 'desc' : 'asc'})">
                                 <div translate>Tags</div>
+                            </th>
+                            <th class="sortable" ng-class="{
+                    'sort-asc': tableParams.isSortBy('pages', 'asc'),
+                    'sort-desc': tableParams.isSortBy('pages', 'desc')}"
+                                ng-click="tableParams.sorting({'pages' : tableParams.isSortBy('pages', 'asc') ? 'desc' : 'asc'})">
+                                <div translate>Pages</div>
                             </th>
                             <th translate>Actions</th>
                         </tr>
@@ -60,15 +78,18 @@
 
                         <tr ng-repeat="doc in $data" ng-class="{'selected': doc.$selected}" ng-click="selectRow(doc)">
                             <td filter="{ 'orig': 'text' }" sortable="'orig'">{{doc.orig}}</td>
-                            <td sortable="'uploaded'">{{doc.uploaded | amDateFormat:'LLL'}}</td>
+                            <td sortable="'uploaded'">{{doc.created | amDateFormat:'LLL'}}</td>
+                            <td sortable="'topic'">{{doc.topic.label}}</td>
+                            <td sortable="'organisation'">{{doc.organisation.label}}</td>
                             <td sortable="'tags'">{{doc.tags.join(',')}}</td>
+                            <td sortable="'pages'">{{doc.info.pages}}</td>
                             <td>
                                 <div ng-show="doc.$processing">
                                     <i class="fa fa-spinner fa-spin"></i>
                                 </div>
                                 <div ng-show="!doc.$processing">
-                                    <!--<i class="btn btn-default fa fa-edit" title="{{'Edit Document'|translate}}" ng-click="showEditDialog()"/>-->
-                                    <!--<i class="btn btn-default fa fa-trash-o" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(user.id)"/>-->
+                                    <!--<i class="btn btn-default fa fa-edit" title="{{'Depublish Document'|translate}}" ng-click="showEditDialog(doc)"/>-->
+                                    <!--<i class="btn btn-default fa fa-trash-o" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(doc)"/>-->
                                 </div>
                             </td>
                         </tr>
@@ -79,11 +100,37 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 hidden">
             <div class="doc-view">
-                {{doc.title}}<br/>
-                {{doc.uploaded | amDateFormat:'LLL'}}<br/>
-                {{doc.tags.join(',')}}
+                <carousel>
+                    <slide ng-repeat="slide in doc.thumbs" active="slide.active">
+                        <img ng-src="{{slide.file}}">
+
+                        <div class="carousel-caption">
+                            <strong style="color: #000">Page {{$index+1}}</strong>
+                        </div>
+                    </slide>
+                </carousel>
+
+                <div class="doc-info">
+                    <ul class="list-unstyled">
+                        <li class="text-info">Meta Informations</li>
+                        <li><span>Topic:</span> {{doc.topic.label}}</li>
+                        <li><span>Organisation:</span> {{doc.organisation.label}}</li>
+                        <li><span>Tags:</span> {{doc.tags.join(',')}}</li>
+                        <li><span>Language:</span> {{doc.lang}}</li>
+                    </ul>
+                    <ul class="list-unstyled">
+                        <li class="text-info">File Informations</li>
+                        <li><span>Filename:</span> {{doc.orig}}</li>
+                        <li><span>Uploaded:</span> {{doc.created | amDateFormat:'LLL'}}</li>
+                        <li><span>Title:</span> {{doc.info.title}}</li>
+                        <li><span>Subject:</span> {{doc.info.subject}}</li>
+                        <li><span>Author:</span> {{doc.info.author}}</li>
+                        <li><span>Keywords:</span> {{doc.info.keywords}}</li>
+                        <li><span>Pages:</span> {{doc.info.pages}}</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
