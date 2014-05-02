@@ -51,6 +51,39 @@ module.exports = function (lobbycloud, i18n) {
 		}
 	};
 
+	var fillOrganisation = function (item, cb) {
+		if (item.organisation && item.organisation.id) {
+			lobbycloud.organisations.get(item.organisation.id, function (err, org) {
+				if ((!err) && org) {
+					item.organisation.id = org.id;
+					item.organisation.label = org.name;
+				}
+				cb();
+			});
+		} else {
+			cb();
+		}
+	};
+
+	var fillTopic = function (item, cb) {
+		if (item.topic && item.topic.id) {
+			lobbycloud.topics.get(item.topic.id, function (err, topic) {
+				if ((!err) && topic) {
+					item.topic.id = topic.id;
+					item.topic.label = topic.label;
+				}
+				cb();
+			});
+		} else {
+			if ((item.topic) && (item.topic.new)) {
+				item.topic = {
+					label: item.topic.new
+				};
+			}
+			cb();
+		}
+	};
+
 	/* strips down queue obj to values needed by ui */
 	var prepareClientQueue = function (topic, callback) {
 
@@ -71,42 +104,42 @@ module.exports = function (lobbycloud, i18n) {
 			created: new Date(topic.created).valueOf()
 		};
 
-		var fillOrganisation = function (cb) {
-			if (qitem.organisation && qitem.organisation.id) {
-				lobbycloud.organisations.get(qitem.organisation.id, function (err, org) {
-					if ((!err) && org) {
-						qitem.organisation.id = org.id;
-						qitem.organisation.label = org.name;
-					}
-					cb();
-				});
-			} else {
-				cb();
-			}
-		};
-
-		var fillTopic = function (cb) {
-			if (qitem.topic && qitem.topic.id) {
-				lobbycloud.topics.get(qitem.topic.id, function (err, topic) {
-					if ((!err) && topic) {
-						qitem.topic.id = topic.id;
-						qitem.topic.label = topic.label;
-					}
-					cb();
-				});
-			} else {
-				if ((qitem.topic) && (qitem.topic.new)) {
-					qitem.topic = {
-						label: qitem.topic.new
-					};
-				}
-				cb();
-			}
-		};
-
-		fillTopic(function () {
-			fillOrganisation(function () {
+		fillTopic(qitem, function () {
+			fillOrganisation(qitem, function () {
 				callback(qitem);
+			})
+		});
+	};
+
+
+	/* strips down document obj to values needed by ui */
+	var prepareClientDoc = function (doc, callback) {
+
+		if (!doc) return callback(null);
+
+		var d = {
+			id: doc.id,
+			user: doc.user,
+			source: doc.source,
+			created: new Date(doc.created).valueOf(),
+			updated: new Date(doc.updated).valueOf(),
+			orig: doc.orig,
+			lang: doc.lang,
+			tags: doc.tags,
+			topic: doc.topic,
+			organisation: doc.organisation,
+			comments: doc.comments,
+			notes: doc.notes,
+			stats: doc.stats,
+			file: doc.file,
+			indexed: doc.indexed,
+			stage: doc.stage,
+			thumb: doc.thumb
+		};
+
+		fillTopic(d, function () {
+			fillOrganisation(d, function () {
+				callback(d);
 			})
 		});
 	};
@@ -140,8 +173,18 @@ module.exports = function (lobbycloud, i18n) {
 			//returns a json with documents for the ui list
 			access: lobbycloud.users.roles.user,
 			execute: function (req, res) {
-				lobbycloud.mockupdocs.listDocs(function (err, data) {
-					res.json(data);
+				lobbycloud.documents.all(function (err, data) {
+					var result = [];
+					var prepare = function (index) {
+						if (index >= data.length) {
+							return res.json(result);
+						}
+						prepareClientDoc(data[index], function (d) {
+							result.push(d);
+							prepare(index + 1);
+						});
+					};
+					prepare(0);
 				});
 			}
 		},

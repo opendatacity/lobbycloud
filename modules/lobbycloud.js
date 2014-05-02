@@ -12,7 +12,6 @@ var i18n = require("i18n");
 var modules = {
 	organisations: require("./organisations"),
 	backendapi: require("./backendapi"),
-	mockupdocs: require("./mockdocs"),
 	mailqueue: require("./mailqueue"),
 	documents: require("./documents"),
 	invites: require("./invites"),
@@ -46,7 +45,6 @@ var Lobbycloud = function(config){
 	/* set up exported objects */
 	l.invites = new modules.invites(path.resolve(__root, config.invitedb));
 	l.mailqueue = new modules.mailqueue(config.mails, config.url);
-	l.mockupdocs = new modules.mockupdocs();
 	l.organisations = new modules.organisations(config, db, l.elastic);
 	l.topics = new modules.topics(config, db, l.elastic);
 	l.users = new modules.users(config, db, l.elastic, l.mailqueue, i18n);
