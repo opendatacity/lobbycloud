@@ -152,7 +152,7 @@ app.configure(function() {
 
 	/* upload error handler */
 	app.use(function (err, req, res, next) {
-		if (req.url === "/api/upload") {
+		if (req.url === "/api/upload" || req.url === "/api/contribute") {
 			console.log(err); // FIXME: do something that makes sense
 			return res.json(500, {"status": "error"});
 		}
@@ -381,6 +381,68 @@ app.get('/upload', function (req, res) {
 /* api index */
 app.get('/api/', function (req, res) {
 	res.json("not implemented");
+});
+
+/* contribute. it's like upload, but different */
+app.post('/api/contribute', function (req, res) {
+
+	if (!req.user) return res.json({"status": "error", "message": i18n.__("Please log in to upload files")});
+
+	if (!req.files.hasOwnProperty("_upload")) return res.json({"status": "error", "message": i18n.__("No files were received")});
+
+	/* check client mimetype, just to sort out all the crap */
+	if (config.upload.mimetypes.indexOf(req.files._upload.mimetype) < 0 && config.upload.fileext.indexOf(req.files._upload.extension) < 0) {
+		return res.json({"status": "error", "message": i18n.__("This is not a PDF file")});
+	}
+
+	/* don't take chances with data from the internet and check the mimetype for real */
+	magic.detectFile(req.files._upload.path, function (err, _mimetype) {
+
+		if (err) {
+			return res.json({"status": "error", "message": i18n.__("This is not a PDF file")});
+		}
+
+		if (config.upload.mimetypes.indexOf(_mimetype) < 0) {
+			return res.json({"status": "error", "message": i18n.__("This is not a PDF file")});
+		}
+
+		/* put file in storage */
+		storage.save(req.files._upload.path, req.files._upload.extension, function (err, _filename) {
+
+			if (err) {
+				console.error("[contribute]", err); // FIXME: better logging
+				return res.json({"status": "error", "message": i18n.__("File could not be saved")});
+			}
+
+			console.log("[contribute]", "new upload", _filename);
+			
+			l.queue.add({
+				file: _filename,
+				orig: path.basename(req.files._upload.path),
+				topic: (req.body.topic || null),
+				organisation: (req.body.organisation || null),
+				tags: (req.body.tags || null),
+				lang: (req.body.lang || null),
+				comment: (req.body.comment || null),
+				source: "upload,"+(req.headers['x-original-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress),
+				user: req.user.id
+			}, function(err, data){
+								
+				if (err) {
+					console.error("[contribute]", "adding to queue failed:", err); // FIXME: better logging
+					return res.json({"status": "error"});
+				}
+
+				console.log("[contribute]", "queued:", data.id, _filename);
+
+				res.json({"status": "success", "id": data.id});
+				
+			});
+
+		});
+
+	});
+
 });
 
 /* upload */
