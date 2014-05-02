@@ -61,6 +61,11 @@ module.exports = function (lobbycloud, i18n) {
 				cb();
 			});
 		} else {
+			if ((item.organisation) && (item.organisation.new)) {
+				item.organisation = {
+					label: item.organisation.new
+				};
+			}
 			cb();
 		}
 	};
