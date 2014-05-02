@@ -188,7 +188,6 @@ app.directive('ngtypeahead', function () {
 app.directive('eatClick', function() {
 	return function(scope, element, attrs) {
 		$(element).click(function(event) {
-			alert('ey');
 			event.preventDefault();
 			return true;
 		});

@@ -257,6 +257,8 @@ module.exports = function (lobbycloud, i18n) {
 						if (index >= data.length) {
 							return res.json(result);
 						}
+						if (data[index].stage !== 1)
+							return prepare(index + 1);
 						prepareClientQueue(data[index], false, function (t) {
 							result.push(t);
 							prepare(index + 1);
@@ -286,13 +288,25 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id) || (!req.body.doc)) return res.send(400);
 				//TODO: update method awaits id & label mixed, better use subobject as delivered
-				req.body.doc.topic = req.body.doc.topic.id || req.body.doc.topic.new;
-				req.body.doc.organisation = req.body.doc.organisation.id || req.body.doc.organisation.new;
+				req.body.doc.topic = req.body.doc.topic ? (req.body.doc.topic.id || req.body.doc.topic.new) : null;
+				req.body.doc.organisation = req.body.doc.organisation ? (req.body.doc.organisation.id || req.body.doc.organisation.new) : null;
 				lobbycloud.queue.update(req.body.id, req.body.doc, function (err, data) {
 						if (err) return res.send(400, err.message);
 						prepareClientQueue(data, true, function (qitem) {
 							res.json(qitem);
 						});
+					}
+				);
+			}
+		},
+		'queue.accept': {
+			//updates a queue item & returns json with the changed
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				lobbycloud.queue.accept(req.body.id, function (err, data) {
+						if (err) return res.send(400, err.message);
+						res.send(200);
 					}
 				);
 			}

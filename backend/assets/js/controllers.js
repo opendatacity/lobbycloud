@@ -194,7 +194,10 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 		}
 	};
 
+	$scope.alldocs = [];
+
 	$scope.initData = function (data) {
+		$scope.alldocs = data;
 		//init filter
 		var min = null;
 		var max = 0;
@@ -230,7 +233,7 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 		}, {
 			total: data.length,
 			getData: function ($defer, params) {
-				var orderedData = data;
+				var orderedData = $scope.alldocs;
 				orderedData = $scope.filter.title ? $filter('filter')(orderedData, {'title': $scope.filter.title}) : orderedData;
 				if ($scope.filter.range && $scope.filter.range_enabled) {
 					var startDate = new Date($scope.filter.range.startDate).valueOf();
@@ -283,14 +286,30 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 	$scope.load();
 
 	$scope.deleteDialog = function (doc) {
-
+		deleteModalDialog($modal, doc, 'deleteQueueItemDialog.html', function (ok) {
+			if (!ok) return;
+			doc.$processing = true;
+			QueueService.delete({id: doc.id},
+				function () {
+					$scope.alldocs = $scope.alldocs.filter(function (d) {
+						return d.id !== doc.id;
+					});
+					$scope.tableParams.reload();
+				}, function (err) {
+					doc.$processing = false;
+					alert(err.data);
+				}
+			);
+		});
 	};
+
 
 });
 
 app.controller('QueueItemController', function ($scope, $state, $stateParams, $timeout, AuthenticationService, QueueService, LangsService) {
 	'use strict';
 
+	//typeahead callbacks
 	var dataset = function (prop) {
 		return {
 			prop: prop,
@@ -323,8 +342,11 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 			$scope.doc[daset.prop].id = '';
 	});
 
+	//cache all languages
+	//TODO: cache global
 	$scope.langs = [];
 
+	//typeahead dataset language
 	$scope.datasetLangs = {
 		prop: 'lang',
 		displayKey: "label",
@@ -337,12 +359,20 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 	};
 
 	$scope.initData = function (data) {
+		//prepare language select
 		$scope.langs.forEach(function (l) {
 			if (l.id === data.lang) {
 				$scope.lang = l.label;
+				data.lang = l;
 			}
 		});
+		if ((!data.lang) || (!data.lang.id)) {
+			$scope.lang = data.lang;
+			data.lang = {label: data.lang};
+		}
+		//prepare tags edit
 		data.tags = data.tags ? data.tags.join(',') : '';
+		//expand img urls
 		if (data.images) {
 			data.images.forEach(function (i) {
 				i.file = '../storage/' + i.file;
@@ -351,6 +381,7 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 		$scope.doc = data;
 	};
 
+	//load languages & doc
 	$scope.load = function () {
 
 		var noneLang = {id: '', label: 'None'};
@@ -383,29 +414,31 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 		});
 	};
 
-	$scope.load();
-
-	var buildPostData = function () {
+	//update the document
+	$scope.update = function (success) {
+		$scope.sending = true;
+		var doc = $scope.doc;
 		var update = {
-			tags: $scope.doc.tags.split(','),
-			organisation: ($scope.doc.organisation.id ? {id: $scope.doc.organisation.id} : {new: $scope.doc.organisation.label.toString()}),
-			topic: ($scope.doc.topic.id ? {id: $scope.doc.topic.id} : {new: $scope.doc.topic.label.toString()}),
-			comment: $scope.doc.comment,
-			lang: $scope.doc.lang.id
+			tags: (doc.tags || '').split(','),
+			comment: doc.comment,
+			lang: doc.lang.id
 		};
-		return update;
-	};
-
-	$scope.update = function () {
-		$scope.loading = true;
-		QueueService.update({id: $stateParams.id, doc: buildPostData()},
+		if (doc.organisation) {
+			update.organisation = (doc.organisation.id ? {id: doc.organisation.id} : {new: doc.organisation.label});
+		}
+		if (doc.topic) {
+			update.topic = (doc.topic.id ? {id: doc.topic.id} : {new: doc.topic.label});
+		}
+		QueueService.update({id: $stateParams.id, doc: update},
 			function (data) {
 				$scope.initData(data);
-				$scope.loading = false;
-
+				$scope.sending = false;
+				if (success) {
+					success();
+				}
 			},
 			function (err) {
-				$scope.loading = false;
+				$scope.sending = false;
 				if (err.status == 401) {
 					AuthenticationService.reset();
 					$state.go('login');
@@ -415,24 +448,43 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 			});
 	};
 
+	//accept the document
 	$scope.accept = function () {
-		$scope.loading = true;
-		QueueService.update({id: $stateParams.id, doc: buildPostData()},
-			function (data) {
-				$state.go('queue');
-				$scope.loading = false;
-
-			},
-			function (err) {
-				$scope.loading = false;
-				if (err.status == 401) {
-					AuthenticationService.reset();
-					$state.go('login');
-				} else if (err.status == 400) {
-					$scope.errormessage = err.data;
-				}
-			});
+		if (!$scope.canPublish()) return;
+		$scope.update(function () {
+			$scope.sending = true;
+			QueueService.accept({id: $stateParams.id},
+				function () {
+					$state.go('queue');
+					$scope.sending = false;
+				},
+				function (err) {
+					$scope.sending = false;
+					if (err.status == 401) {
+						AuthenticationService.reset();
+						$state.go('login');
+					} else if (err.status == 400) {
+						$scope.errormessage = err.data;
+					}
+				});
+		});
 	};
+
+	//check if doc can be accepted
+	$scope.canPublish = function () {
+		return (
+			($scope.doc) &&
+			($scope.doc.topic) &&
+			($scope.doc.topic.id) &&
+			($scope.doc.organisation) &&
+			($scope.doc.organisation.id) &&
+			($scope.doc.lang) &&
+			($scope.doc.lang.id)
+			);
+	};
+
+	//startup
+	$scope.load();
 
 });
 

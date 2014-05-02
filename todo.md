@@ -33,3 +33,9 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 * Upload Guidelines
 * Video
 * About stuff (paid for by greens, made by odc, etc)
+
+## Backend
+
+* Queue Item Edit: Add 'Choose from List' for Topics & Organisations
+* Queue Item Edit: Add 'Create now' for new Topic & new Organisation
+
