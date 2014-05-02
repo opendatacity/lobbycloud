@@ -36,7 +36,7 @@ module.exports = queue = function(config, db, l){
 	var users = l.users;
 
 	/* set up extractor */
-	var ex = extractor(path.resolve(__root, config.storage));
+	var ex = extractor(path.resolve(__root, config.storage), config.debug);
 
 	var cache = {};
 

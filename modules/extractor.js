@@ -11,17 +11,37 @@ var pdfinfo = require("pdfinfojs");
 var pdftxt = require("pdftxt");
 var moment = require("moment");
 var stream = require("stream");
+var async = require("async");
 var gm = require("gm").subClass({ imageMagick: true });
 
-module.exports = extractor = function(store){
+module.exports = extractor = function(store, debug){
+
+	if (typeof debug === "undefined") var debug = false;
 
 	var t = this;
-	
+		
 	/* storage path */
 	t.store = path.resolve(store);
 
 	/* local instance of filedump */
 	t.filedump = new filedump(t.store);
+	
+	/* queue */
+	t.queue = async.queue(function(task, callback){
+		if (debug) console.log("[extract]", "starting extraction", task.file);
+		t._extract(task.file, function(err, data){
+			/* log */
+			if (debug) console.log("[extract]", "extraction finished", task.file);
+			/* extraction callback */
+			task.callback(err, data);
+			/* queue callback */
+			callback();
+		});
+	}, 1);
+	
+	t.queue.drain = function(){
+		if (debug) console.log("[extract]", "extraction queue is empty.")
+	};
 	
 	/* extract pdf info */
 	t.info = function(file, callback) {
@@ -96,6 +116,7 @@ module.exports = extractor = function(store){
 		var page = (pages === 1) ? "" : "["+(page-1)+"]";
 
 		t.filedump.prepare("png", function(err, filename){
+			if (err) return callback(err);
 			gm(file+page).resize(dim,dim).write(path.resolve(t.store, filename), function(err){
 				if (err) return callback(err);
 				callback(null, filename);
@@ -103,6 +124,7 @@ module.exports = extractor = function(store){
 		});
 	};
 	
+	/* resize */
 	t.resize = function(file, pages, page, dim, callback) {
 		var file = path.resolve(file);
 		
@@ -123,6 +145,7 @@ module.exports = extractor = function(store){
 		var page = (pages === 1) ? "" : "["+(page-1)+"]";
 
 		t.filedump.prepare("png", function(err, filename){
+			if (err) return callback(err);
 			gm(file+page).density(300, 300).background('white').resize(dim,dim,"^").write(path.resolve(t.store, filename), function(err){
 				if (err) return callback(err);
 				callback(null, filename);
@@ -132,12 +155,21 @@ module.exports = extractor = function(store){
 
 	/* everything */
 	t.extract = function(file, callback) {
+		t.queue.push({
+			file: file,
+			callback: callback
+		}, function(err){
+			if (err) console.log("[extract]", "error extracting", file, err);
+		});
+	};
+	
+	t._extract = function(file, callback) {
 
 		/* FIXME: check if file exists */
 
 		/* FIXME: make this async and way more solid*/
 
-		var e = this;
+		var e = {};
 		e.data = {};
 
 		t.info(file, function(err, data){
