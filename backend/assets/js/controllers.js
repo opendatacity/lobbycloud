@@ -313,12 +313,14 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 	$scope.datasetTopic = dataset('topic');
 
 	var select = function (sender, object, suggestion, daset) {
-		$scope.doc[daset.prop] = suggestion;
+		if ($scope.doc)
+			$scope.doc[daset.prop] = suggestion;
 	};
 	$scope.$on("typeahead:selected", select);
 	$scope.$on("typeahead:autocompleted", select);
 	$scope.$on("typeahead:changed", function (sender, value, daset) {
-		$scope.doc[daset.prop].id = '';
+		if ($scope.doc)
+			$scope.doc[daset.prop].id = '';
 	});
 
 	$scope.langs = [];
@@ -383,7 +385,7 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 
 	$scope.load();
 
-	$scope.buildPostData = function () {
+	var buildPostData = function () {
 		var update = {
 			tags: $scope.doc.tags.split(','),
 			organisation: ($scope.doc.organisation.id ? {id: $scope.doc.organisation.id} : {new: $scope.doc.organisation.label.toString()}),
