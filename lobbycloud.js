@@ -161,7 +161,7 @@ app.configure(function() {
 
 	/* user & session handling */
 	app.use(express.cookieParser());
-	app.use(express.session({ secret: config.passport.secret, store: new (connectmongo(express))({ db: config.db }) }));
+	app.use(express.session({ secret: config.passport.secret, store: new (connectmongo(express))({ db: config.db, auto_reconnect: true }) }));
 	app.use(passport.initialize());
 	app.use(passport.session());
 
