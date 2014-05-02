@@ -11,6 +11,7 @@
 	"devDependencies": {
 		"grunt": "*",
 		"grunt-angular-gettext": "*",
-		"grunt-contrib-uglify": "*"
+		"grunt-contrib-uglify": "*",
+		"grunt-contrib-concat": "*"
 	}
 }
