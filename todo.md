@@ -6,13 +6,12 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 
 * Delete old tmp files
 * LRU Cache
-* Approve and import Document from Queue
 * Update Document
 * Check Documents before Topic/Organisation Deletion
 * Log
 * Indexer and Garbage Collection
 * /api/*/suggest must match substring [as]
-* `lang` is not saved to queue
+* queue for thumnails, resize, etc in extract.js
 
 ## Views
 
