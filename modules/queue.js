@@ -254,7 +254,7 @@ module.exports = queue = function(config, db, l){
 											},
 											updated: (new Date())
 										}},"new":true}, function(err, doc){
-											if (err) return console.log("extraction error", err); // FIXME: better error handling
+											if (err) return console.error("[queue]", "extraction error", err); // FIXME: better error handling
 
 											/* update cache */
 											cache[id] = doc;
@@ -265,7 +265,7 @@ module.exports = queue = function(config, db, l){
 										});
 
 										/* don't proceed */
-										return console.log("extraction error", err); // FIXME: better error handling
+										if (err) return console.error("[queue]", "extraction error", err); // FIXME: better error handling
 									}
 
 									console.log("[queue]", "convert finished for doc", doc.id);
@@ -431,8 +431,8 @@ module.exports = queue = function(config, db, l){
 					l.documents.import(id, function(err){
 						if (err) {
 							/* roll back stage */
-							if (config.debug) console.log("[queue] failed accepting", id);
-							if (config.debug) console.log("[queue]", err);
+							if (config.debug) console.error("[queue] failed accepting", id);
+							if (config.debug) console.error("[queue]", err);
 							// FIXME: update manually
 							
 							return db.collection("queue").findAndModify({"query":{"id":id},"update":{"$set":{"stage":1}},"new":true}, function(_err, doc){
@@ -453,7 +453,7 @@ module.exports = queue = function(config, db, l){
 						};
 						
 						/* yay */
-						if (config.debug) console.log("[queue] accepted", id);
+						if (config.debug) console.log("[queue]", "accepted", id);
 						callback(null, id);
 					});
 				});
@@ -471,7 +471,7 @@ module.exports = queue = function(config, db, l){
 				if (doc.stage >= 3) return callback("this queue element cannot be declined");
 				queue.update(id, {stage: 4}, function(err, doc){
 					if (err) return callback(err);
-					if (config.debug) console.log("[queue] declined", id);
+					if (config.debug) console.log("[queue]", "declined", id);
 					callback(null, id);
 				});
 			});
