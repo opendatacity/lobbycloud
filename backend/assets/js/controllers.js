@@ -313,13 +313,13 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 	$scope.datasetTopic = dataset('topic');
 
 	var select = function (sender, object, suggestion, daset) {
-		if ($scope.doc)
+		if ($scope.doc && daset)
 			$scope.doc[daset.prop] = suggestion;
 	};
 	$scope.$on("typeahead:selected", select);
 	$scope.$on("typeahead:autocompleted", select);
 	$scope.$on("typeahead:changed", function (sender, value, daset) {
-		if ($scope.doc)
+		if ($scope.doc && daset)
 			$scope.doc[daset.prop].id = '';
 	});
 
