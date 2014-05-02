@@ -35,9 +35,9 @@
                 <thead>
                 <tr>
                     <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('title', 'asc'),
-                    'sort-desc': tableParams.isSortBy('title', 'desc')}"
-                        ng-click="tableParams.sorting({'title' : tableParams.isSortBy('title', 'asc') ? 'desc' : 'asc'})">
+                    'sort-asc': tableParams.isSortBy('orig', 'asc'),
+                    'sort-desc': tableParams.isSortBy('orig', 'desc')}"
+                        ng-click="tableParams.sorting({'orig' : tableParams.isSortBy('orig', 'asc') ? 'desc' : 'asc'})">
                         <div translate>Filename</div>
                     </th>
                     <th class="sortable" ng-class="{
@@ -63,7 +63,7 @@
                 </thead>
 
                 <tr ng-repeat="doc in $data" ng-class="{'selected': doc.$selected}" ng-click="selectRow(doc)">
-                    <td filter="{ 'title': 'text' }" sortable="'title'">{{doc.orig}}</td>
+                    <td filter="{ 'orig': 'text' }" sortable="'orig'">{{doc.orig}}</td>
                     <td sortable="'uploaded'">{{doc.created | amDateFormat:'LLL'}}</td>
                     <td sortable="'stage'">{{doc.stage}}</td>
                     <!--<td sortable="'tags'">{{doc.tags.join(',')}}</td>-->
@@ -72,7 +72,7 @@
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
                         <div ng-show="!doc.$processing">
-                            <i class="btn btn-default fa fa-edit" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"/>
+                            <!--<i class="btn btn-default fa fa-edit" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"/>-->
                             <!--<i class="btn btn-default fa fa-trash-o" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(user.id)"/>-->
                         </div>
                     </td>
