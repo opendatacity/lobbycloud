@@ -608,6 +608,7 @@ header {
 		#main .document .list-group-item strong {
 			overflow-x: hidden;
 			word-wrap: break-word;
+			max-width: 100%;
 		}
 	
 	#main .documents {}
