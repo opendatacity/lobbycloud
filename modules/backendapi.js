@@ -299,11 +299,23 @@ module.exports = function (lobbycloud, i18n) {
 			}
 		},
 		'queue.accept': {
-			//updates a queue item & returns json with the changed
+			//updates a queue item & returns nothing if successfull
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.queue.accept(req.body.id, function (err, data) {
+						if (err) return res.send(400, err.message);
+						res.send(200);
+					}
+				);
+			}
+		},
+		'queue.decline': {
+			//declines a queue item & returns nothing if successfull
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				lobbycloud.queue.decline(req.body.id, function (err, data) {
 						if (err) return res.send(400, err.message);
 						res.send(200);
 					}

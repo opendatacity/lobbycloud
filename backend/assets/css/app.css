@@ -1,4 +1,6 @@
-.fa-mouse-pointer {
+/* general */
+
+.clickable {
     cursor: pointer;
 }
 
@@ -6,25 +8,8 @@
     background-color: #d7d7d3 !important;
 }
 
-.doc-view {
-    border: solid #ececec 1px;
-    min-height: 400px;
-    padding: 20px;
-}
-
-#drop label {
-    background-color: #007a96;
-    color: #fff;
-    padding: 12px 26px;
-    font-size: 14px;
-    border-radius: 2px;
-    cursor: pointer;
+.inlineblock {
     display: inline-block;
-    line-height: 1;
-}
-
-#drop label:hover {
-    background-color: #0986a3;
 }
 
 .input-daterange {
@@ -35,6 +20,13 @@
     text-align: left;
 }
 
+.list-title {
+    margin-left: 8px;
+    line-height: 34px;
+}
+
+/* modals */
+
 .modal-dialog {
     width: 900px;
 }
@@ -44,62 +36,70 @@
     padding-bottom: 0;
 }
 
+/* footer */
+
 #nav-lang {
     position: absolute;
-    bottom: 24px;
+    bottom: 16px;
 }
 
-    #nav-lang a {
-        margin: 6px;
-    }
-
-.list-title {
-    margin-left: 8px;
-    line-height: 34px;
+#nav-lang a {
+    margin: 6px;
 }
 
-.nomargins {
-    margin: 0;
-}
+/* central start page */
 
-.btn-link {
+.central .btn-link {
     color: #000;
 }
 
-.btn-link i {
+.central .btn-link i {
     margin-right: 6px;
 }
 
 /* queue item edit */
 
+/* queue & doc list */
 
-/* queue list */
-
-.queue-item td:first-of-type {
-    cursor: pointer;
+.doc-item tr.dropdown-row {
+    border: 1px solid #DDDDDD;
+    text-align: center;
 }
 
-.queue-item td img.thumb {
+.doc-item td img.thumb {
     height: 26px;
 }
 
-.queue-item td.queue-actions {
+.doc-item td.doc-actions {
     padding: 4px 0 0;
 }
 
-.queue-item td .carousel-indicators {
+.doc-item td .carousel {
+    margin-right: 30px;
+}
+
+.doc-item td .carousel-indicators {
     bottom: 10px;
     color: #000;
 }
 
-.queue-item td .carousel-caption {
+.doc-item td .carousel-indicators {
+    bottom: 10px;
+    color: #000;
+}
+
+.doc-item td .carousel-caption {
     bottom: 0;
     color: #000;
     padding-bottom: 4px;
 }
 
+/* Doc Properties */
+
 .doc-info {
     margin-top: 10px;
+    text-align: left;
+    vertical-align: top;
 }
 
 .doc-info span {
@@ -118,4 +118,29 @@
 
 .doc-info .slide img {
     margin: auto;
+}
+
+/* upload */
+
+#drop label {
+    background-color: #007a96;
+    color: #fff;
+    padding: 12px 26px;
+    font-size: 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 1;
+}
+
+#drop label:hover {
+    background-color: #0986a3;
+}
+
+/* doc list */
+
+.doc-view {
+    border: solid #ececec 1px;
+    min-height: 400px;
+    padding: 20px;
 }

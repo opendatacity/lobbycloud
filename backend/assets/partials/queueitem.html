@@ -27,12 +27,14 @@
                 <div class="form-group has-feedback">
                     <label translate>Topic</label>
                     <input type="text" class="form-control" options="typeaheadOptions" datasets="datasetTopic" ng-model="doc.topic.label" ngtypeahead>
+                    <span ng-show="!doc.topic.id" title="Add Topic" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="addTopicDialog()"></span>
                     <span ng-show="doc.topic.id" class="glyphicon glyphicon-ok form-control-feedback"></span>
                 </div>
                 <div class="form-group has-feedback">
                     <label translate>Organisation</label>
                     <input type="text" class="form-control" options="typeaheadOptions" datasets="datasetOrganisation" ng-model="doc.organisation.label" ngtypeahead>
-                    <span ng-show="doc.organisation.id" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                    <span ng-show="!doc.organisation.id" title="Add Organisation" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="addOrganisationDialog()"></span>
+                    <span ng-show="doc.organisation.id" title="Organisation known" class="glyphicon glyphicon-ok form-control-feedback"></span>
                 </div>
                 <div class="form-group has-feedback">
                     <label translate>Language</label>

@@ -52,9 +52,9 @@
                         <i class="fa fa-spinner fa-spin"></i>
                     </div>
                     <div ng-if="!rowuser.$processing">
-                        <!--<i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ui-sref='admin.user({id: rowuser.id})'/>-->
-                        <i class="btn btn-default fa fa-edit fa-mouse-pointer" title="{{'Edit User'|translate}}" ng-click="editDialog(rowuser)"/>
-                        <i class="btn btn-default fa fa-trash-o fa-mouse-pointer" title="{{'Delete User'|translate}}" ng-click="deleteDialog(rowuser)"/>
+                        <!--<i class="btn btn-default fa fa-edit clickable" title="{{'Edit User'|translate}}" ui-sref='admin.user({id: rowuser.id})'/>-->
+                        <i class="btn btn-default fa fa-edit clickable" title="{{'Edit User'|translate}}" ng-click="editDialog(rowuser)"/>
+                        <i class="btn btn-default fa fa-trash-o clickable" title="{{'Delete User'|translate}}" ng-click="deleteDialog(rowuser)"/>
                     </div>
                 </td>
             </tr>

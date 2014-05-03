@@ -4,24 +4,24 @@
 
 <!--<h2 translate>Hello {{account.name||account.id}}!</h2>-->
 
-<div class="row">
+<div class="row central">
 
     <div class="col-md-4">
         <h3 translate>Documents</h3>
-        <a class="btn btn-link" href="javascript:;" ui-sref="upload"><i class="fa fa-upload"></i><span translate>Upload Documents</span></a><br/>
-        <a class="btn btn-link" href="javascript:;" ui-sref="docs"><i class="fa fa-files-o"></i><span translate>Edit Documents</span></a><br/>
-        <a class="btn btn-link" href="javascript:;" ui-sref="queue"><i class="fa fa-file"></i><span translate>Edit Queue</span></a>
+        <!--<a class="btn btn-link" href="javascript:;" ui-sref="upload"><i class="fa fa-upload"></i><span translate>Upload Documents</span></a><br/>-->
+        <a class="btn btn-link" href="javascript:;" ui-sref="queue"><i class="fa fa-file"></i><span translate>Edit Queue</span></a><br/>
+        <a class="btn btn-link" href="javascript:;" ui-sref="docs"><i class="fa fa-files-o"></i><span translate>Edit Documents</span></a>
     </div>
 
     <div ng-show="access(accessLevels.editor)" class="col-md-4">
+        <h3 translate>Reference Data</h3>
+        <a class="btn btn-link" href="javascript:;" ui-sref="topics"><i class="fa fa-tag"></i><span translate>Topics</span></a><br/>
+        <a class="btn btn-link" href="javascript:;" ui-sref="organisations"><i class="fa fa-building-o"></i><span translate>Organisations</span></a>
+    </div>
+
+    <div ng-show="access(accessLevels.admin)" class="col-md-4">
         <h3 translate>Administration</h3>
         <a class="btn btn-link" href="javascript:;" ui-sref="users"><i class="fa fa-users"></i><span translate>Users</span></a><br/>
-        <a class="btn btn-link" href="javascript:;" ui-sref="topics"><i class="fa fa-tag"></i><span translate>Topics</span></a><br/>
-        <a class="btn btn-link" href="javascript:;" ui-sref="organisations"><i class="fa fa-building-o"></i><span translate>Organisations</span></a><br/>
-    </div>
-
-    <div ng-show="access(accessLevels.editor)" class="col-md-4">
-        <h3 translate>Invites</h3>
         <a class="btn btn-link" href="javascript:;" ng-click="genInvite()"><i class="fa fa-key"></i><span translate>Generate Invite</span></a>
         <div class="well" ng-if="invite">
             {{invite.invite}}
