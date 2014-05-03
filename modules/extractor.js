@@ -45,7 +45,7 @@ module.exports = extractor = function(store, debug){
 	
 	/* extract pdf info */
 	t.info = function(file, callback) {
-		new pdfinfo(file).add_options(["-rawdates"]).getInfo(function(err, info, params) {
+		new pdfinfo(file).add_options(["-rawdates", "-enc UTF-8"]).getInfo(function(err, info, params) {
 			if (err) return callback(err);
 			callback(null, {
 				title: (info.hasOwnProperty("title")) ? info.title : null, 
