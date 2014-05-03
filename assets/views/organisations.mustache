@@ -1,0 +1,26 @@
+{{>header}}
+<div id="content" class="content organisations">
+	<div class="headline">
+		<h1>{{#__}}Organisations{{/__}}</h1>
+		<p>{{#__}}Lorem Ipsum{{/__}}</p>
+	</div>
+	<div class="row">		
+		<div class="col-md-4">
+			{{#organisations}}
+			{{^break}}
+			<h2>{{letter}}</h2>
+			<ul class="organisations-list">
+			{{#items}}
+			<li><a href="{{{_url}}}/organisation/{{id}}"><strong>{{name}}</strong> {{#fullname}}<small>{{fullname}}</small>{{/fullname}}</a></li>
+			{{/items}}
+			</ul>
+			{{/break}}
+			{{#break}}
+		</div>
+		<div class="col-md-4">
+			{{/break}}
+			{{/organisations}}
+		</div>
+	</div>
+</div>
+{{>footer}}

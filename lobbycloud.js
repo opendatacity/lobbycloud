@@ -348,7 +348,45 @@ app.get('/topics/:id', function (req, res) {
 
 /* browse organisations */
 app.get('/organisations', function (req, res) {
-	render(req, res, 'organisations', {});
+	l.organisations.all(function(err, orgs){
+		if (err) send404(req, res);
+
+		/* sort alphabetically */
+		var _list = {};
+		var _letters = [];
+		var _orgs = [];
+		orgs.forEach(function(org){
+
+			/* remove fullname if same ar organisation name */
+			if (org.hasOwnProperty("fullname") && org.fullname !== org.name) org.fullname = null;
+			
+			var _name = (org.hasOwnProperty("fullname") && org.fullname !== null) ? org.fullname : org.name;
+			var _letter = _name.substr(0,1).toUpperCase();
+			if (!_list.hasOwnProperty(_letter)) _list[_letter] = [];
+			_list[_letter].push(org);
+			if (_letters.indexOf(_letter) < 0) _letters.push(_letter);
+		});
+		_letters = _letters.sort();
+		var _break = Math.floor(_letters.length/3);
+		var _breakidx = 0;
+		_letters.forEach(function(letter){
+			_orgs.push({
+				letter: letter,
+				items: _list[letter]
+			});
+			_breakidx++;
+			if (_breakidx >= _break) {
+				_orgs.push({
+					break: true
+				});
+				_breakidx = 0;
+			}
+		});
+		console.log(_orgs);
+		render(req, res, 'organisations', {
+			organisations: _orgs
+		});
+	});
 });
 
 /* organisation */
