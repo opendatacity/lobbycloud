@@ -58,11 +58,13 @@
 	<script type="text/javascript" src="{{{_url}}}/assets/js/profile.js"></script>
 	{{/profile}}
 	{{#_user}}
+	{{^upload}}
 	<link href="{{{_url}}}/assets/css/omniupload.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="{{{_url}}}/assets/js/jquery.ui.widget.js"></script>
 	<script type="text/javascript" src="{{{_url}}}/assets/js/jquery.iframe-transport.js"></script>
 	<script type="text/javascript" src="{{{_url}}}/assets/js/jquery.fileupload.js"></script>
 	<script type="text/javascript" src="{{{_url}}}/assets/js/omniupload.js"></script>
+	{{/upload}}
 	{{/_user}}
 	{{/_headers}}
 	
