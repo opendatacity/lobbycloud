@@ -124,6 +124,39 @@ module.exports = extractor = function(store, debug){
 		});
 	};
 	
+	/* thumbnail queue */
+	t.thumbq = function(file, pages, dim, callback) {
+		
+		var thumbs = [];
+		var errs = [];
+		
+		/* queue thumbnail generation */
+		var _queue = async.queue(function(task, _callback){
+			if (debug) console.log("[extract]", "generating thumbnail", task.page+"/"+pages, "from", file);
+			t.thumb(file, pages, task.page, dim, function(err, data){
+				if (debug) console.log("[extract]", "generated thumbnail", task.page+"/"+pages, "from", file);
+				_callback(err, data);
+			});
+		}, 1);
+		
+		/* call back if queue is empty */
+		_queue.drain = function(){
+			if (errs.length > 0) callback(errs.shift());
+			callback(null, thumbs);
+		};
+
+		/* queue thubnail generation for every page */
+		for (var p = 1; p <= pages; p++) {
+			(function(p){
+				_queue.push({"page":p}, function(err, data){
+					if (!err) return err
+					thumbs.push(data);
+				});
+			})(p);
+		}
+
+	};
+	
 	/* resize */
 	t.resize = function(file, pages, page, dim, callback) {
 		var file = path.resolve(file);
@@ -151,6 +184,39 @@ module.exports = extractor = function(store, debug){
 				callback(null, filename);
 			});
 		});
+	};
+
+	/* resize queue */
+	t.resizeq = function(file, pages, dim, callback) {
+		
+		var images = [];
+		var errs = [];
+		
+		/* queue image generation */
+		var _queue = async.queue(function(task, _callback){
+			if (debug) console.log("[extract]", "generating image", task.page+"/"+pages, "from", file);
+			t.resize(file, pages, task.page, dim, function(err, data){
+				if (debug) console.log("[extract]", "generated image", task.page+"/"+pages, "from", file);
+				_callback(err, data);
+			});
+		}, 1);
+		
+		/* call back if queue is empty */
+		_queue.drain = function(){
+			if (errs.length > 0) callback(errs.shift());
+			callback(null, images);
+		};
+
+		/* queue image generation for every page */
+		for (var p = 1; p <= pages; p++) {
+			(function(p){
+				_queue.push({"page":p}, function(err, data){
+					if (!err) return err
+					images.push(data);
+				});
+			})(p);
+		}
+
 	};
 
 	/* everything */
@@ -193,49 +259,29 @@ module.exports = extractor = function(store, debug){
 						e.data.hashthumb = hashthumb;
 						e.data.thumbs = [];
 						e.data.images = [];
-						for (var p = 1; p <= e.data.info.pages; p++) {
-							(function(p){
-								t.thumb(file, e.data.info.pages, p, 300, function(err, thumb){
-									if (err) return callback(err);
-									e.data.thumbs.push({
-										"page": p,
-										"file": thumb
-									});
-									if (e.data.thumbs.length === e.data.info.pages) {
-										/* thumbs are done */
-										for (var pp = 1; pp <= e.data.info.pages; pp++) {
-											(function(p){
-												t.resize(file, e.data.info.pages, p, 800, function(err, image){
-													if (err) return callback(err);
-													e.data.images.push({
-														"page": p,
-														"file": image
-													});
-													if (e.data.images.length === e.data.info.pages) {
-														e.data.images = e.data.images.sort(function(a,b){
-															return (a.page - b.page);
-														});
-														e.data.thumbs = e.data.thumbs.sort(function(a,b){
-															return (a.page - b.page);
-														});
-														/* images are done */
-														callback(null, e.data);
-													}
-												});
-											})(pp);
-										}
-									}
+						
+						t.thumbq(file, e.data.info.pages, 300, function(err, thumbs){
+							if (err) return callback(err);
+							e.data.thumbs = thumbs;
+							t.resizeq(file, e.data.info.pages, 800, function(err, images){
+								if (err) return callback(err);
+								e.data.images = thumbs;
+								/* sort */
+								e.data.images = e.data.images.sort(function(a,b){
+									return (a.page - b.page);
 								});
-							})(p);
-						}
+								e.data.thumbs = e.data.thumbs.sort(function(a,b){
+									return (a.page - b.page);
+								});
+								/* images are done */
+								callback(null, e.data);
+							});
+						});
 					});
-				})
-				
+				});
 			});
-			
 		});
-		
-	}
+	};
 	
 	return t;
 	
