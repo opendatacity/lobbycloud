@@ -52,6 +52,9 @@ header {
 			color: #fff;
 			font-family: "Roboto Slab";
 			font-weight: 300;
+			padding-left: 50px;
+			background: url(../img/lobbycloud-icon.png) 10px center no-repeat;
+			background-size: auto 70%;
 		}
 
 			header #navbar .navbar-brand i {
