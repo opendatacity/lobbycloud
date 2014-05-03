@@ -45,6 +45,16 @@ module.exports = documents = function(config, db, es, l){
 				/* check if an organisation exists */
 				var check_organisation = function(_callback) {
 					if (doc.organisation === null) return _callback(null);
+					if (doc.organisation.hasOwnProperty("new")) {
+						/* create organisation */
+						return l.organisations.add({
+							name: doc.organisation.new,
+						}, function(err, org){
+							if (err) _callback(new Error("organisation could not be created"));
+							doc.organisation = org.id;
+							_callback(null);
+						});
+					};
 					if (!doc.organisation.hasOwnProperty("id")) return _callback(new Error("organisation has to be created"));
 					organisations.check(doc.organisation.id, function(err, exists){
 						if (err) return _callback(new Error(err));
@@ -56,6 +66,16 @@ module.exports = documents = function(config, db, es, l){
 				/* check if a topic exists */
 				var check_topic = function(_callback) {
 					if (doc.topic === null) return _callback(null);
+					if (doc.topic.hasOwnProperty("new")) {
+						/* create organisation */
+						return l.topic.add({
+							label: doc.topic.new,
+						}, function(err, topic){
+							if (err) _callback(new Error("topic could not be created"));
+							doc.topic = topic.id;
+							_callback(null);
+						});
+					};
 					if (!doc.topic.hasOwnProperty("id")) return _callback(new Error("topic has to be created"));
 					l.topics.check(doc.topic.id, function(err, exists){
 						if (err) return _callback(new Error(err));
