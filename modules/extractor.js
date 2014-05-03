@@ -148,9 +148,12 @@ module.exports = extractor = function(store, debug){
 		/* queue thubnail generation for every page */
 		for (var p = 1; p <= pages; p++) {
 			(function(p){
-				_queue.push({"page":p}, function(err, data){
-					if (!err) return err
-					thumbs.push(data);
+				_queue.push({"page":p}, function(err, file){
+					if (err) return err
+					thumbs.push({
+						page: p,
+						file: file
+					});
 				});
 			})(p);
 		}
@@ -204,15 +207,19 @@ module.exports = extractor = function(store, debug){
 		/* call back if queue is empty */
 		_queue.drain = function(){
 			if (errs.length > 0) callback(errs.shift());
+			console.log(images);
 			callback(null, images);
 		};
 
 		/* queue image generation for every page */
 		for (var p = 1; p <= pages; p++) {
 			(function(p){
-				_queue.push({"page":p}, function(err, data){
-					if (!err) return err
-					images.push(data);
+				_queue.push({"page":p}, function(err, file){
+					if (err) return err
+					images.push({
+						page: p,
+						file: file
+					});
 				});
 			})(p);
 		}
@@ -233,7 +240,7 @@ module.exports = extractor = function(store, debug){
 
 		/* FIXME: check if file exists */
 
-		/* FIXME: make this async and way more solid*/
+		/* FIXME: make this async and way more solid */
 
 		var e = {};
 		e.data = {};
@@ -265,7 +272,7 @@ module.exports = extractor = function(store, debug){
 							e.data.thumbs = thumbs;
 							t.resizeq(file, e.data.info.pages, 800, function(err, images){
 								if (err) return callback(err);
-								e.data.images = thumbs;
+								e.data.images = images;
 								/* sort */
 								e.data.images = e.data.images.sort(function(a,b){
 									return (a.page - b.page);
