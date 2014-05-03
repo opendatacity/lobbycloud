@@ -207,7 +207,6 @@ module.exports = extractor = function(store, debug){
 		/* call back if queue is empty */
 		_queue.drain = function(){
 			if (errs.length > 0) callback(errs.shift());
-			console.log(images);
 			callback(null, images);
 		};
 
