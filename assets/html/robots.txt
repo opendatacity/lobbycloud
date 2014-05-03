@@ -1,0 +1,4 @@
+# hello sweet robots, yetzt likes you!
+
+User-agent: *
+Disallow:
