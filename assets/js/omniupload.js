@@ -1,5 +1,7 @@
 $(document).ready(function(){
 	
+	if ($('form#upload').length > 0) return;
+	
 	/* create upload drop overlay */
 	$('body').append($('<div id="omniupload-drop"><span>Drop your files here.</span></div>'));
 
