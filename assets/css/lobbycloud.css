@@ -604,6 +604,11 @@ header {
 				margin-bottom: 20px;
 				
 			}
+			
+		#main .document .list-group-item strong {
+			overflow-x: hidden;
+			word-wrap: break-word;
+		}
 	
 	#main .documents {}
 
