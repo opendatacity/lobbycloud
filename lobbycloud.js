@@ -358,7 +358,7 @@ app.get('/organisations', function (req, res) {
 		orgs.forEach(function(org){
 
 			/* remove fullname if same ar organisation name */
-			if (org.hasOwnProperty("fullname") && org.fullname !== org.name) org.fullname = null;
+			if (org.hasOwnProperty("fullname") && org.fullname === org.name) org.fullname = null;
 			
 			var _name = (org.hasOwnProperty("fullname") && org.fullname !== null) ? org.fullname : org.name;
 			var _letter = _name.substr(0,1).toUpperCase();
