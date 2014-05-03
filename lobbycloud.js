@@ -258,9 +258,16 @@ app.post('/beta', function (req, res) {
 });
 
 var send404 = function(req, res) {
+	if (config.debug) console.error("[404]", req.method, req.originalUrl);
 	res.status(404);
 	render(req, res, '404', {});
-}
+};
+
+var send500 = function(req, res, err) {
+	if (err) console.error("[500]", err);
+	res.status(500);
+	render(req, res, '500', {});
+};
 
 var sendProfile = function (profile, req, res) {
 	render(req, res, 'profile', {
