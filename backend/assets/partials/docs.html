@@ -75,61 +75,60 @@
                             <th translate>Actions</th>
                         </tr>
                         </thead>
+                        <tbody ng-repeat="doc in $data" class="doc-item">
+                            <tr ng-class="{'selected': doc.$selected}">
+                                <td class="clickable" ng-click="selectRow(doc)" filter="{ 'orig': 'text' }" sortable="'orig'">{{doc.orig}}</td>
+                                <td sortable="'uploaded'">{{doc.created | amDateFormat:'LLL'}}</td>
+                                <td sortable="'topic'">{{doc.topic.label}}</td>
+                                <td sortable="'organisation'">{{doc.organisation.label}}</td>
+                                <td sortable="'tags'">{{doc.tags.join(',')}}</td>
+                                <td sortable="'pages'">{{doc.info.pages}}</td>
+                                <td class="doc-actions">
+                                   <div ng-show="doc.$processing">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                    </div>
+                                    <div ng-show="!doc.$processing">
+                                        <!--<i class="btn btn-default fa fa-edit" title="{{'Depublish Document'|translate}}" ng-click="showEditDialog(doc)"/>-->
+                                        <!--<i class="btn btn-default fa fa-trash-o" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(doc)"/>-->
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-if="doc.$selected" class="dropdown-row">
+                                <td colspan="6">
+                                    <carousel class="thumbnails inlineblock">
+                                        <slide ng-repeat="slide in doc.thumbs" active="slide.active">
+                                            <img ng-src="{{slide.file}}">
 
-                        <tr ng-repeat="doc in $data" ng-class="{'selected': doc.$selected}" ng-click="selectRow(doc)">
-                            <td filter="{ 'orig': 'text' }" sortable="'orig'">{{doc.orig}}</td>
-                            <td sortable="'uploaded'">{{doc.created | amDateFormat:'LLL'}}</td>
-                            <td sortable="'topic'">{{doc.topic.label}}</td>
-                            <td sortable="'organisation'">{{doc.organisation.label}}</td>
-                            <td sortable="'tags'">{{doc.tags.join(',')}}</td>
-                            <td sortable="'pages'">{{doc.info.pages}}</td>
-                            <td>
-                                <div ng-show="doc.$processing">
-                                    <i class="fa fa-spinner fa-spin"></i>
-                                </div>
-                                <div ng-show="!doc.$processing">
-                                    <!--<i class="btn btn-default fa fa-edit" title="{{'Depublish Document'|translate}}" ng-click="showEditDialog(doc)"/>-->
-                                    <!--<i class="btn btn-default fa fa-trash-o" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(doc)"/>-->
-                                </div>
-                            </td>
-                        </tr>
+                                            <div class="carousel-caption">
+                                                <strong style="color: #000">Page {{$index+1}}</strong>
+                                            </div>
+                                        </slide>
+                                    </carousel>
 
+                                    <div class="doc-info inlineblock">
+                                        <ul class="list-unstyled">
+                                            <li class="text-info">Meta Informations</li>
+                                            <li><span>Topic:</span> {{doc.topic.label}}</li>
+                                            <li><span>Organisation:</span> {{doc.organisation.label}}</li>
+                                            <li><span>Tags:</span> {{doc.tags.join(',')}}</li>
+                                            <li><span>Language:</span> {{doc.lang}}</li>
+                                        </ul>
+                                        <ul class="list-unstyled">
+                                            <li class="text-info">File Informations</li>
+                                            <li><span>Filename:</span> {{doc.orig}}</li>
+                                            <li><span>Uploaded:</span> {{doc.created | amDateFormat:'LLL'}}</li>
+                                            <li><span>Title:</span> {{doc.info.title}}</li>
+                                            <li><span>Subject:</span> {{doc.info.subject}}</li>
+                                            <li><span>Author:</span> {{doc.info.author}}</li>
+                                            <li><span>Keywords:</span> {{doc.info.keywords}}</li>
+                                            <li><span>Pages:</span> {{doc.info.pages}}</li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
 
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 hidden">
-            <div class="doc-view">
-                <carousel>
-                    <slide ng-repeat="slide in doc.thumbs" active="slide.active">
-                        <img ng-src="{{slide.file}}">
-
-                        <div class="carousel-caption">
-                            <strong style="color: #000">Page {{$index+1}}</strong>
-                        </div>
-                    </slide>
-                </carousel>
-
-                <div class="doc-info">
-                    <ul class="list-unstyled">
-                        <li class="text-info">Meta Informations</li>
-                        <li><span>Topic:</span> {{doc.topic.label}}</li>
-                        <li><span>Organisation:</span> {{doc.organisation.label}}</li>
-                        <li><span>Tags:</span> {{doc.tags.join(',')}}</li>
-                        <li><span>Language:</span> {{doc.lang}}</li>
-                    </ul>
-                    <ul class="list-unstyled">
-                        <li class="text-info">File Informations</li>
-                        <li><span>Filename:</span> {{doc.orig}}</li>
-                        <li><span>Uploaded:</span> {{doc.created | amDateFormat:'LLL'}}</li>
-                        <li><span>Title:</span> {{doc.info.title}}</li>
-                        <li><span>Subject:</span> {{doc.info.subject}}</li>
-                        <li><span>Author:</span> {{doc.info.author}}</li>
-                        <li><span>Keywords:</span> {{doc.info.keywords}}</li>
-                        <li><span>Pages:</span> {{doc.info.pages}}</li>
-                    </ul>
                 </div>
             </div>
         </div>

@@ -65,37 +65,32 @@
                         ng-click="tableParams.sorting({'pages' : tableParams.isSortBy('pages', 'asc') ? 'desc' : 'asc'})">
                         <div translate>Pages</div>
                     </th>
-                    <!--<th class="sortable" ng-class="{-->
-                    <!--'sort-asc': tableParams.isSortBy('tags', 'asc'),-->
-                    <!--'sort-desc': tableParams.isSortBy('tags', 'desc')}"-->
-                    <!--ng-click="tableParams.sorting({'tags' : tableParams.isSortBy('tags', 'asc') ? 'desc' : 'asc'})">-->
-                    <!--<div translate>Tags</div>-->
-                    <!--</th>-->
                     <th translate>Actions</th>
                 </tr>
                 </thead>
-                <tbody ng-repeat="doc in $data" class="queue-item">
+                <tbody ng-repeat="doc in $data" class="doc-item">
                 <tr ng-class="{'selected': doc.$selected}">
-                    <td ng-click="selectRow(doc)" filter="{ 'orig': 'text' }" sortable="'orig'">
+                    <td class="clickable" ng-click="selectRow(doc)" filter="{ 'orig': 'text' }" sortable="'orig'">
                         <img class="thumb" ng-src="{{doc.thumbs[0].file}}"/>
                         {{doc.orig}}</td>
                     <td sortable="'uploaded'">{{doc.created | amDateFormat:'LLL'}}</td>
                     <td sortable="'topic'">{{doc.topic.label}}</td>
                     <td sortable="'organisation'">{{doc.organisation.label}}</td>
                     <td sortable="'pages'">{{doc.info.pages}}</td>
-                    <td class="queue-actions">
+                    <td class="doc-actions">
                         <div ng-show="doc.$processing">
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
                         <div ng-show="!doc.$processing">
                             <a href="" class="btn btn-default btn-sm" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"><i class="fa fa-edit" /></a>
+                            <a href="" class="btn btn-default btn-sm" title="{{'Decline Document'|translate}}" ng-click="decline(doc)" eat-click><i class="fa fa-ban" /></a>
                             <a href="" class="btn btn-default btn-sm" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(doc)" eat-click><i class="fa fa-trash-o" /></a>
                         </div>
                     </td>
                 </tr>
-                <tr ng-if="doc.$selected">
+                <tr ng-if="doc.$selected" class="dropdown-row">
                     <td colspan="6">
-                        <carousel class="thumbnails pull-left">
+                        <carousel class="thumbnails inlineblock">
                             <slide ng-repeat="slide in doc.thumbs" active="slide.active">
                                 <img ng-src="{{slide.file}}">
 
@@ -105,7 +100,7 @@
                             </slide>
                         </carousel>
 
-                        <div class="doc-info pull-left">
+                        <div class="doc-info inlineblock">
                             <ul class="list-unstyled">
                                 <li class="text-info">Meta Informations</li>
                                 <li><span>Topic:</span> {{doc.topic.label}}</li>

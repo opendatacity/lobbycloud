@@ -290,6 +290,33 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 
 	$scope.load();
 
+	//check if doc can be accepted
+	$scope.canPublish = function (doc) {
+		return (
+			(doc) &&
+			(doc.topic) &&
+			(doc.topic.id) &&
+			(doc.organisation) &&
+			(doc.organisation.id) &&
+			(doc.lang)
+			);
+	};
+
+	$scope.decline = function (doc) {
+		doc.$processing = true;
+		QueueService.decline({id: doc.id},
+			function () {
+				$scope.alldocs = $scope.alldocs.filter(function (d) {
+					return d.id !== doc.id;
+				});
+				$scope.tableParams.reload();
+			}, function (err) {
+				doc.$processing = false;
+				alert(err.data);
+			}
+		);
+	};
+
 	$scope.deleteDialog = function (doc) {
 		deleteModalDialog($modal, doc, 'deleteQueueItemDialog.html', function (ok) {
 			if (!ok) return;
@@ -311,7 +338,7 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 
 });
 
-app.controller('QueueItemController', function ($scope, $state, $stateParams, $timeout, AuthenticationService, QueueService, LangsService) {
+app.controller('QueueItemController', function ($scope, $state, $stateParams, $timeout, $modal, AuthenticationService, QueueService, TopicsService, OrganisationsService, LangsService) {
 	'use strict';
 
 	//typeahead callbacks
@@ -486,6 +513,43 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 			($scope.doc.lang) &&
 			($scope.doc.lang.id)
 			);
+	};
+
+	$scope.addOrganisationDialog = function () {
+		editModalDialog($modal, {
+			organisation: {
+				create:true,
+				name: $scope.doc.organisation.label
+			}
+		}, 'partials/organisation.html', function (data) {
+			if (data) {
+				OrganisationsService.add({organisation: data.organisation}, function (org) {
+					$scope.doc.organisation = {
+						id: org.id,
+						label: org.name
+					}
+				}, function (err) {
+					alert(err.data);
+				})
+			}
+		});
+	};
+
+	$scope.addTopicDialog = function () {
+		editModalDialog($modal, {
+			topic: {
+				create:true,
+				label: $scope.doc.topic.label
+			}
+		}, 'partials/topic.html', function (data) {
+			if (data) {
+				TopicsService.add({topic: data.topic}, function (topic) {
+					$scope.doc.topic = topic;
+				}, function (err) {
+					alert(err.data);
+				});
+			}
+		});
 	};
 
 	//startup
@@ -716,7 +780,7 @@ app.controller('TopicsController', function ($scope, $state, $modal, $filter, ng
 	$scope.editDialog = function (org_topic) {
 		editModalDialog($modal, {
 			topic: angular.copy(org_topic)
-		}, 'editTopicDialog.html', function (data) {
+		}, 'partials/topic.html', function (data) {
 			if (data) {
 				if (!org_topic.create) {
 					org_topic.$processing = true;
@@ -854,7 +918,7 @@ app.controller('OrganisationsController', function ($scope, $state, $modal, $fil
 	$scope.editDialog = function (org_org) {
 		editModalDialog($modal, {
 			organisation: angular.copy(org_org)
-		}, 'editOrganisationDialog.html', function (data) {
+		}, 'partials/organisation.html', function (data) {
 			if (data) {
 				if (!org_org.create) {
 					org_org.$processing = true;

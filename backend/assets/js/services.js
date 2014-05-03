@@ -168,6 +168,10 @@ app.factory('QueueService', function ($resource) {
 			delete: {
 				method: 'POST',
 				params: {cmd: 'queue.delete'}
+			},
+			decline: {
+				method: 'POST',
+				params: {cmd: 'queue.decline'}
 			}
 		}
 	);

@@ -35,6 +35,4 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 
 ## Backend
 
-* Queue Item Edit: Add 'Choose from List' for Topics & Organisations
-* Queue Item Edit: Add 'Create now' for new Topic & new Organisation
-
+* beauty
