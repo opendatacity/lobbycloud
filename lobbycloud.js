@@ -389,7 +389,6 @@ app.get('/organisations', function (req, res) {
 				_breakidx = 0;
 			}
 		});
-		console.log(_orgs);
 		render(req, res, 'organisations', {
 			organisations: _orgs
 		});
@@ -397,8 +396,25 @@ app.get('/organisations', function (req, res) {
 });
 
 /* organisation */
-app.get('/organisations/:id', function (req, res) {
-	render(req, res, 'organisations', {});
+app.get('/organisation/:id', function (req, res) {
+	l.organisations.check(req.param("id"), function(err, exists, id){
+		if (err) return send500(req, res, err);
+		if (!exists) return send404(req, res);
+		l.organisations.get(id, function(err, org){
+			if (err) return send500(req, res, err);
+			/* get documents for organisation */
+			l.documents.by_organisation(id, function(err, docs){
+				if (err) return send500(req, res, err);
+				docs.map(function(doc){
+					doc.created_ago = moment(doc.created).lang(req.locale||"en").calendar(true);
+				});
+				render(req, res, 'organisation', {
+					organisation: org,
+					documents: docs
+				});
+			});
+		});
+	});
 });
 
 /* upload */

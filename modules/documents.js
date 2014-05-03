@@ -219,7 +219,12 @@ module.exports = documents = function(config, db, es, l){
 				/* add to cache */
 				cache[r.id] = r;
 			});
-			callback(null, list);
+			/* add organisations and topics */
+			documents.add_organisations(list, function(err, list){
+				documents.add_topics(list, function(err, list){
+					callback(null, list);
+				});
+			});
 		});
 	};
 
@@ -249,11 +254,18 @@ module.exports = documents = function(config, db, es, l){
 				/* add to cache */
 				cache[r.id] = r;
 			});
-			callback(null, list);
+
+			/* add organisations and topics */
+			documents.add_organisations(list, function(err, list){
+				documents.add_topics(list, function(err, list){
+					callback(null, list);
+				});
+			});
 		});
 		
 	};
 	
+	/* get documents for topic */
 	documents.by_topic = function(topic_id, callback) {
 
 		/* devise statement according to query */
@@ -279,10 +291,17 @@ module.exports = documents = function(config, db, es, l){
 				/* add to cache */
 				cache[r.id] = r;
 			});
-			callback(null, list);
+
+			/* add organisations and topics */
+			documents.add_organisations(list, function(err, list){
+				documents.add_topics(list, function(err, list){
+					callback(null, list);
+				});
+			});
 		});
 	};
 	
+	/* get documents for organisation */
 	documents.by_organisation = function(organisation_id, callback) {
 
 		/* devise statement according to query */
@@ -305,8 +324,44 @@ module.exports = documents = function(config, db, es, l){
 				/* add to cache */
 				cache[r.id] = r;
 			});
-			callback(null, list);
+
+			/* add organisations and topics */
+			documents.add_organisations(list, function(err, list){
+				documents.add_topics(list, function(err, list){
+					callback(null, list);
+				});
+			});
 		});
+	};
+	
+	/* add organisation data to an array of organisations */
+	documents.add_organisations = function(list, callback) {
+		var _completed = 0;
+		list.forEach(function(item){
+			l.organisations.get(item.organisation, function(err, org){
+				/* be fault tolerant */
+				if (!err) item.organisation_data = org;
+				_completed++;
+				if (_completed === list.length) {
+					callback(null, list);
+				}
+			});
+		});	
+	};
+	
+	/* add topic data to an array of organisations */
+	documents.add_topics = function(list, callback) {
+		var _completed = 0;
+		list.forEach(function(item){
+			l.topics.get(item.topic, function(err, topic){
+				/* be fault tolerant */
+				if (!err) item.topic_data = topic;
+				_completed++;
+				if (_completed === list.length) {
+					callback(null, list);
+				}
+			});
+		});	
 	};
 
 	return this;

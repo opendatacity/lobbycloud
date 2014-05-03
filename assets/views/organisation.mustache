@@ -1,21 +1,29 @@
 {{>header}}
-<div id="content" class="content documents">
-	<h1>{{#__}}Documents{{/__}}</h1>
-	<div class="row">
-		{{^documents}}
-		{{^error}}
-		<div class="col-md-12">
-			<h2>Nothing to see yet</h2>
-			<p>{{#__}}No documents have been released yet.{{/__}}</p>
+<div id="content" class="content organisation">
+	{{#organisation}}
+	<div class="headline clearfix">
+		<h1><strong>{{name}}</strong> {{#fullname}}<small>{{fullname}}</small>{{/fullname}}</h1>
+		{{#description}}
+		<p>{{description}}</p>
+		{{/description}}
+		{{^description}}
+		<p><em>{{#__}}No description{{/__}}</em></p>
+		{{/description}}
+		{{#logo}}
+		<div class="organisation-logo">
+			<img src="{{{logo}}}" class="img-responsive">
 		</div>
-		{{/error}}
-		{{#error}}
+		{{/logo}}
+	</div>
+	{{/organisation}}
+	<div class="row documents">		
 		<div class="col-md-12">
-			<h2>{{#__}}Error{{/__}}</h2>
-			<p>{{error}}</p>
+			<h2>{{#__}}Documents{{/__}}</h2>
+			<p>{{#__}}Lorem Imsum{{/__}}</p>
+			{{^documents}}
+			<p><em>{{#__}}There are no documents by this organisation.{{/__}}</em></p>
+			{{/documents}}
 		</div>
-		{{/error}}
-		{{/documents}}
 		{{#documents}}
 		<div class="col-md-3 col-sm-4 col-xs-12">
 			<div class="doc">
@@ -36,6 +44,7 @@
 			</div>
 		</div>
 		{{/documents}}
+		</div>
 	</div>
 </div>
 {{>footer}}
