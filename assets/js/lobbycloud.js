@@ -104,4 +104,20 @@ $(document).ready(function(e){
 		
 	});
 	
+	/* shortlink copy paste */
+	$(".shortlink").each(function(idx,e){
+		var $c = $(e);
+		$(".shortlink-action", $c).zclip({
+			copy: $('.lnk', $c).attr("href"),
+			afterCopy: function() {
+				$(".shortlink-action", $c).removeClass("btn-dark").addClass("btn-success").blur();
+				$(".shortlink-action i", $c).removeClass("fa-clipboard").addClass("fa-check");
+				setTimeout(function(){
+					$(".shortlink-action", $c).removeClass("btn-success").addClass("btn-dark");
+					$(".shortlink-action i", $c).removeClass("fa-check").addClass("fa-clipboard");
+				},5000);
+			}
+		});
+	});
+	
 });

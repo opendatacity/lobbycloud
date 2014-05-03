@@ -623,6 +623,30 @@ header {
 			word-wrap: break-word;
 			max-width: 100%;
 		}
+		
+		#main .document .shortlink {
+			
+			display: block;
+			position: relative;
+			padding: 15px;
+			background-color: rgba(255,255,255,0.5);
+			border-radius: 5px;
+			font-size: 20px;
+			font-family: "Menlo", fixed;
+			font-weight: bold;
+			text-align: left;
+			
+		}
+		
+			#main .document .shortlink a.lnk {
+				color: #89cf0f;
+				text-decoration: none;
+			}
+
+			#main .document .shortlink a.btn {
+				float: right;
+				margin-top: -5px;
+			}
 	
 	#main .documents {}
 
