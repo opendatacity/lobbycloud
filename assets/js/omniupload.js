@@ -66,11 +66,15 @@ $(document).ready(function(){
 	$('body').append($form);
 	
 	$('body').on("dragover", function(event) {
-		event.preventDefault();
+		// event.preventDefault();
 		$("#omniupload-drop").addClass("active");
 		return false;
-	}).on("dragleave", function(event) {
-		// $("#omniupload-drop").removeClass("active");
+	});
+	
+	$('#omniupload-drop').on("dragleave", function(event) {
+		$("#omniupload-drop").removeClass("active");
+	}).on("mouseleave", function(event) {
+		$("#omniupload-drop").removeClass("active");
 	}).on("drop", function(event){
 		$("#omniupload-drop").removeClass("active");
 	});
