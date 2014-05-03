@@ -72,7 +72,7 @@ $(document).ready(function(){
 		$("#omniupload-drop").addClass("active");
 		return false;
 	}).on("dragleave", function(event) {
-		$("#omniupload-drop").removeClass("active");
+		// $("#omniupload-drop").removeClass("active");
 	}).on("drop", function(event){
 		$("#omniupload-drop").removeClass("active");
 	});
