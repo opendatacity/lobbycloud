@@ -1,50 +1,56 @@
 {{>header}}
-<div id="content" class="content documents">
-    <div id="headline">
-        <h1>{{#__}}Search in Documents{{/__}}</h1>
-    </div>
-    <div class="row">
-        <div class="col-md-6 white-box">
-            <form action="{{{_url}}}/search" method="post" class="form-inline" role="form">
-                <div class="form-group">
-                    <input type="text" name="query" class="form-control" id="query" value="{{query}}" placeholder="{{#__}}Your search query{{/__}}">
-                </div>
-                <button type="submit" class="btn btn-primary">{{#__}}Search{{/__}}</button>
-            </form>
-        </div>
-    </div>
-    <div class="row">
-		{{#items}}
-			<hr />
-				 <div class="col-md-4">
-					 <div class="doc">
-						 <div class="thumb">
-							 <a href="{{_url}}/document/{{id}}"><img src="{{_url}}/{{_storage}}/{{thumb}}" class="responsive-image"></a>
-						 </div>
-						 <p class="id"><a href="{{_url}}/document/{{id}}">{{id}}</a></p>
-						 <div class="badges">
-							 <a href="{{_url}}/document/{{id}}">
-								 {{#topic_data}}<span class="topic" title="{{subject}}">{{label}}</span>{{/topic_data}}
-								 {{#organisation_data}}<span class="organisation" title="{{fullname}}">{{name}}</span>{{/organisation_data}}
-								 {{#stats.comments}}<span class="comments">{{stats.comments}} {{#__}}Comments{{/__}}</span>{{/stats.comments}}
-								 {{#stats.notes}}<span class="notes">{{stats.notes}} {{#__}}Notes{{/__}}</span>{{/stats.notes}}
-								 {{#lang}}<span class="lang">{{lang}}</span>{{/lang}}
-							 </a>
-						 </div>
-						 {{#created_ago}}<a href="{{_url}}/document/{{id}}" class="created">{{created_ago}}</a>{{/created_ago}}
-					 </div>
-				 </div>
-				<div class="col-md-8">
-                   {{#highlights}}
-					   <p>...{{{.}}}...</p>
-				   {{/highlights}}
+<div id="content" class="content documents search">
+	<div class="headline">
+		<h1>{{#__}}Search in Documents{{/__}}</h1>
+	</div>
+	<div class="search-bar">
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3">
+				<form action="{{{_url}}}/search" method="post" class="form-inline" role="form">
+					<div class="form-group">
+						<input type="text" size="30" name="query" class="form-control" id="query" value="{{query}}" placeholder="{{#__}}Your search query{{/__}}">
+					</div>
+					<button type="submit" class="btn btn-primary">{{#__}}Search{{/__}}</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	{{#items}}
+	<div class="row">
+		<div class="col-md-4">
+			<div class="doc">
+				<div class="thumb">
+					<a href="{{_url}}/document/{{id}}"><img src="{{_url}}/{{_storage}}/{{thumb}}" class="responsive-image"></a>
 				</div>
-		{{/items}}
-		{{#query}}
-			{{^items}}
-				No results :.(
-			{{/items}}
-		{{/query}}
-    </div>
+				<p class="id"><a href="{{_url}}/document/{{id}}">{{id}}</a></p>
+				<div class="badges">
+					<a href="{{_url}}/document/{{id}}">
+						{{#topic_data}}<span class="topic" title="{{subject}}">{{label}}</span>{{/topic_data}}
+						{{#organisation_data}}<span class="organisation" title="{{fullname}}">{{name}}</span>{{/organisation_data}}
+						{{#stats.comments}}<span class="comments">{{stats.comments}} {{#__}}Comments{{/__}}</span>{{/stats.comments}}
+						{{#stats.notes}}<span class="notes">{{stats.notes}} {{#__}}Notes{{/__}}</span>{{/stats.notes}}
+						{{#lang}}<span class="lang">{{lang}}</span>{{/lang}}
+					</a>
+				</div>
+				{{#created_ago}}<a href="{{_url}}/document/{{id}}" class="created">{{created_ago}}</a>{{/created_ago}}
+			</div>
+		</div>
+		<div class="col-md-8">
+			{{#highlights}}
+			<p>...{{{.}}}...</p>
+			{{/highlights}}
+		</div>
+	</div>
+	{{/items}}
+	{{#query}}
+	{{^items}}
+	<div class="row">
+		<div class="col-md-12">
+			<h2>No results</h2>
+			<p>We could not find anything.</p>
+		</div>
+	</div>
+	{{/items}}
+	{{/query}}
 </div>
 {{>footer}}
