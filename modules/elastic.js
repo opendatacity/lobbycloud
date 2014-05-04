@@ -88,40 +88,21 @@ module.exports = function (config, es) {
 		});
 	};
 
-	/* fuzzy search by type, text in the specified es search entry properties */
+	/* fuzzy & wildcard search by type, text in the specified es search entry properties */
 	me.suggest = function (type, query, fields, callback) {
-
-		var queries = [
-			{
-				"fuzzy_like_this": {
-					"fields": fields.map(function (f) {
-						return type + '.' + f
-					}), //A list of the fields to run the more like this query against. Defaults to the _all field.
-					"like_text": query, //The text to find documents like it, required.
-					"ignore_tf": false, //Should term frequency be ignored. Defaults to false.
-					"max_query_terms": 25, //The maximum number of query terms that will be included in any generated query. Defaults to 25.
-					"fuzziness": 0.5, //The minimum similarity of the term variants. Defaults to 0.5
-					"prefix_length": 0, // Length of required common prefix on variant terms. Defaults to 0.
-					"boost": 1.0 // Sets the boost value of the query. Defaults to 1.0.
-				}
-			}
-		];
 		es.search(
 			{
 				index: config.index,
 				type: type,
 				body: {
 					"query": {
-						"bool": {
-							"must": [],
-							"must_not": [],
-							"should": queries
+						"query_string": {
+							"fields": fields,
+							"query": query + '*~',
+							"fuzzy_prefix_length" : 3,
+							analyze_wildcard: true
 						}
-					}//,
-//						"from":0,
-//						"size":10,
-//						"sort":[],
-//						"facets":{}
+					}
 				}
 			},
 			function (err, result) {
@@ -149,10 +130,10 @@ module.exports = function (config, es) {
 				index: config.index,
 				type: type,
 				body: {
-					"query" : {
-						"query_string" : {
-							"fields" : [field],
-							"query" : query
+					"query": {
+						"query_string": {
+							"fields": [field],
+							"query": query
 						}
 					}
 				}

@@ -10,7 +10,6 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 * Check Documents before Topic/Organisation Deletion
 * Log
 * Indexer and Garbage Collection
-* /api/*/suggest must match substring [as]
 * queue for thumnails, resize, etc in extract.js
 * typeahead sends every keystroke as a suggest-search, maybe a little delay for typing?
 
