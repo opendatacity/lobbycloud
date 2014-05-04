@@ -74,6 +74,7 @@
 /* queue & doc list */
 
 .doc-item tr.dropdown-row {
+    background-color: #fff;
     border: 1px solid #DDDDDD;
     text-align: center;
 }
