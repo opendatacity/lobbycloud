@@ -91,7 +91,7 @@ app.factory('UsersService', function ($resource) {
 	return $resource('/api/backend/:cmd', {}, {
 			list: {
 				method: 'POST',
-				params: {cmd: 'users'},
+				params: {cmd: 'users.list'},
 				isArray: true
 			},
 			delete: {
@@ -150,7 +150,7 @@ app.factory('QueueService', function ($resource) {
 	return $resource('/api/backend/:cmd', {}, {
 			list: {
 				method: 'POST',
-				params: {cmd: 'queue'},
+				params: {cmd: 'queue.list'},
 				isArray: true
 			},
 			item: {
@@ -180,9 +180,14 @@ app.factory('QueueService', function ($resource) {
 app.factory('TopicsService', function ($resource) {
 	'use strict';
 	return $resource('/api/backend/:cmd', {}, {
+			index: {
+				method: 'POST',
+				params: {cmd: 'topics.index'},
+				isArray: true
+			},
 			list: {
 				method: 'POST',
-				params: {cmd: 'topics'},
+				params: {cmd: 'topics.list'},
 				isArray: true
 			},
 			delete: {
@@ -204,9 +209,14 @@ app.factory('TopicsService', function ($resource) {
 app.factory('OrganisationsService', function ($resource) {
 	'use strict';
 	return $resource('/api/backend/:cmd', {}, {
+			index: {
+				method: 'POST',
+				params: {cmd: 'organisations.index'},
+				isArray: true
+			},
 			list: {
 				method: 'POST',
-				params: {cmd: 'organisations'},
+				params: {cmd: 'organisations.list'},
 				isArray: true
 			},
 			delete: {

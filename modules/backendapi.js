@@ -202,7 +202,18 @@ module.exports = function (lobbycloud, i18n) {
 				res.json(prepareClientUser(req.user));
 			}
 		},
-		'topics': {
+		'topics.index': {
+			//returns a json with a very simple topics list for the ui
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				lobbycloud.topics.all(function (err, data) {
+					res.json(data.map(function (t) {
+						return {id: t.id, label: t.label};
+					}));
+				});
+			}
+		},
+		'topics.list': {
 			//returns a json with a topic list for the ui
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
@@ -246,7 +257,7 @@ module.exports = function (lobbycloud, i18n) {
 				});
 			}
 		},
-		'queue': {
+		'queue.list': {
 			//returns a json with a organisation list for the ui
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
@@ -334,7 +345,18 @@ module.exports = function (lobbycloud, i18n) {
 				);
 			}
 		},
-		'organisations': {
+		'organisations.index': {
+			//returns a json with a very simple organisation list for the ui
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				lobbycloud.organisations.all(function (err, data) {
+					res.json(data.map(function (t) {
+						return {id: t.id, label: t.name + ' - ' + t.fullname};
+					}));
+				});
+			}
+		},
+		'organisations.list': {
 			//returns a json with a organisation list for the ui
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
@@ -378,7 +400,7 @@ module.exports = function (lobbycloud, i18n) {
 				});
 			}
 		},
-		'users': {
+		'users.list': {
 			//returns a json with a user list for the ui
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
