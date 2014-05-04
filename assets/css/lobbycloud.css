@@ -276,14 +276,19 @@ header {
 				#main .review-queue .panel-heading {
 					
 					position: relative;
-					cursor: pointer;
+					user-select: none;
+					-o-user-select:none;
+					-moz-user-select: none;
+					-khtml-user-select: none;
+					-webkit-user-select: none;
 					
 				}
 					
 					#main .review-queue .panel-heading h3 {
 				
-						margin-right: 25px;
+						margin-right: 50px;
 						white-space: nowrap;
+						cursor: pointer;
 				
 					}
 					
@@ -295,26 +300,49 @@ header {
 							background: rgba(255,255,255,0.2);
 						}
 
-					#main .review-queue .panel-heading .cancel {
-						display: block;
-						position: absolute;
-						right: 30px;
-						top: 0px;
-						bottom: 0px;
-						width: 30px;
-						font-size: 20px;
-						font-weight: bold;
-						text-align: center;
-						padding-left: 2px;
-						line-height: 38px;
-						color: #333;
-						background-color: rgba(255,255,255,0.3);
-					}
-					
-						#main .review-queue .panel-heading .cancel:hover {
-							background-color: #f00;
-							color: #fff;
+						#main .review-queue .panel-heading .panel-buttons {
+							display: block;
+							position: absolute;
+							right: 0px;
+							top: 0px;
+							bottom: 0px;
+							font-size: 20px;
+							font-weight: bold;
+							text-align: center;
+							padding-left: 2px;
+							line-height: 38px;
+							color: #333;
+							background-color: rgba(255,255,255,0.3);
 						}
+
+							#main .review-queue .panel-heading .panel-buttons a {
+								display: block;
+								position: relative;
+								float: left;
+								font-size: 20px;
+								height: 37px;
+								min-width: 25px;
+								line-height: 37px;
+								color: #333;
+								margin: 0px;
+								padding: 0px;
+						
+							}
+
+								#main .review-queue .panel-heading .cancel:hover {
+									background-color: #f00;
+									color: #fff;
+								}
+
+								#main .review-queue .panel-heading .edit:hover {
+									background-color: #333;
+									color: #fff;
+								}
+
+								#main .review-queue .panel-heading .accept:hover {
+									background-color: #bd0;
+									color: #fff;
+								}
 
 					#main .review-queue .panel-heading .folder-toggle {
 						display: block;
@@ -331,11 +359,27 @@ header {
 						background-color: rgba(255,255,255,0.1);
 					}
 
+				#main .review-queue .panel-body p {
+					word-break: break-word;
+					overflow: hidden;
+				}
+
 				#main .review-queue .folder-closed {}
 
 					#main .review-queue .folder-closed .panel-body {
 						display: none;
 					}
+
+		#main .update-form {
+
+			display: block;
+			position: relative;
+			background-color: #fff;
+			box-shadow: 0px 0px 20px -10px rgba(0,0,0,0.5);
+			padding: 20px;
+			margin: 20px -35px 0px 0px;
+
+		}
 		
 		#main .upload-form {
 			

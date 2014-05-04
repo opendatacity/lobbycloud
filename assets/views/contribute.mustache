@@ -1,0 +1,161 @@
+{{>header}}
+<div id="content" class="content about">
+	<div class="headline">
+		<h1>{{#__}}Contribute{{/__}}</h1>
+		<p>Who let the docs out?</p>
+	</div>
+	{{^_user}}
+	<div class="row">
+		<div class="col-md-6">
+			<p>The text, which is not written yet, goes here.</p>
+		</div>
+	</div>
+	{{/_user}}
+	{{#_user}}
+	<div class="row">
+		{{^queue}}
+		<div class="col-md-12">
+			<p>Nothing uploded yet explanatory text</p>
+		</div>
+		{{/queue}}
+		{{#queue}}
+		<div class="col-md-8 col-md-push-4">
+		{{#edit}}
+		<h2>{{#__}}Update document{{/__}} <strong>{{id}}</strong></h2>
+		<div class="update-form">
+			<!-- FIXME: document thumbnails or so here -->
+			<form id="update" method="post" action="{{{_url}}}/contribute/{{id}}/update" role="form">
+				<div class="form-group form-topic prop-select" data-prop="topic">
+					<label for="document-topic">{{#__}}Topic{{/__}}</label>
+					<div class="input-group">
+						<div class="input-group-btn dropdown-action">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No topic{{/__}}</span> <span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="javascript:;" {{^topic}}data-selected=""{{/topic}} data-action="disabled">{{#__}}No topic{{/__}}</a></li>
+								<li class="divider"></li>
+								<li><a href="javascript:;" {{#topic.id}}data-selected="{{topic.id}}"{{/topic.id}} data-action="select">{{#__}}Select topic{{/__}}</a></li>
+								<li><a href="javascript:;" {{#topic.new}}data-selected="{{topic.new}}"{{/topic.new}} data-action="suggest">{{#__}}Suggest new topic{{/__}}</a></li>
+							</ul>
+						</div>
+						<input type="hidden" class="form-control" id="document-topic-search" name="topic-query" placeholder="{{#__}}Search for topics{{/__}}">
+						<input type="text" class="form-control" id="document-topic" name="topic" disabled="disabled" placeholder="{{#__}}Topic{{/__}}">
+					</div>
+				</div>
+				<div class="form-group form-organisation prop-select" data-prop="organisation">
+					<label for="document-organisation">{{#__}}Organisation{{/__}}</label>
+					<div class="input-group">
+						<div class="input-group-btn dropdown-action">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No organisation{{/__}}</span> <span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="javascript:;" {{^organisation}}data-selected=""{{/organisation}} data-action="disabled">{{#__}}No organisation{{/__}}</a></li>
+								<li class="divider"></li>
+								<li><a href="javascript:;" {{#organisation.id}}data-selected="{{organisation.id}}"{{/organisation.id}} data-action="select">{{#__}}Select organisation{{/__}}</a></li>
+								<li><a href="javascript:;" {{#organisation.new}}data-selected="{{organisation.new}}"{{/organisation.new}} data-action="suggest">{{#__}}Suggest new organisation{{/__}}</a></li>
+							</ul>
+						</div>
+						<input type="hidden" class="form-control" id="document-organisation-search" name="organisation-query" placeholder="{{#__}}Search for organisations{{/__}}">
+						<input type="text" class="form-control" id="document-organisation" name="organisation" disabled="disabled" placeholder="{{#__}}Organisation{{/__}}">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="document-tags">{{#__}}Tags, separated by comma{{/__}}</label>
+					<input value="{{tags_value}}" type="text" class="form-control tags-input" id="document-tags" name="tags" data-role="tagsinput" placeholder="{{#__}}Tags{{/__}}">
+				</div>
+				
+				<div class="form-group">
+					<label for="document-lang">{{#__}}Language of the document{{/__}}</label>
+					<select id="document-lang" name="lang" class="form-control" size="1">
+						{{#lang_name}}
+							<option value="{{lang}}" selected="selected">{{lang_name}}</option>
+						{{/lang_name}}
+						{{^lang_name}}
+							<option value="">- {{#__}}Choose a language{{/__}} -</option>
+						{{/lang_name}}
+						{{>lang-options}}
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="document-comment">{{#__}}Comment for the review{{/__}}</label>
+					<textarea id="document-comment" name="comment" class="form-control" rows="3">{{comment}}</textarea>
+				</div>
+
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">{{#__}}Update document{{/__}}</button>
+				</div>
+
+			</form>
+		</div>
+		{{/edit}}
+		{{^edit}}
+			<p>&lt;- there!</p>
+		{{/edit}}
+		</div>
+		<div class="col-md-4 col-md-pull-8">
+			<h2>{{#__}}Upload queue{{/__}}</h2>
+			<p>{{#__}}These are your uploaded documents waiting for processing or approval.{{/__}}</p>
+			<div class="review-queue">
+				{{#items}}
+				<div id="queue-item-{{id}}" class="queue-item queue-item-stage-{{stage}} panel panel-default panel-{{#stage-0}}warning{{/stage-0}}{{#stage-1}}warning{{/stage-1}}{{#stage-2}}error{{/stage-2}}{{#stage-3}}success{{/stage-3}}{{#stage-4}}error{{/stage-4}}{{#stage-5}}error{{/stage-5}} folder folder-closed">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							{{id}}
+							<span class="label">
+								{{#stage-0}}<strong>{{#__}}UPLOADED{{/__}}</strong>{{/stage-0}}
+								{{#stage-1}}<strong>{{#__}}PROCESSED{{/__}}</strong>{{/stage-1}}
+								{{#stage-2}}<strong>{{#__}}FAILED{{/__}}</strong>{{/stage-2}}
+								{{#stage-3}}<strong>{{#__}}ACCEPTED{{/__}}</strong>{{/stage-3}}
+								{{#stage-4}}<strong>{{#__}}DECLINED{{/__}}</strong>{{/stage-4}}
+								{{#stage-5}}<strong>{{#__}}CANCELLED{{/__}}</strong>{{/stage-5}}
+							</span>
+							<span class="label">{{created_formatted}}</span>
+						</h3>
+						<div class="panel-buttons">
+							{{#cancelable}}
+							<a href="javascript:;" class="cancel _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Cancel publishing{{/__}}"><i class="fa fa-times-circle"></i></a>
+							{{/cancelable}}
+							{{#_user._is_editor}}
+							{{#acceptable}}
+							<a href="javascript:;" class="accept _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Publish this{{/__}}"><i class="fa fa-check-circle"></i></a>
+							{{/acceptable}}
+							{{/_user._is_editor}}
+							{{#editable}}
+							<a href="{{{_url}}}/contribute/{{id}}" class="edit _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Edit this{{/__}}"><i class="fa fa-pencil"></i></a>
+							{{/editable}}
+						</div>
+					</div>
+					<div class="panel-body">
+						<p>{{#__}}Uploaded{{/__}}: <strong>{{created_relative}}</strong></p>
+						<p>{{#__}}Last update{{/__}}: <strong>{{updated_relative}}</strong></p>
+						<p>
+							{{#__}}Processing status{{/__}}:
+							{{#stage-0}}<strong>{{#__}}Just uploaded, waiting for automated processing.{{/__}}</strong>{{/stage-0}}
+							{{#stage-1}}<strong>{{#__}}Processed and ready for review.{{/__}}</strong>{{/stage-1}}
+							{{#stage-2}}<strong>{{#__}}Processing failed.{{/__}}</strong>{{/stage-2}}
+							{{#stage-3}}<strong>{{#__}}Accepted.{{/__}}</strong>{{/stage-3}}
+							{{#stage-4}}<strong>{{#__}}Declined.{{/__}}</strong>{{/stage-4}}
+							{{#stage-5}}<strong>{{#__}}Cancelled.{{/__}}</strong>{{/stage-5}}
+						</p>
+						<p>
+							{{#__}}Original Filename{{/__}}: <strong>{{orig}}</strong>
+						</p>
+						{{#________________________________________________________________}}
+						{{#processed}}
+						<div class="thumb-well">
+							{{#data.thumbs}}
+							<img src="{{{_url}}}/{{{_storage}}}/{{{file}}}" alt="" title="">
+							{{/data.thumbs}}
+						</div>
+						{{/processed}}
+						{{/________________________________________________________________}}
+					</div>
+				</div>
+				{{/items}}
+			</div>
+		</div>
+		{{/queue}}
+	</div>
+	{{/_user}}
+</div>
+{{>footer}}

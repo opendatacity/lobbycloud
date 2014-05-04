@@ -319,7 +319,7 @@ module.exports = queue = function(config, db, l){
 				
 				/* check stage */
 				if (doc.stage > 1) return callback(new Error("The document can not be updated"));
-				
+								
 				var update = {};
 								
 				/* check stage */
@@ -335,7 +335,7 @@ module.exports = queue = function(config, db, l){
 					if (data.tags instanceof Array) {
 						/* everything is fine */
 						update.tags = data.tags;
-					} else if (data.tags instanceof String) {
+					} else if (typeof data.tags === "string") {
 						if (data.tags !== "") {
 							/* split by linefeeds, returns, pounds, commas and semicolons */
 							update.tags = data.tags.split(/[,;\r\n\#]+/g).map(function(tag){ return tag.replace(/^\s+|\s+$/g,'') });
@@ -385,6 +385,13 @@ module.exports = queue = function(config, db, l){
 		
 				check_organisation(function(){
 					check_topic(function(){
+
+						// FIXME: check if anything to update
+
+						/* set last modified */
+						update.updated = (new Date());
+
+						console.log(update);
 
 						db.collection("queue").findAndModify({"query":{"id":id},"update":{"$set":update},"new":true}, function(err, doc){
 							if (err) return callback(err);
@@ -601,7 +608,7 @@ module.exports = queue = function(config, db, l){
 		// FIXME: cache the result
 		
 		/* get from collection */
-		db.collection("queue").find(find, function(err, result){
+		db.collection("queue").find(find).sort({"created": -1}, function(err, result){
 			if (err) return callback(err);
 
 			var list = [];

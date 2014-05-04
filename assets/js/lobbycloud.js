@@ -12,19 +12,22 @@ $(document).ready(function(e){
 	/* folder toggle */
 	$(".folder").each(function(idx,f){
 		var $f = $(f);
-		$(".cancel", $f).tooltip().click(function(e){
+		/*$("._tooltip", $f).tooltip().click(function(e){
 			e.stopPropagation();
 			e.preventDefault();
 			$(this).blur();
 			// FIXME: cancel
-		});
-		$(".panel-heading", $f).click(function(e){
+		});*/
+		$(".panel-heading h3", $f).click(function(e){
 			e.preventDefault();
 			$f.toggleClass("folder-closed");
-			$(".folder-toggle i", $f).toggleClass("fa-angle-down").toggleClass("fa-angle-up");
-			$(".folder-toggle", $f).blur();
 		});
-	})
+	});
+	
+	/* check for folder untoggle */
+	if (location.hash && $('.review-queue').length === 1) {
+		$("#queue-item-"+location.hash.substr(1)).removeClass("folder-closed");
+	}
 	
 	/* strengthometer */
 	$("input[type=password].strengthometer").each(function(idx,e){
@@ -90,7 +93,36 @@ $(document).ready(function(e){
 					$v.val("").removeAttr("disabled").attr("type","text").focus();
 				break;
 			}
-		}
+		};
+		
+		var _set = function($f){
+			/* show text on dropdown button */
+			$(".dropdown-label", $e).text($f.text());
+			
+			var _val = $f.attr("data-selected");
+			$f.removeAttr("data-selected");
+			
+			/* do magic */
+			switch ($f.attr("data-action")) {
+				case "disabled":
+					$q.attr("type","hidden");
+					$v.val("").attr("disabled", "disabled").attr("type","text");
+				break;
+				case "select":
+					$q.val(_val).removeAttr("readonly").removeClass("fixed").attr("type","text");
+					$v.val(_val).removeAttr("disabled").attr("type","hidden");
+					$v.val(_val);
+					$q.attr("readonly","readonly").addClass("fixed").one("click", function(evt){
+						$q.val("").removeAttr("readonly").removeClass("fixed");
+						$v.val("");
+					});
+				break;
+				case "suggest":
+					$q.attr("type","hidden");
+					$v.val(_val).removeAttr("disabled").attr("type","text");
+				break;
+			}
+		};
 		
 		$(".dropdown-action .dropdown-menu li a", $e).each(function(idx,f){
 			var $f = $(this);
@@ -100,7 +132,11 @@ $(document).ready(function(e){
 			});
 		});
 		
-		_select($(".dropdown-menu li:first a", $e));
+		if ($(".dropdown-menu li a[data-selected]", $e).length === 1) {
+			_set($(".dropdown-menu li a[data-selected]", $e));
+		} else {
+			_select($(".dropdown-menu li:first a", $e));
+		}
 		
 	});
 	

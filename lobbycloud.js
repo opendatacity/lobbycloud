@@ -289,6 +289,96 @@ var sendProfile = function (profile, req, res) {
 	});
 };
 
+/* contributions */
+app.get('/contribute/:id?', function (req, res) {
+	if (!req.user) return render(req, res, 'contribute', {});
+	l.queue.user(req.user.id, function(err, queue){
+
+		/* check for empty queue */
+		if (queue.length === 0) return render(req, res, 'contribute', {});
+		
+		queue.map(function(item){
+			item["stage-"+item.stage] = true;
+			item["cancelable"] = (item.stage < 2);
+			item["editable"] = (item.stage < 2);
+			item["acceptable"] = (item.stage === 1);
+			item.created_unix = moment(item.created).unix();
+			item.created_formatted = moment(item.created).lang(req.locale||"en").format("YY-MM-DD HH:mm");
+			item.created_relative = moment(item.created).lang(req.locale||"en").fromNow();
+			item.updated_relative = moment(item.updated).lang(req.locale||"en").fromNow();
+			if (item.stage === 1 || item.stage >= 3) item.processed = true;
+		});
+		
+		/* show queue index */
+		if (!req.param("id")) return render(req, res, 'contribute', {queue: {items: queue}});
+		
+		l.queue.check(req.param("id"), function(err, exists, id){
+			if (err) return send500(req, res, err);
+			if (!exists) return send404(req, res);
+			l.queue.get(id, function(err, doc){
+				if (err) return send500(req, res, err);
+
+				/* check privileges */
+				if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user "+req.user.id+" ("+req.user.role+") tried to access queue item "+id));
+				if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document "+id+" stage "+doc.stage));
+
+				/* tags */
+				doc.tags_value = doc.tags.join(",");
+
+				/* lang */
+				if (doc.lang && l.lang.check(doc.lang)) {
+					doc.lang_name = l.lang.get(doc.lang);
+				}
+				
+				/* render form */
+				render(req, res, 'contribute', {
+					queue: {items: queue},
+					edit: doc
+				});
+			});
+		});
+	});
+});
+
+/* contribution update */
+app.post('/contribute/:id/update', function (req, res) {
+	
+	/* only for users */
+	if (!req.user) return res.redirect("/contribute");
+
+	l.queue.check(req.param("id"), function(err, exists, id){
+		if (err) return send500(req, res, err);
+		if (!exists) return send404(req, res);
+	
+		l.queue.get(id, function(err, doc){
+			if (err) return send500(req, res, err);
+
+			/* check privileges */
+			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user "+req.user.id+" ("+req.user.role+") tried to access queue item "+id));
+			if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document "+id+" stage "+doc.stage));
+
+			console.log(req.body);
+
+			l.queue.update(id, {
+				topic: (req.body.topic || null),
+				organisation: (req.body.organisation || null),
+				tags: (req.body.tags || null),
+				lang: (req.body.lang || null),
+				comment: (req.body.comment || null)
+			}, function(err, data){
+				if (err) return send500(req, res, err);
+
+				/* redirect to index :) */
+				res.redirect("/contribute#"+id);
+				
+			});
+			
+		});
+		
+	});
+	
+});
+
 /* profile */
 app.get('/profile', function (req, res) {
 	sendProfile(req.user, req, res);
@@ -672,6 +762,8 @@ app.post('/users/verification/request', function (req, res) {
 var render = function (req, res, name, opt) {
 	var opt = (opt || {});
 	opt._user = req.user;
+	opt._user._is_admin = (req.user.role === "admin");
+	opt._user._is_editor = (req.user.role === "admin" || req.user.role === "editor");
 	opt._url = config.url;
 	opt._storage = config.storage;
 	opt._userrole = {};
