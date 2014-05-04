@@ -401,14 +401,14 @@ app.get('/imprint', function (req, res) {
 	render(req, res, 'imprint', {});
 });
 
-/* engage */
-app.get('/engage', function (req, res) {
-	render(req, res, 'engage', {});
-});
-
-/* browse documents */
+/* about */
 app.get('/about', function (req, res) {
 	render(req, res, 'about', {});
+});
+
+/* contribution guidelines */
+app.get('/contribution-guidelines', function (req, res) {
+	render(req, res, 'contribution-guidelines', {});
 });
 
 /* browse documents */
