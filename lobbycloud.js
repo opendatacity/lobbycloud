@@ -889,6 +889,12 @@ app.get('/api/whatever', function (req, res) {
 });
 */
 
+app.get('/research', function (req, res) {
+	// FIXME: put /search here or so
+	res.redirect("/search");
+});
+
+
 /* search */
 app.all('/search', function (req, res) {
 	var q = (req.body.query || req.query.query || "").replace(/\*/g,'');
