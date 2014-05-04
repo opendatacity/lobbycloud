@@ -44,7 +44,7 @@
     <hr/>
     <div class="row">
         <div class="col-md-12">
-            <table class="table table-responsive table-topics ng-table-rowselected" ng-table="tableParams" show-filter="true">
+            <table class="table table-responsive table-topics table-hover ng-table-rowselected" ng-table="tableParams" show-filter="true">
                 <thead>
                 <tr>
                     <th class="sortable" ng-class="{
@@ -75,18 +75,18 @@
                 </tr>
                 </thead>
 
-                <tr ng-repeat="topic in $data" ng-class="{'selected': topic.$selected}" ng-click="topic.$selected = !topic.$selected">
+                <tr ng-repeat="topic in $data" ng-class="{'selected': topic.$selected}" ng-click="topic.$selected = !topic.$selected" class="row-item">
                     <td filter="{ 'label': 'text' }" sortable="'label'">{{topic.label}}</td>
                     <td filter="{ 'subject': 'text' }" sortable="'subject'">{{topic.subject}}</td>
                     <td filter="{ 'description': 'text' }" sortable="'description'">{{topic.description}}</td>
                     <td sortable="'created'">{{topic.created | amDateFormat:'LLL'}}</td>
-                    <td>
+                    <td class="row-actions">
                         <div ng-if="topic.$processing">
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
                         <div ng-show="!topic.$processing">
-                            <i class="btn btn-default fa fa-edit" title="{{'Edit Topic'|translate}}" ng-click="editDialog(topic)"/>
-                            <i class="btn btn-default fa fa-trash-o" title="{{'Delete Topic'|translate}}" ng-click="deleteDialog(topic)"/>
+                            <a href="" class="btn btn-default btn-sm" title="{{'Edit Topic'|translate}}" ng-click="editDialog(topic)"><i class="fa fa-edit"/></a>
+                            <a href="" class="btn btn-default btn-sm" title="{{'Delete Topic'|translate}}" ng-click="deleteDialog(topic)"><i class="fa fa-trash-o"/></a>
                         </div>
                     </td>
                 </tr>
@@ -96,18 +96,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/ng-template" id="deleteTopicDialog.html">
-    <div class="modal-header">
-        <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" translate>Delete Topic?</h4>
-    </div>
-    <div class="modal-body">
-        <p translate>Sure to delete topic {{data.subject}}?</p>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()" translate>OK</button>
-        <button class="btn btn-warning" ng-click="cancel()" translate>Cancel</button>
-    </div>
-</script>
-

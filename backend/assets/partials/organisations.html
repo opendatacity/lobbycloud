@@ -44,7 +44,7 @@
     <hr/>
     <div class="row">
         <div class="col-md-12">
-            <table class="table table-responsive table-organisations ng-table-rowselected" ng-table="tableParams" show-filter="true">
+            <table class="table table-responsive table-organisations table-hover ng-table-rowselected" ng-table="tableParams" show-filter="true">
                 <thead>
                 <tr>
                     <th class="sortable" ng-class="{
@@ -75,18 +75,18 @@
                 </tr>
                 </thead>
 
-                <tr ng-repeat="org in $data" ng-class="{'selected': org.$selected}" ng-click="org.$selected = !org.$selected">
+                <tr ng-repeat="org in $data" ng-class="{'selected': org.$selected}" ng-click="org.$selected = !org.$selected" class="row-item">
                     <td filter="{ 'name': 'text' }" sortable="'name'">{{org.name}}</td>
                     <td filter="{ 'fullname': 'text' }" sortable="'fullname'">{{org.fullname}}</td>
                     <td filter="{ 'description': 'text' }" sortable="'description'">{{org.description}}</td>
                     <td sortable="'created'">{{org.created | amDateFormat:'LLL'}}</td>
-                    <td>
+                    <td class="row-actions">
                         <div ng-if="org.$processing">
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
                         <div ng-show="!org.$processing">
-                            <i class="btn btn-default fa fa-edit" title="{{'Edit Organisation'|translate}}" ng-click="editDialog(org)"/>
-                            <i class="btn btn-default fa fa-trash-o" title="{{'Delete Organisation'|translate}}" ng-click="deleteDialog(org)"/>
+                            <a href="" class="btn btn-default btn-sm" title="{{'Edit Organisation'|translate}}" ng-click="editDialog(org)"><i class="fa fa-edit" /></a>
+                            <a href="" class="btn btn-default btn-sm" title="{{'Delete Organisation'|translate}}" ng-click="deleteDialog(org)"><i class="fa fa-trash-o" /></a>
                         </div>
                     </td>
                 </tr>
@@ -96,65 +96,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/ng-template" id="editOrganisationDialog.html">
-    <form role="form" name="form">
-
-        <div class="modal-header">
-            <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">
-                <span ng-show="data.organisation.create" translate>New Organisation</span>
-                <span ng-show="!data.organisation.create" translate>Edit Organisation</span>
-            </h4>
-        </div>
-
-        <div class="modal-body">
-            <div class="row">
-                <div class="form-group col-sm-6">
-                    <label translate>Name</label>
-                    <input type="text" class="form-control" placeholder="{{'Name'|translate}}" ng-model="data.organisation.name" required>
-                </div>
-                <div class="form-group col-sm-6">
-                    <label translate>Full name</label>
-                    <input type="text" class="form-control" placeholder="{{'Full name'|translate}}" ng-model="data.organisation.fullname">
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-6">
-                    <label translate>Logo</label>
-                    <input type="url" class="form-control" placeholder="{{'Logo'|translate}}" ng-model="data.organisation.logo" required>
-                </div>
-                <div class="form-group col-sm-6">
-                    <label translate>Website</label>
-                    <input type="url" class="form-control" placeholder="{{'Website URL'|translate}}" ng-model="data.organisation.url">
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-12">
-                    <label translate>Description</label>
-                    <textarea class="form-control" rows="3" placeholder="{{'Description'|translate}}" ng-model="data.organisation.description"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="ok(form)" translate>OK</button>
-            <button class="btn btn-warning" ng-click="cancel()" translate>Cancel</button>
-        </div>
-    </form>
-</script>
-
-<script type="text/ng-template" id="deleteOrganisationDialog.html">
-    <div class="modal-header">
-        <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" translate>Delete Organisation?</h4>
-    </div>
-    <div class="modal-body">
-        <p translate>Sure to delete organisation {{data.name}}?</p>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()" translate>OK</button>
-        <button class="btn btn-warning" ng-click="cancel()" translate>Cancel</button>
-    </div>
-</script>
-

@@ -17,7 +17,7 @@
                     <img ng-src="{{slide.file}}">
 
                     <div class="carousel-caption">
-                        <strong style="color: #000">Page {{$index+1}}</strong>
+                        <strong style="color: #000"><span translate>Page</span> {{$index+1}}</strong>
                     </div>
                 </slide>
             </carousel>
@@ -26,47 +26,50 @@
             <form role="form" name="form">
                 <div class="form-group">
                     <label translate>Topic</label>
+
                     <div class="input-group">
 
                         <div class="has-feedback">
-                            <input type="text" class="form-control" options="typeaheadOptions" datasets="datasetTopic" ng-model="doc.topic.label" ngtypeahead>
-                            <span ng-show="(!doc.topic.id) && (doc.topic.label)" title="Add Topic" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="addTopicDialog()"></span>
+                            <input type="text" class="form-control" options="typeaheadOptions" datasets="datasetTopic" ng-model="doc.topic.label" ng-dblclick="selectTopicDialog()" ngtypeahead>
+                            <span ng-show="(!doc.topic.id) && (doc.topic.label)" title="{{'Add Topic'|translate}}" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="addTopicDialog()"></span>
                             <span ng-show="doc.topic.id" class="glyphicon glyphicon-ok text-success form-control-feedback"></span>
                         </div>
 
                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" ng-click="selectTopicDialog()"><span class="caret"></span></button>
+                            <button type="button" class="btn btn-default" title="{{'Select Topic'|translate}}" ng-click="selectTopicDialog()"><span class="caret"></span></button>
                         </span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label translate>Organisation</label>
+
                     <div class="input-group">
 
                         <div class="has-feedback">
-                            <input type="text" class="form-control" options="typeaheadOptions" datasets="datasetOrganisation" ng-model="doc.organisation.label" ngtypeahead>
-                            <span ng-show="(!doc.organisation.id) && (doc.organisation.label)" title="Add Organisation" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="addOrganisationDialog()"></span>
+                            <input type="text" class="form-control" options="typeaheadOptions" datasets="datasetOrganisation" ng-model="doc.organisation.label" ng-dblclick="selectOrganisationDialog()" ngtypeahead>
+                            <span ng-show="(!doc.organisation.id) && (doc.organisation.label)" title="{{'Add Organisation'|translate}}" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="addOrganisationDialog()"></span>
                             <span ng-show="doc.organisation.id" class="glyphicon glyphicon-ok text-success form-control-feedback"></span>
                         </div>
 
                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" title="Select Organisation" ng-click="selectOrganisationDialog()"><span class="caret"></span></button>
+                            <button type="button" class="btn btn-default" title="{{'Select Organisation'|translate}}" ng-click="selectOrganisationDialog()"><span class="caret"></span></button>
                         </span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label translate>Language</label>
+
                     <div class="input-group">
 
                         <div class="has-feedback">
-                            <input type="text" class="form-control" options="typeaheadOptions2" datasets="datasetLangs" ng-model="lang" ngtypeahead>
+                            <input type="text" class="form-control" options="typeaheadOptions2" datasets="datasetLangs" ng-model="lang" ng-dblclick="selectLanguageDialog()" ngtypeahead>
                             <span ng-show="doc.lang.id" class="glyphicon glyphicon-ok text-success form-control-feedback"></span>
                         </div>
 
                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" title="Select Language" ng-click="selectLanguageDialog()"><span class="caret"></span></button>
+                            <button type="button" class="btn btn-default" title="{{'Select Language'|translate}}" ng-click="selectLanguageDialog()"><span class="caret"></span></button>
                         </span>
                     </div>
                 </div>
@@ -96,14 +99,14 @@
             <div class="clearfix"></div>
             <div class="doc-info">
                 <ul class="list-unstyled">
-                    <li class="text-info">File Informations</li>
-                    <li><span>Filename:</span> {{doc.orig}}</li>
-                    <li><span>Uploaded:</span> {{doc.created | amDateFormat:'LLL'}}</li>
-                    <li><span>Title:</span> {{doc.info.title}}</li>
-                    <li><span>Subject:</span> {{doc.info.subject}}</li>
-                    <li><span>Author:</span> {{doc.info.author}}</li>
-                    <li><span>Keywords:</span> {{doc.info.keywords}}</li>
-                    <li><span>Pages:</span> {{doc.info.pages}}</li>
+                    <li class="text-info" translate>File Informations</li>
+                    <li><span translate>Filename</span> {{doc.orig}}</li>
+                    <li><span translate>Uploaded</span> {{doc.created | amDateFormat:'LLL'}}</li>
+                    <li><span translate>Title</span> {{doc.info.title}}</li>
+                    <li><span translate>Subject</span> {{doc.info.subject}}</li>
+                    <li><span translate>Author</span> {{doc.info.author}}</li>
+                    <li><span translate>Keywords</span> {{doc.info.keywords}}</li>
+                    <li><span translate>Pages</span> {{doc.info.pages}}</li>
                 </ul>
             </div>
         </div>

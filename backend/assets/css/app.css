@@ -52,11 +52,15 @@
 
 #nav-lang {
     position: absolute;
-    bottom: 16px;
+    bottom: 11px;
 }
 
 #nav-lang a {
     margin: 6px;
+}
+
+.btn-sm {
+  /*padding: 2px;*/
 }
 
 /* central start page */
@@ -69,39 +73,42 @@
     margin-right: 6px;
 }
 
-/* queue item edit */
+/* lists */
 
-/* queue & doc list */
+.row-item td {
+    padding-top: 12px !important;
+}
 
-.doc-item tr.dropdown-row {
+.row-item td.row-actions {
+    padding-top: 8px !important;
+}
+
+.row-item tr.dropdown-row {
     background-color: #fff;
     border: 1px solid #DDDDDD;
     text-align: center;
 }
 
-.doc-item td img.thumb {
+.row-item td img.thumb {
     height: 26px;
+    margin-top: -2px;
 }
 
-.doc-item td.doc-actions {
-    padding: 4px 0 0;
-}
-
-.doc-item td .carousel {
+.row-item td .carousel {
     margin-right: 30px;
 }
 
-.doc-item td .carousel-indicators {
+.row-item td .carousel-indicators {
     bottom: 10px;
     color: #000;
 }
 
-.doc-item td .carousel-indicators {
+.row-item td .carousel-indicators {
     bottom: 10px;
     color: #000;
 }
 
-.doc-item td .carousel-caption {
+.row-item td .carousel-caption {
     bottom: 0;
     color: #000;
     padding-bottom: 4px;
