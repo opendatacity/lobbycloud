@@ -391,8 +391,25 @@ app.get('/topics', function (req, res) {
 });
 
 /* topic */
-app.get('/topics/:id', function (req, res) {
-	render(req, res, 'topics', {});
+app.get('/topic/:id', function (req, res) {
+	l.topics.check(req.param("id"), function(err, exists, id){
+		if (err) return send500(req, res, err);
+		if (!exists) return send404(req, res);
+		l.topics.get(id, function(err, topic){
+			if (err) return send500(req, res, err);
+			/* get documents for organisation */
+			l.documents.by_topic(id, function(err, docs){
+				if (err) return send500(req, res, err);
+				docs.map(function(doc){
+					doc.created_ago = moment(doc.created).lang(req.locale||"en").calendar(true);
+				});
+				render(req, res, 'topic', {
+					topic: topic,
+					documents: docs
+				});
+			});
+		});
+	});
 });
 
 /* browse organisations */

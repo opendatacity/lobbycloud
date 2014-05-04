@@ -1,44 +1,27 @@
 {{>header}}
-<div id="content" class="content">
+<div id="content" class="content topics">
+	<div class="headline">
+		<h1>{{#__}}Topics{{/__}}</h1>
+	</div>
 	{{#topics}}
 	<div class="row">
-		{{#features}}
-		<div class="col-md-12">
-			<h2>{{label}}</h2>
-			<p><strong>{{subject}}</strong></p>
-			<p>[FIXME: topic image here]</p>
-			<p>
-				{{description}}
-			</p>
-			<p>
-				<a href="{{{_url}}}/topics/{{id}}" class="btn btn-primary" role="button">{{#__}}Details{{/__}}</a>
-			</p>
-		</div>
-		{{/features}}
 		{{#list}}
-		<div class="col-md-6">
-			<h2>{{label}}</h2>
-			<p><strong>{{subject}}</strong></p>
-			<p>
-				{{description}}
-			</p>
-			<p>
-				<a href="{{{_url}}}/topics/{{id}}" class="btn btn-primary" role="button">{{#__}}Details{{/__}}</a>
-			</p>
+		<div class="col-md-4">
+			<div class="item clearfix">
+				<h2><a href="{{_url}}/topic/{{id}}">{{label}}</a></h2>
+				<p class="subject"><a href="{{_url}}/topic/{{id}}"><strong>{{subject}}</strong></a></p>
+				{{#description}}
+				<p class="description">
+					{{description}}
+				</p>
+				<p>
+					<a href="{{_url}}/topic/{{id}}" class="btn btn-xs btn-primary pull-right">{{#__}}View topic{{/__}} <i class="fa fa-arrow-right"></i></a>
+				</p>
+				{{/description}}
+			</div>
 		</div>
 		{{/list}}
-		[FIXME: pagination here]
 	</div>
 	{{/topics}}
-	{{#topic}}
-	<div class="row">
-		<div class="col-md-12">
-			<h2>topic, yay!</h2>
-			<p>
-				...
-			</p>
-		</div>
-	</div>
-	{{/topic}}
 </div>
 {{>footer}}
