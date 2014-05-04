@@ -207,6 +207,7 @@ module.exports = documents = function(config, db, l){
 	documents.all = function(callback) {	
 		db.collection("documents").find({}, function(err, result){
 			if (err) return callback(err);
+			if (result.length === 0) return callback(null, []);
 			var list = [];
 			result.forEach(function(r){
 				/* add to result set */
@@ -241,6 +242,7 @@ module.exports = documents = function(config, db, l){
 		/* get from collection */
 		db.collection("documents").find(find, function(err, result){
 			if (err) return callback(err);
+			if (result.length === 0) return callback(null, []);
 
 			var list = [];
 			result.forEach(function(r){
@@ -278,6 +280,7 @@ module.exports = documents = function(config, db, l){
 		/* get from collection */
 		db.collection("documents").find(find, function(err, result){
 			if (err) return callback(err);
+			if (result.length === 0) return callback(null, []);
 
 			var list = [];
 			result.forEach(function(r){
@@ -311,6 +314,7 @@ module.exports = documents = function(config, db, l){
 		/* get from collection */
 		db.collection("documents").find(find, function(err, result){
 			if (err) return callback(err);
+			if (result.length === 0) return callback(null, []);
 
 			var list = [];
 			result.forEach(function(r){
@@ -331,6 +335,7 @@ module.exports = documents = function(config, db, l){
 	
 	/* add organisation data to an array of organisations */
 	documents.add_organisations = function(list, callback) {
+		if (list.length === 0) return callback(null, list);
 		var _completed = 0;
 		list.forEach(function(item){
 			l.organisations.get(item.organisation, function(err, org){
@@ -346,6 +351,7 @@ module.exports = documents = function(config, db, l){
 	
 	/* add topic data to an array of organisations */
 	documents.add_topics = function(list, callback) {
+		if (list.length === 0) return callback(null, list);
 		var _completed = 0;
 		list.forEach(function(item){
 			l.topics.get(item.topic, function(err, topic){
