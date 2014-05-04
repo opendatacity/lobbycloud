@@ -76,6 +76,7 @@
 
 .row-item td.row-actions {
     padding-top: 8px !important;
+    white-space: nowrap;
 }
 
 .row-item tr.dropdown-row {

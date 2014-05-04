@@ -64,13 +64,18 @@
                 <a class="navbar-brand" ui-sref="start">Lobby<strong>Cloud</strong>Central</a>
             </div>
             <nav role="navigation" class="collapse navbar-collapse bs-navbar-collapse">
-                <ul id="nav-site" class="nav navbar-nav" ng-class="{ hidden: !isLoggedIn()}">
+                <ul id="nav-site" class="nav navbar-nav navbar-main" ng-class="{ hidden: !isLoggedIn()}">
                     <!--<li ui-sref-active="active"><a ui-sref="upload" translate>Upload</a></li>-->
                     <li ui-sref-active="active"><a ui-sref="queue" translate>Queue</a></li>
                     <li ui-sref-active="active"><a ui-sref="docs" translate>Documents</a></li>
-                    <li ui-sref-active="active"><a ui-sref="topics" translate>Topics</a></li>
-                    <li ui-sref-active="active"><a ui-sref="organisations" translate>Organisations</a></li>
-                    <li ng-show="access(accessLevels.admin)" ui-sref-active="active"><a ui-sref="users" translate>Users</a></li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" href ng-init="dropopen = false" ng-click="dropopen = !dropopen">Administration <b class="caret"></b></a>
+                        <ul class="dropdown-menu" ng-class="{'open':!dropopen}">
+                                <li ui-sref-active="active"><a ui-sref="topics" translate>Topics</a></li>
+                            <li ui-sref-active="active"><a ui-sref="organisations" translate>Organisations</a></li>
+                            <li ng-show="access(accessLevels.admin)" ui-sref-active="active"><a ui-sref="users" translate>Users</a></li>
+                        </ul>
+                    </li>
                  </ul>
                 <ul class="nav navbar-nav navbar-right navbar-user">
                     <li ng-show="isLoggedIn()"><a href="/profile" class="profile"><i class="fa fa-user"></i> {{account.name}}</a></li>
