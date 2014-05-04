@@ -1,20 +1,58 @@
 {{>header}}
 <div id="content" class="content document">
 	{{#document}}
-	<h1>{{#__}}Document{{/__}} <strong>{{id}}</strong></h1>
-	<p>&lt;3</p>
+	<div class="headline">
+		<div class="row">
+			<div class="col-md-8">
+				<h1>{{#__}}Document{{/__}} <strong>{{id}}</strong></h1>
+				{{#topic}}
+				<p>
+					{{#__}}Topic{{/__}}: 
+					<a href="{{_url}}/topic/{{topic}}" title="{{topic_data.subject}}"><strong>{{topic_data.label}}</strong></a>
+					{{#organisation}}<br />{{/organisation}}
+				{{/topic}}
+				{{#organisation}}
+					{{#__}}Organisation{{/__}}:
+					<a href="{{_url}}/organisation/{{organisation}}" title="{{organisation_data.fullname}}"><strong>{{organisation_data.name}}</strong></a>
+				</p>
+				{{/organisation}}
+			</div>
+			<div class="col-md-4">
+				<p class="tags">
+					{{#tags}}<span class="label label-primary">{{.}}</span>{{/tags}}
+				</p>
+			</div>
+		</div>
+	</div>
 	<div class="row">
 		<div class="col-md-8">
-			<div class="viewer">
-				{{#data.images}}
-					<img src="{{_url}}/{{_storage}}/{{file}}" />
-				{{/data.images}}
+			
+			<ul class="nav nav-tabs">
+			  <li class="active"><a href="#viewer" data-toggle="tab">{{#__}}PDF Viewer{{/__}}</a></li>
+			  <li><a href="#text" data-toggle="tab">{{#__}}Extracted Text{{/__}}</a></li>
+			</ul>
+			
+			<div class="tab-content">
+				<div class="tab-pane active" id="viewer">
+					<div class="viewer">
+						{{#data.images}}
+							<img src="{{_url}}/{{_storage}}/{{file}}" draggable="false" />
+						{{/data.images}}
+					</div>
+				</div>
+				<div class="tab-pane" id="text">
+					<div class="text">
+						{{#data.text_lines}}
+						<p>{{.}}</p>
+						{{/data.text_lines}}
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="col-md-4">
 
 			<div class="btn-group btn-group-justified">
-				<a href="{{_url}}/{{_storage}}/{{file}}" class="btn btn-primary btn-lg"><i class="fa fa-download"></i> Download PDF</a>
+				<a href="{{_url}}/document/{{id}}/download" class="btn btn-primary btn-lg"><i class="fa fa-download"></i> Download PDF</a>
 			</div>
 
 			<h3>{{#__}}Short Link{{/__}}</h3>

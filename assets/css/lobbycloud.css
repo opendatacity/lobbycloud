@@ -514,6 +514,25 @@ header {
 		
 			}
 
+				#main .content .headline p a {
+				
+					color: #fff;
+					text-decoration: none;
+					
+				}
+
+			#main .content .headline p.tags {
+				
+				text-align: right;
+				font-size: 1.4em;
+				padding: 30px 0px 0px;
+				
+			}
+			
+				#main .content .headline p.tags .label {
+					margin: 5px;
+				}
+
 	#main .content.err {
 
 		background: rgba(255,255,255,0.1) url(../img/intro-pattern.png) center center repeat;
@@ -594,6 +613,27 @@ header {
 
 	#main .document {}
 
+		#main .document .text {
+		
+			display: block;
+			position: relative;
+			background-color: #fff;
+			padding: 30px;
+			border: 1px solid #ddd;
+			border-top-width: 0px;
+			max-height: 500px;
+			overflow: hidden;
+			overflow-x: hidden;
+			overflow-y: scroll;
+			
+		}
+			#main .document .text p:last-child {
+			
+				margin-bottom: 30px;
+				
+			}
+			
+
 		#main .document .viewer {
 			
 			display: block;
@@ -615,7 +655,12 @@ header {
 				background-color: #fff;
 				box-shadow: 0px 0px 20px -15px rgba(0,0,0,0.25);
 				margin-bottom: 20px;
-				
+				pointer-events: none;
+				user-select: none;
+				-o-user-select:none;
+				-moz-user-select: none;
+				-khtml-user-select: none;
+				-webkit-user-select: none;
 			}
 			
 		#main .document .list-group-item strong {

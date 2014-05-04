@@ -364,6 +364,42 @@ module.exports = documents = function(config, db, es, l){
 		});	
 	};
 
+	/* add organisation data to an array of organisations */
+	documents.add_organisation = function(item, callback) {
+		if (!item.hasOwnProperty("organisation") || item.organisation === null) return callback(null, item);
+		l.organisations.get(item.organisation, function(err, org){
+			/* be fault tolerant */
+			if (!err) item.organisation_data = org;
+			callback(null, item);
+		});
+	};
+	
+	/* add topic data to an array of organisations */
+	documents.add_topic = function(item, callback) {
+		if (!item.hasOwnProperty("topic") || item.topic === null) return callback(null, item);
+		l.topics.get(item.topic, function(err, topic){
+			/* be fault tolerant */
+			if (!err) item.topic_data = topic;
+			callback(null, item);
+		});
+	};
+
+	/* increments stats.views by one */
+	documents.count_view = function(id, callback) {
+		db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$inc": {"stats.views": 1}}, "new": true}, function (err, doc) {
+			if (err) return console.error("[document]", "count view", err);
+			cache[id] = doc;
+		});
+	};
+
+	/* increments stats.downloads by one */
+	documents.count_download = function(id, callback) {
+		db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$inc": {"stats.downloads": 1}}, "new": true}, function (err, doc) {
+			if (err) return console.error("[document]", "count view", err);
+			cache[id] = doc;
+		});
+	};
+
 	return this;
 	
 };
