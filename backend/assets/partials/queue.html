@@ -30,7 +30,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <table class="table table-responsive table-docs ng-table-rowselected" ng-table="tableParams" show-filter="true">
+            <table class="table table-responsive table-hover table-docs ng-table-rowselected" ng-table="tableParams" show-filter="true">
                 <thead>
                 <tr>
                     <th class="sortable" ng-class="{
@@ -68,23 +68,24 @@
                     <th translate>Actions</th>
                 </tr>
                 </thead>
-                <tbody ng-repeat="doc in $data" class="doc-item">
+                <tbody ng-repeat="doc in $data" class="row-item">
                 <tr ng-class="{'selected': doc.$selected}">
                     <td class="clickable" ng-click="selectRow(doc)" filter="{ 'orig': 'text' }" sortable="'orig'">
                         <img class="thumb" ng-src="{{doc.thumbs[0].file}}"/>
-                        {{doc.orig}}</td>
+                        {{doc.orig}}
+                    </td>
                     <td sortable="'uploaded'">{{doc.created | amDateFormat:'LLL'}}</td>
                     <td sortable="'topic'">{{doc.topic.label}}</td>
                     <td sortable="'organisation'">{{doc.organisation.label}}</td>
                     <td sortable="'pages'">{{doc.info.pages}}</td>
-                    <td class="doc-actions">
+                    <td class="row-actions">
                         <div ng-show="doc.$processing">
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
                         <div ng-show="!doc.$processing">
-                            <a href="" class="btn btn-default btn-sm" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"><i class="fa fa-edit" /></a>
-                            <a href="" class="btn btn-default btn-sm" title="{{'Decline Document'|translate}}" ng-click="decline(doc)" eat-click><i class="fa fa-ban" /></a>
-                            <a href="" class="btn btn-default btn-sm" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(doc)" eat-click><i class="fa fa-trash-o" /></a>
+                            <a href="" class="btn btn-default btn-sm" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"><i class="fa fa-edit"/></a>
+                            <a href="" class="btn btn-default btn-sm" title="{{'Decline Document'|translate}}" ng-click="decline(doc)" eat-click><i class="fa fa-ban"/></a>
+                            <a href="" class="btn btn-default btn-sm" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(doc)" eat-click><i class="fa fa-trash-o"/></a>
                         </div>
                     </td>
                 </tr>
@@ -95,7 +96,7 @@
                                 <img ng-src="{{slide.file}}">
 
                                 <div class="carousel-caption">
-                                    <strong style="color: #000">Page {{$index+1}}</strong>
+                                    <strong style="color: #000"><span translate>Page</span> {{$index+1}}</strong>
                                 </div>
                             </slide>
                         </carousel>
@@ -103,20 +104,20 @@
                         <div class="doc-info inlineblock">
                             <ul class="list-unstyled">
                                 <li class="text-info">Meta Informations</li>
-                                <li><span>Topic:</span> {{doc.topic.label}}</li>
-                                <li><span>Organisation:</span> {{doc.organisation.label}}</li>
-                                <li><span>Tags:</span> {{doc.tags.join(',')}}</li>
-                                <li><span>Language:</span> {{doc.lang}}</li>
+                                <li><span translate>Topic</span> {{doc.topic.label}}</li>
+                                <li><span translate>Organisation</span> {{doc.organisation.label}}</li>
+                                <li><span translate>Tags</span> {{doc.tags.join(',')}}</li>
+                                <li><span translate>Language</span> {{doc.lang}}</li>
                             </ul>
                             <ul class="list-unstyled">
                                 <li class="text-info">File Informations</li>
-                                <li><span>Filename:</span> {{doc.orig}}</li>
-                                <li><span>Uploaded:</span> {{doc.created | amDateFormat:'LLL'}}</li>
-                                <li><span>Title:</span> {{doc.info.title}}</li>
-                                <li><span>Subject:</span> {{doc.info.subject}}</li>
-                                <li><span>Author:</span> {{doc.info.author}}</li>
-                                <li><span>Keywords:</span> {{doc.info.keywords}}</li>
-                                <li><span>Pages:</span> {{doc.info.pages}}</li>
+                                <li><span translate>Filename</span> {{doc.orig}}</li>
+                                <li><span translate>Uploaded</span> {{doc.created | amDateFormat:'LLL'}}</li>
+                                <li><span translate>Title</span> {{doc.info.title}}</li>
+                                <li><span translate>Subject</span> {{doc.info.subject}}</li>
+                                <li><span translate>Author</span> {{doc.info.author}}</li>
+                                <li><span translate>Keywords</span> {{doc.info.keywords}}</li>
+                                <li><span translate>Pages</span> {{doc.info.pages}}</li>
                             </ul>
                         </div>
                     </td>
@@ -126,17 +127,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/ng-template" id="deleteQueueItemDialog.html">
-    <div class="modal-header">
-        <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" translate>Delete Queue Item?</h4>
-    </div>
-    <div class="modal-body">
-        <p translate>Sure to delete queue item {{data.orig}}?</p>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()" translate>OK</button>
-        <button class="btn btn-warning" ng-click="cancel()" translate>Cancel</button>
-    </div>
-</script>

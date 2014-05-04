@@ -1,0 +1,71 @@
+<form role="form" name="form">
+
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+            <span ng-show="data.user.create" translate>New User</span>
+            <span ng-show="!data.user.create" translate>Edit User</span>
+        </h4>
+    </div>
+
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="form-group col-sm-6">
+                <label translate>Login name</label>
+                <input type="text" class="form-control" placeholder="{{'Login name'|translate}}" ng-model="data.user.id" required>
+            </div>
+            <div class="form-group col-sm-6">
+                <label translate>Password</label>
+                <input ng-if="!user.create" type="text" class="form-control" placeholder="{{'(leave empty for no changes)'|translate}}" ng-model="data.user.password">
+                <input ng-if="user.create" type="text" class="form-control" placeholder="{{'Password'|translate}}" ng-model="data.user.password" required>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-sm-6">
+                <label translate>Full name</label>
+                <input type="text" class="form-control" placeholder="{{'Full name'|translate}}" ng-model="data.user.name">
+            </div>
+            <div class="form-group col-sm-6">
+                <label translate>Organisation</label>
+                <input type="text" class="form-control" placeholder="{{'Organisation'|translate}}" ng-model="data.user.organisation">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-sm-6">
+                <label translate>Email</label>
+                <input type="email" class="form-control" placeholder="{{'Email adress'|translate}}" ng-model="data.user.email" required>
+            </div>
+            <div class="form-group col-sm-6">
+                <label translate>Website</label>
+                <input type="url" class="form-control" placeholder="{{'Website URL'|translate}}" ng-model="data.user.url">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-sm-6">
+                <label translate>Location</label>
+                <input type="text" class="form-control" placeholder="{{'Location'|translate}}" ng-model="data.user.location">
+            </div>
+            <div class="form-group col-sm-6">
+                <label translate>Role</label>
+                <select ng-model="data.user.role" class="form-control" ng-options="c for c in data.userRoles" required></select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-sm-12">
+                <label translate>Description</label>
+                <textarea class="form-control" rows="3" placeholder="{{'Description'|translate}}" ng-model="data.user.description"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok(form)" translate>OK</button>
+        <button class="btn btn-warning" ng-click="cancel()" translate>Cancel</button>
+    </div>
+
+</form>

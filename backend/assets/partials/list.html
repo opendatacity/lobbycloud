@@ -1,0 +1,21 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">
+        <span><span translate>Select</span> {{data.prop}}</span>
+    </h4>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-sm-12">
+            <ul class="list-unstyled">
+                <li class="list-group-item clickable" ng-repeat="item in data.list" ng-click="data.selected=item" ng-dblclick="ok()" ng-class="{'selected':data.selected.id===item.id}">{{item.label}}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-class="{'disabled':(!data.selected.id)}" ng-click="ok()" translate>OK</button>
+    <button class="btn btn-warning" ng-click="cancel()" translate>Cancel</button>
+</div>

@@ -2,6 +2,89 @@
 
 /* Controllers */
 
+var editModalDialog = function ($modal, data, templateUrl, cb) {
+	var modalInstance = $modal.open({
+		templateUrl: templateUrl,
+		controller: function ($scope, $modalInstance, data) {
+
+			$scope.data = data;
+
+			$scope.ok = function (form) {
+				if (form.$valid)
+					$modalInstance.close($scope.data);
+			};
+
+			$scope.cancel = function () {
+				$modalInstance.dismiss('cancel');
+			};
+		},
+		resolve: {
+			data: function () {
+				return data;
+			}
+		}
+	});
+
+	modalInstance.result.then(function (data) {
+		cb(data);
+	}, function () {
+//			$log.info('Modal dismissed at: ' + new Date());
+	});
+};
+var listModalDialog = function ($modal, data, cb) {
+	var modalInstance = $modal.open({
+		templateUrl: 'partials/list.html',
+		controller: function ($scope, $modalInstance, data) {
+
+			$scope.data = data;
+
+			$scope.ok = function () {
+				$modalInstance.close($scope.data.selected);
+			};
+
+			$scope.cancel = function () {
+				$modalInstance.dismiss('cancel');
+			};
+		},
+		resolve: {
+			data: function () {
+				return data;
+			}
+		}
+	});
+
+	modalInstance.result.then(function (data) {
+		cb(data);
+	}, function () {
+//			$log.info('Modal dismissed at: ' + new Date());
+	});
+};
+var deleteModalDialog = function ($modal, data, cb) {
+	var modalInstance = $modal.open({
+		templateUrl: 'partials/ask.html',
+		controller: function ($scope, $modalInstance, data) {
+			$scope.data = data;
+			$scope.ok = function () {
+				$modalInstance.close($scope.data);
+			};
+			$scope.cancel = function () {
+				$modalInstance.dismiss('cancel');
+			};
+		},
+		resolve: {
+			data: function () {
+				return data;
+			}
+		}
+	});
+
+	modalInstance.result.then(function () {
+		cb(data);
+	}, function () {
+//			$log.info('Modal dismissed at: ' + new Date());
+	});
+};
+
 app.controller('BodyController', function ($scope, $state, $window, AuthenticationService, gettextCatalog) {
 	'use strict';
 
@@ -318,7 +401,11 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 	};
 
 	$scope.deleteDialog = function (doc) {
-		deleteModalDialog($modal, doc, 'deleteQueueItemDialog.html', function (ok) {
+		deleteModalDialog($modal, {
+			headline: 'Delete Document',
+			question: 'Are you sure to delete ' + doc.orig + '?'
+
+		}, function (ok) {
 			if (!ok) return;
 			doc.$processing = true;
 			QueueService.delete({id: doc.id},
@@ -518,7 +605,7 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 	$scope.addOrganisationDialog = function () {
 		editModalDialog($modal, {
 			organisation: {
-				create:true,
+				create: true,
 				name: $scope.doc.organisation.label
 			}
 		}, 'partials/organisation.html', function (data) {
@@ -535,10 +622,66 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 		});
 	};
 
+	$scope.selectOrganisationDialog = function () {
+
+		OrganisationsService.index(function (list) {
+			list.sort(function (a, b) {
+				return a.label - b.label;
+			});
+			listModalDialog($modal, {
+				list: list,
+				prop: 'Organisation',
+				selected: $scope.doc.organisation
+			}, function (data) {
+				if (data) {
+					$scope.doc.organisation = data;
+				}
+			});
+
+		}, function (err) {
+			alert(err.data);
+		});
+	};
+
+	$scope.selectLanguageDialog = function () {
+
+		listModalDialog($modal, {
+			list: $scope.langs,
+			prop: 'Language',
+			selected: $scope.doc.lang
+		}, function (data) {
+			if (data) {
+				$scope.doc.lang = data;
+				$scope.lang = data.label;
+			}
+		});
+
+	};
+	$scope.selectTopicDialog = function () {
+
+		TopicsService.index(function (list) {
+			list.sort(function (a, b) {
+				return a.label - b.label;
+			});
+			listModalDialog($modal, {
+				list: list,
+				prop: 'Topics',
+				selected: $scope.doc.topic
+			}, function (data) {
+				if (data) {
+					$scope.doc.topic = data;
+				}
+			});
+
+		}, function (err) {
+			alert(err.data);
+		});
+	};
+
 	$scope.addTopicDialog = function () {
 		editModalDialog($modal, {
 			topic: {
-				create:true,
+				create: true,
 				label: $scope.doc.topic.label
 			}
 		}, 'partials/topic.html', function (data) {
@@ -561,62 +704,6 @@ app.controller('DocsUploadController', function ($scope) {
 	'use strict';
 	//we use the components from the front end
 });
-
-var editModalDialog = function ($modal, data, templateUrl, cb) {
-	var modalInstance = $modal.open({
-		templateUrl: templateUrl,
-		controller: function ($scope, $modalInstance, data) {
-
-			$scope.data = data;
-
-			$scope.ok = function (form) {
-				if (form.$valid)
-					$modalInstance.close($scope.data);
-			};
-
-			$scope.cancel = function () {
-				$modalInstance.dismiss('cancel');
-			};
-		},
-		resolve: {
-			data: function () {
-				return data;
-			}
-		}
-	});
-
-	modalInstance.result.then(function (data) {
-		cb(data);
-	}, function () {
-//			$log.info('Modal dismissed at: ' + new Date());
-	});
-};
-
-var deleteModalDialog = function ($modal, data, templateUrl, cb) {
-	var modalInstance = $modal.open({
-		templateUrl: templateUrl,
-		controller: function ($scope, $modalInstance, data) {
-			$scope.data = data;
-			$scope.ok = function () {
-				$modalInstance.close($scope.data);
-			};
-			$scope.cancel = function () {
-				$modalInstance.dismiss('cancel');
-			};
-		},
-		resolve: {
-			data: function () {
-				return data;
-			}
-		}
-	});
-
-	modalInstance.result.then(function () {
-		cb(data);
-	}, function () {
-//			$log.info('Modal dismissed at: ' + new Date());
-	});
-};
 
 app.controller('UsersController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, UsersService) {
 	'use strict';
@@ -644,7 +731,7 @@ app.controller('UsersController', function ($scope, $state, $modal, $filter, ngT
 		editModalDialog($modal, {
 			user: angular.copy(org_user),
 			userRoles: AuthenticationService.userRolesList
-		}, 'editUserDialog.html', function (data) {
+		}, 'partials/user.html', function (data) {
 			if (data) {
 				if (!org_user.create) {
 					org_user.$processing = true;
@@ -666,7 +753,10 @@ app.controller('UsersController', function ($scope, $state, $modal, $filter, ngT
 	};
 
 	$scope.deleteDialog = function (user) {
-		deleteModalDialog($modal, user, 'deleteUserDialog.html', function (ok) {
+		deleteModalDialog($modal, {
+			headline: 'Delete User',
+			question: 'Are you sure to delete ' + user.id + '?'
+		}, function (ok) {
 			if (!ok) return;
 			user.$processing = true;
 			UsersService.delete({id: user.id},
@@ -804,7 +894,10 @@ app.controller('TopicsController', function ($scope, $state, $modal, $filter, ng
 	};
 
 	$scope.deleteDialog = function (topic) {
-		deleteModalDialog($modal, topic, 'deleteTopicDialog.html', function (ok) {
+		deleteModalDialog($modal, {
+			headline: 'Delete Topic',
+			question: 'Are you sure to delete ' + topic.label + '?'
+		}, function (ok) {
 			if (!ok) return;
 			topic.$processing = true;
 			TopicsService.delete({id: topic.id},
@@ -942,7 +1035,10 @@ app.controller('OrganisationsController', function ($scope, $state, $modal, $fil
 	};
 
 	$scope.deleteDialog = function (organisation) {
-		deleteModalDialog($modal, organisation, 'deleteOrganisationDialog.html', function (ok) {
+		deleteModalDialog($modal, {
+			headline: 'Delete Organisation',
+			question: 'Are you sure to delete ' + organisation.name + '?'
+		}, function (ok) {
 			if (!ok) return;
 			organisation.$processing = true;
 			OrganisationsService.delete({id: organisation.id},
