@@ -24,7 +24,7 @@
 	{{/_user}}
 	{{#_user}}
 	<div class="row">
-		{{#queue}}
+		{{^queue}}
 		<div class="col-md-12">
 			<p>
 				{{#__}}You can contribute to LobbyCloud by publishing documents distributed by lobbying organisations, NGOs or similar.{{/__}}
@@ -38,7 +38,7 @@
 			<p class="upload-advice">{{#__}}Drop your files anywhere on this website to upload.{{/__}}</p>
 		</div>
 		{{/queue}}
-		{{^queue}}
+		{{#queue}}
 		<div class="col-md-8 col-md-push-4">
 			{{#edit}}
 			<h2>{{#__}}Update document{{/__}} <strong>{{id}}</strong></h2>
