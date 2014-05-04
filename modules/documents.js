@@ -204,7 +204,7 @@ module.exports = documents = function(config, db, l){
 	};
 
 	/* get complete documents by stage */
-	documents.all = function(callback) {	
+	documents.all = function(callback) {
 		db.collection("documents").find({}, function(err, result){
 			if (err) return callback(err);
 			if (result.length === 0) return callback(null, []);
@@ -223,6 +223,27 @@ module.exports = documents = function(config, db, l){
 			});
 		});
 	};
+
+	/* get latest topics */
+	documents.latest = function (num, callback) {
+		if (typeof num === "function") {
+			var callback = num;
+			var num = 1;
+		}
+		db.collection("documents").find().sort({"created": 1}).limit(num, function(err, result) {
+			if (err) return callback(err);
+			if (result.length === 0) return callback(null, []);
+			result.forEach(function(r) {
+				cache[r.id] = r;
+			});
+			documents.add_organisations(result, function(err, result){
+				documents.add_topics(result, function(err, result){
+					callback(null, result);
+				});
+			});
+		});
+	};
+
 
 	/* get documents for user */
 	documents.by_user = function(user_id, callback) {

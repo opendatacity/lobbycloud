@@ -1,33 +1,29 @@
 {{>header}}
 {{>intro}}
-<div id="content" class="content">
+<div id="content" class="content index">
 	<div class="row">
 		<div class="col-md-6">
 			<h2>{{#__}}Hot Topics{{/__}}</h2>
+			{{#topics}}
+			<div class="topic clearfix">
+				<h3><a href="{{{_url}}}/topic/{{id}}">{{label}}</a></h3>
+				<p class="subject"><a href="{{{_url}}}/topic/{{id}}">{{subject}} <i class="fa fa-arrow-right"></i></a></p>
+			</div>
+			{{/topics}}
 			<p>
-				...
-			</p>
-			<p>
-				<a href="{{{_url}}}/topics" class="btn btn-primary" role="button">{{#__}}Browse topics{{/__}}</a>
+				<a href="{{{_url}}}/topics" role="button">{{#__}}Browse all topics{{/__}} <i class="fa fa-arrow-right"></i></a>
 			</p>
 		</div>
 		<div class="col-md-6">
-			<h2>{{#__}}Avid Organisations{{/__}}</h2>
-			<p>
-				...
-			</p>
-			<p>
-				<a href="{{{_url}}}/organisations" class="btn btn-primary" role="button">{{#__}}Browse organisations{{/__}}</a>
-			</p>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-12">
-			<h2>{{#__}}Latest Releases{{/__}}</h2>
-			<p>
-				...
-			</p>
-			<a href="{{{_url}}}/documents" class="btn btn-primary">{{#__}}Browse documents{{/__}}</a>
+			<h2>{{#__}}Latest Documents{{/__}}</h2>
+			<div class="document-stack clearfix">
+				{{#documents}}
+				<div class="document">
+					<a href="{{{_url}}}/document/{{id}}"><img src="{{{_url}}}/{{{_storage}}}/{{thumb}}" class="img-responsive"></a>
+				</div>
+				{{/documents}}
+			</div>
+			<a href="{{{_url}}}/documents">{{#__}}Browse all documents{{/__}} <i class="fa fa-arrow-right"></i></a>
 		</div>
 	</div>
 </div>

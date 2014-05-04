@@ -169,7 +169,15 @@ app.configure(function() {
 
 /* routes */
 app.get('/', function (req, res) {
-	render(req, res, 'index', {});
+	/* get topics */
+	l.topics.latest(3, function(err, topics){
+		l.documents.latest(15, function(err, documents){
+			render(req, res, 'index', {
+				topics: topics,
+				documents: documents
+			});
+		});
+	});
 });
 
 /* frontend login & logout */
@@ -477,6 +485,7 @@ app.get('/organisation/:id', function (req, res) {
 });
 
 /* upload */
+/*
 app.get('/upload', function (req, res) {
 	if (!req.user) return res.redirect('/login?redirect=/upload');
 	l.queue.user(req.user.id, function(err, queue){
@@ -493,15 +502,18 @@ app.get('/upload', function (req, res) {
 		});
 	});
 });
+*/
 
 /**
  API
  **/
 
-/* api index */
+/* api index FIXME: doc here */
+/*
 app.get('/api/', function (req, res) {
 	res.json("not implemented");
 });
+*/
 
 /* contribute. it's like upload, but different */
 app.post('/api/contribute', function (req, res) {
@@ -629,18 +641,22 @@ app.post('/api/upload', function (req, res) {
 });
 
 /* invites testing endpoint REMOVEME */
+/*
 app.get('/api/test/invites/:create?', function (req, res) {
 	if (req.param("create")) l.invites.create(req.param("create"));
 	res.json(l.invites.all());
 });
+*/
 
 /* accept testing endpoint REMOVEME */
+/*
 app.get('/api/test/accept/:id', function (req, res) {
 	l.queue.accept(req.param("id"), function(err){
 		if (err) return res.json({"error": err.toString()});
 		res.json({"id": req.param("id")});
 	});
 });
+*/
 
 /* manual validation e-mail request */
 app.post('/users/verification/request', function (req, res) {
@@ -768,9 +784,11 @@ app.post('/api/backend/:cmd', function (req, res) {
 });
 
 /* dummy api endpoint */
+/*
 app.get('/api/whatever', function (req, res) {
 	res.json("not implemented");
 });
+*/
 
 /* search */
 app.all('/search', function (req, res) {

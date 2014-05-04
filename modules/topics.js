@@ -168,6 +168,21 @@ module.exports = function (opts, db, es) {
 		});
 	};
 
+	/* get latest topics */
+	topics.latest = function (num, callback) {
+		if (typeof num === "function") {
+			var callback = num;
+			var num = 1;
+		}
+		db.collection("topics").find().sort({"created": 1}).limit(num, function(err, result) {
+			if (err) return callback(err);
+			result.forEach(function(r) {
+				cache[r.id] = r;
+			});
+			callback(null, result);
+		});
+	};
+
 	/* find topics by a query on label and subject */
 	topics.suggest = function (q, callback) {
 		es.suggest('topic', q, ['label', 'subject'], function (err, hits) {

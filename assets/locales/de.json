@@ -194,5 +194,8 @@
 	"more": "more",
 	"details": "details",
 	"View topic": "View topic",
-	"There are no documents within this topic.": "There are no documents within this topic."
+	"There are no documents within this topic.": "There are no documents within this topic.",
+	"Latest Documents": "Latest Documents",
+	"Browse all topics": "Browse all topics",
+	"Browse all documents": "Browse all documents"
 }
