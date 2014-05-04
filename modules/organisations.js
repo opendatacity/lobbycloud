@@ -195,8 +195,8 @@ module.exports = orgs = function (opts, db, es) {
 	};
 
 	/* find organisations by a query on name and fullname */
-	organisations.find = function (q, callback) {
-		es.search('organisation', q, ['name', 'fullname'], function (err, hits) {
+	organisations.suggest = function (q, callback) {
+		es.suggest('organisation', q, ['name', 'fullname'], function (err, hits) {
 			if (err) return callback(err);
 			var ids = Object.keys(hits);
 			if (ids.length === 0) return callback(null, []);

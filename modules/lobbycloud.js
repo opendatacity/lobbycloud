@@ -49,7 +49,7 @@ var Lobbycloud = function(config){
 	l.topics = new modules.topics(config, db, l.elastic);
 	l.users = new modules.users(config, db, l.elastic, l.mailqueue, i18n);
 	l.queue = new modules.queue(config, db, l);
-	l.documents = new modules.documents(config, db, es, l);
+	l.documents = new modules.documents(config, db, l);
 	l.backendapi = new modules.backendapi(l, i18n);
 
 	return l;

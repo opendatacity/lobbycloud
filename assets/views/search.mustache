@@ -1,7 +1,7 @@
 {{>header}}
 <div class="container">
     <div id="headline">
-        <h1>{{#__}}Search (Topics){{/__}}</h1>
+        <h1>{{#__}}Search in Documents{{/__}}</h1>
     </div>
     <div class="row">
         <div class="col-md-6 col-md-offset-3 white-box">
@@ -16,11 +16,8 @@
 	{{#items}}
    		 <div class="row">
 			<div class="col-md-12">
-				<h2>{{label}}</h2>
-				<p><strong>{{subject}}</strong></p>
-				<p>
-					{{description}}
-				</p>
+				<h2>{{orig}}</h2>
+				<p><strong>{{score}}</strong></p>
 			</div>
         </div>
 	{{/items}}

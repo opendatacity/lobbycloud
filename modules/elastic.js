@@ -42,7 +42,7 @@ module.exports = function (config, es) {
 	/* upserts the properties of an es search entry */
 	/* data is ONLY inserted if no entry exists. no updating fields is performed */
 	me.upsert = function (type, id, obj, callback) {
-		console.log(type, config.index, id, obj);
+//		console.log(type, config.index, id, obj);
 		es.update({
 			index: config.index,
 			type: type,
@@ -67,7 +67,7 @@ module.exports = function (config, es) {
 					me.create(type, id, obj, callback);
 				} else {
 					console.log(err);
-					callback(err);
+					if (callback) callback(err);
 				}
 			} else if (callback) {
 				callback(err, resp);
@@ -89,7 +89,7 @@ module.exports = function (config, es) {
 	};
 
 	/* fuzzy search by type, text in the specified es search entry properties */
-	me.search = function (type, query, fields, callback) {
+	me.suggest = function (type, query, fields, callback) {
 
 		var queries = [
 			{
@@ -106,7 +106,6 @@ module.exports = function (config, es) {
 				}
 			}
 		];
-
 		es.search(
 			{
 				index: config.index,
@@ -123,6 +122,39 @@ module.exports = function (config, es) {
 //						"size":10,
 //						"sort":[],
 //						"facets":{}
+				}
+			},
+			function (err, result) {
+				if (err) return callback(err);
+
+				result = result.hits;
+
+				if (result.total === 0) return callback(null, []);
+
+				var searchresult = {};
+
+				result.hits.forEach(function (hit) {
+					searchresult[hit._id] = hit._score;
+				});
+
+				callback(err, searchresult);
+			}
+		);
+	};
+
+	me.search = function (type, query, field, callback) {
+
+		es.search(
+			{
+				index: config.index,
+				type: type,
+				body: {
+					"query" : {
+						"query_string" : {
+							"fields" : [field],
+							"query" : query
+						}
+					}
 				}
 			},
 			function (err, result) {

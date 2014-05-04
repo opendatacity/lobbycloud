@@ -717,7 +717,7 @@ app.get('/api/whatever', function (req, res) {
 app.all('/search', function (req, res) {
 	var q = (req.body.query || req.query.query || "").replace(/\*/g,'');
 	if (q === null || q === "") return render(req, res, 'search', {});
-	l.topics.find(q, function(err, result){
+	l.documents.search(q, function(err, result){
 		render(req, res, 'search', {
 			query: q,
 			items: result
@@ -730,7 +730,7 @@ app.all('/api/topic/suggest', function (req, res) {
 	res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
 	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
 	if (q === null || q === "") return res.json([]);
-	l.topics.find(q, function(err, result){
+	l.topics.suggest(q, function(err, result){
 		if (result && (result.length > 0)) {
 			return res.json(result.map(function(r){
 				return { id: r.id, label: r.label };
@@ -745,7 +745,7 @@ app.all('/api/organisation/suggest', function (req, res) {
 	res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
 	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
 	if (q === null || q === "") return res.json([]);
-	l.organisations.find(q, function(err, result){
+	l.organisations.suggest(q, function(err, result){
 		if (result && (result.length > 0)) {
 			return res.json(result.map(function(r){
 				return { id: r.id, label: [r.name, r.fullname].join(" - ") };

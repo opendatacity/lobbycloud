@@ -155,7 +155,6 @@ module.exports = function (opts, db, es) {
 			});
 			callback(null, list);
 		});
-
 	};
 
 	/* get all topics — rather don't use this */
@@ -170,8 +169,8 @@ module.exports = function (opts, db, es) {
 	};
 
 	/* find topics by a query on label and subject */
-	topics.find = function (q, callback) {
-		es.search('topic', q, ['label', 'subject'], function (err, hits) {
+	topics.suggest = function (q, callback) {
+		es.suggest('topic', q, ['label', 'subject'], function (err, hits) {
 			if (err) return callback(err);
 			var ids = Object.keys(hits);
 			if (ids.length === 0) return callback(null, []);

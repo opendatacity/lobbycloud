@@ -36,3 +36,4 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 ## Backend
 
 * beauty
+* Edit Queue Item: Select Topic/Organisation (not only typeahead)

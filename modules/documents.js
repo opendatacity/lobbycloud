@@ -8,7 +8,7 @@ var crypto = require("crypto");
 /* get dirname of main module */
 var __root = path.dirname(process.mainModule.filename);
 
-module.exports = documents = function(config, db, es, l){
+module.exports = documents = function(config, db, l){
 	
 	var documents = this;
 
@@ -137,25 +137,20 @@ module.exports = documents = function(config, db, es, l){
 	documents.index = function(id, callback) {
 		if (typeof callback !== "function") var callback = function(){};
 		if (!documents.checkid(id)) return callback(new Error("invaild id"));
-		return callback(new Error("not implemented yet"));
 		documents.get(id, function(err, doc){
 			if (err) return callback(err);
-			es.update({
-				index: opts.elasticsearch.index,
-				type: 'document',
-				id: doc.id,
-				upsert: {
-					lang: doc.lang,
-					user: doc.user,
-					tags: doc.tags,
-					topic: doc.topic,
-					organisation: doc.organisation,
-					created: doc.created,
-					updated: doc.updated,
-					text: doc.data.text
-				}
-			}, function (err, resp) {
-				if (err) return calback(err);
+			l.elastic.create('document', doc.id,{
+				lang: doc.lang,
+				user: doc.user,
+				tags: doc.tags.join(','),
+				topic: doc.topic,
+				organisation: doc.organisation,
+				created: doc.created,
+				updated: doc.updated
+				,
+				text: doc.data.text
+			}, function(err,resp){
+				if (err) return console.log("[documents] creation of search index for ["+doc.id+"] failed", err);
 				if (config.debug) console.log("[documents] created new search index for ["+doc.id+"]");
 
 				// FIXME: seperate indexes for comments and notes
@@ -163,7 +158,7 @@ module.exports = documents = function(config, db, es, l){
 				/* update indexed flag */
 				db.collection("documents").findAndModify({"query":{"id":id},"update":{"$set":{"indexed":true}},"new":true}, function(err, doc){
 					if (err) return callback(err);
-					
+
 					/* update cache */
 					cache[id] = doc;
 
@@ -362,6 +357,53 @@ module.exports = documents = function(config, db, es, l){
 				}
 			});
 		});	
+	};
+
+	//returns a list of documents by ids
+	documents.list = function(ids, callback) {
+		var list = [];
+		var query = [];
+		ids.forEach(function (id) {
+			if (cache.hasOwnProperty(id)) {
+				list.push(cache[id]);
+			} else {
+				query.push(id);
+			}
+		});
+		/* got all from cache? */
+		if (query.length === 0) return callback(null, list);
+		/* get rest from mongodb */
+		db.collection("documents").find({id: {"$in": query}}, function (err, result) {
+			if (err) return callback(err);
+			result.forEach(function (r) {
+				/* add to result set */
+				list.push(r);
+				/* add to cache */
+				cache[r.id] = r;
+			});
+			callback(null, list);
+		});
+	};
+
+	documents.search = function(q, callback) {
+		l.elastic.search('document', q, 'text', function (err, hits) {
+			if (err) return callback(err);
+			var ids = Object.keys(hits);
+			if (ids.length === 0) return callback(null, []);
+			documents.list(ids, function (err, result) {
+				if (err) return callback(err);
+				/* add score to result */
+				result.map(function (r) {
+					r.score = hits[r.id];
+				});
+				/* sort by score */
+				result.sort(function (a, b) {
+					return (b.score - a.score)
+				});
+				/* call back */
+				callback(null, result);
+			});
+		});
 	};
 
 	return this;
