@@ -47,29 +47,11 @@
             <table class="table table-responsive table-organisations table-hover ng-table-rowselected" ng-table="tableParams" show-filter="true">
                 <thead>
                 <tr>
-                    <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('name', 'asc'),
-                    'sort-desc': tableParams.isSortBy('name', 'desc')}"
-                        ng-click="tableParams.sorting({'name' : tableParams.isSortBy('name', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Name</div>
-                    </th>
-                    <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('fullname', 'asc'),
-                    'sort-desc': tableParams.isSortBy('fullname', 'desc')}"
-                        ng-click="tableParams.sorting({'fullname' : tableParams.isSortBy('fullname', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Full name</div>
-                    </th>
-                    <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('description', 'asc'),
-                    'sort-desc': tableParams.isSortBy('description', 'desc')}"
-                        ng-click="tableParams.sorting({'description' : tableParams.isSortBy('description', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Description</div>
-                    </th>
-                    <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('created', 'asc'),
-                    'sort-desc': tableParams.isSortBy('created', 'desc')}"
-                        ng-click="tableParams.sorting({'created' : tableParams.isSortBy('created', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Created</div>
+                    <th ng-repeat="head in tablecolumns" class="sortable" ng-class="{
+                    'sort-asc': tableParams.isSortBy(head.sortable, 'asc'),
+                    'sort-desc': tableParams.isSortBy(head.sortable, 'desc')}"
+                        ng-click="o={}; o[head.sortable]=tableParams.isSortBy(head.sortable, 'asc') ? 'desc' : 'asc'; tableParams.sorting(o);">
+                        <div>{{head.name}}</div>
                     </th>
                     <th translate>Actions</th>
                 </tr>

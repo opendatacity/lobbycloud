@@ -33,37 +33,11 @@
             <table class="table table-responsive table-hover table-docs ng-table-rowselected" ng-table="tableParams" show-filter="true">
                 <thead>
                 <tr>
-                    <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('orig', 'asc'),
-                    'sort-desc': tableParams.isSortBy('orig', 'desc')}"
-                        ng-click="tableParams.sorting({'orig' : tableParams.isSortBy('orig', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Filename</div>
-                    </th>
-
-                    <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('uploaded', 'asc'),
-                    'sort-desc': tableParams.isSortBy('uploaded', 'desc')}"
-                        ng-click="tableParams.sorting({'uploaded' : tableParams.isSortBy('uploaded', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Uploaded</div>
-                    </th>
-                    <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('topic', 'asc'),
-                    'sort-desc': tableParams.isSortBy('topic', 'desc')}"
-                        ng-click="tableParams.sorting({'topic' : tableParams.isSortBy('topic', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Topic</div>
-                    </th>
-
-                    <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('organisation', 'asc'),
-                    'sort-desc': tableParams.isSortBy('organisation', 'desc')}"
-                        ng-click="tableParams.sorting({'organisation' : tableParams.isSortBy('organisation', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Organisation</div>
-                    </th>
-                    <th class="sortable" ng-class="{
-                    'sort-asc': tableParams.isSortBy('pages', 'asc'),
-                    'sort-desc': tableParams.isSortBy('pages', 'desc')}"
-                        ng-click="tableParams.sorting({'pages' : tableParams.isSortBy('pages', 'asc') ? 'desc' : 'asc'})">
-                        <div translate>Pages</div>
+                    <th ng-repeat="head in tablecolumns" class="sortable" ng-class="{
+                    'sort-asc': tableParams.isSortBy(head.sortable, 'asc'),
+                    'sort-desc': tableParams.isSortBy(head.sortable, 'desc')}"
+                        ng-click="o={}; o[head.sortable]=tableParams.isSortBy(head.sortable, 'asc') ? 'desc' : 'asc'; tableParams.sorting(o);">
+                        <div>{{head.name}}</div>
                     </th>
                     <th translate>Actions</th>
                 </tr>
@@ -74,10 +48,10 @@
                         <img class="thumb" ng-src="{{doc.thumbs[0].file}}"/>
                         {{doc.orig}}
                     </td>
-                    <td sortable="'uploaded'">{{doc.created | amDateFormat:'LLL'}}</td>
-                    <td sortable="'topic'">{{doc.topic.label}}</td>
-                    <td sortable="'organisation'">{{doc.organisation.label}}</td>
-                    <td sortable="'pages'">{{doc.info.pages}}</td>
+                    <td sortable="'created'">{{doc.created | amDateFormat:'LLL'}}</td>
+                    <td sortable="'topic.label'">{{doc.topic.label}}</td>
+                    <td sortable="'organisation.label'">{{doc.organisation.label}}</td>
+                    <td sortable="'info.pages'">{{doc.info.pages}}</td>
                     <td class="row-actions">
                         <div ng-show="doc.$processing">
                             <i class="fa fa-spinner fa-spin"></i>

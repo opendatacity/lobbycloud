@@ -183,8 +183,34 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 		}
 	};
 
+	$scope.tablecolumns = [
+		{
+			sortable: 'orig',
+			name: 'Filename'
+		},
+		{
+			sortable: 'created',
+			name: 'Uploaded'
+		},
+		{
+			sortable: 'topic.label',
+			name: 'Topic'
+		},
+		{
+			sortable: 'organisation.label',
+			name: 'Organisation'
+		},
+		{
+			sortable: 'info.pages',
+			name: 'Pages'
+		}
+	];
+
+	$scope.alldocs = [];
+
 	$scope.initData = function (data) {
 		//init filter
+		$scope.alldocs = data;
 		var min = null;
 		var max = 0;
 		data.forEach(function (doc) {
@@ -219,7 +245,7 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 		}, {
 			total: data.length,
 			getData: function ($defer, params) {
-				var orderedData = data;
+				var orderedData = $scope.alldocs;
 				orderedData = $scope.filter.title ? $filter('filter')(orderedData, {'title': $scope.filter.title}) : orderedData;
 				if ($scope.filter.range && $scope.filter.range_enabled) {
 					var startDate = new Date($scope.filter.range.startDate).valueOf();
@@ -269,8 +295,13 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 			});
 	};
 
-	$scope.load();
+	$scope.depublishDialog = function (doc) {
 
+	};
+
+	//startup
+	$scope.load();
+	$scope.resize();
 });
 
 app.controller('QueueController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, QueueService) {
@@ -281,6 +312,29 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 			$scope.tableParams.reload();
 		}
 	};
+
+	$scope.tablecolumns = [
+		{
+			sortable: 'orig',
+			name: 'Filename'
+		},
+		{
+			sortable: 'created',
+			name: 'Uploaded'
+		},
+		{
+			sortable: 'topic.label',
+			name: 'Topic'
+		},
+		{
+			sortable: 'organisation.label',
+			name: 'Organisation'
+		},
+		{
+			sortable: 'info.pages',
+			name: 'Pages'
+		}
+	];
 
 	$scope.alldocs = [];
 
@@ -371,8 +425,6 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 			});
 	};
 
-	$scope.load();
-
 	//check if doc can be accepted
 	$scope.canPublish = function (doc) {
 		return (
@@ -422,7 +474,9 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 		});
 	};
 
-
+	//startup
+	$scope.load();
+	$scope.resize();
 });
 
 app.controller('QueueItemController', function ($scope, $state, $stateParams, $timeout, $modal, AuthenticationService, QueueService, TopicsService, OrganisationsService, LangsService) {
@@ -697,7 +751,7 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 
 	//startup
 	$scope.load();
-
+	$scope.resize();
 });
 
 app.controller('DocsUploadController', function ($scope) {
@@ -772,8 +826,9 @@ app.controller('UsersController', function ($scope, $state, $modal, $filter, ngT
 		});
 	};
 
+	//startup
 	$scope.load();
-
+	$scope.resize();
 });
 
 app.controller('TopicsController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, TopicsService) {
@@ -784,6 +839,25 @@ app.controller('TopicsController', function ($scope, $state, $modal, $filter, ng
 			$scope.tableParams.reload();
 		}
 	};
+
+	$scope.tablecolumns = [
+		{
+			sortable: 'label',
+			name: 'Label'
+		},
+		{
+			sortable: 'subject',
+			name: 'Subject'
+		},
+		{
+			sortable: 'description',
+			name: 'Description'
+		},
+		{
+			sortable: 'created',
+			name: 'Created'
+		}
+	];
 
 	$scope.fulldata = [];
 
@@ -914,7 +988,9 @@ app.controller('TopicsController', function ($scope, $state, $modal, $filter, ng
 		});
 	};
 
+	//startup
 	$scope.load();
+	$scope.resize();
 
 });
 
@@ -926,6 +1002,25 @@ app.controller('OrganisationsController', function ($scope, $state, $modal, $fil
 			$scope.tableParams.reload();
 		}
 	};
+
+	$scope.tablecolumns = [
+		{
+			sortable: 'name',
+			name: 'Name'
+		},
+		{
+			sortable: 'fullname',
+			name: 'Full name'
+		},
+		{
+			sortable: 'description',
+			name: 'Description'
+		},
+		{
+			sortable: 'created',
+			name: 'Created'
+		}
+	];
 
 	$scope.fulldata = [];
 
@@ -961,7 +1056,7 @@ app.controller('OrganisationsController', function ($scope, $state, $modal, $fil
 		$scope.tableParams = new ngTableParams({
 			page: 1,
 			count: 10,
-			sorting: {label: 'asc'}
+			sorting: {name: 'asc'}
 		}, {
 			total: $scope.fulldata.length,
 			getData: function ($defer, params) {
@@ -1055,6 +1150,8 @@ app.controller('OrganisationsController', function ($scope, $state, $modal, $fil
 		});
 	};
 
+	//startup
 	$scope.load();
+	$scope.resize();
 
 });

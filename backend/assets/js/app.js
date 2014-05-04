@@ -97,20 +97,20 @@ app.config(function ($stateProvider, $urlRouterProvider, $logProvider, $location
 		});
 });
 
-app.run(function ($window, $rootScope, $location, $state, gettextCatalog, AuthenticationService) {
+app.run(function ($window, $rootScope, $timeout, $location, $state, gettextCatalog, AuthenticationService) {
 
 	'use strict';
 
 	var access = routingConfig.accessLevels;
 
-	var resize = function(e) {
-		$('#main').css('min-height', $(window).innerHeight()-($('header').outerHeight()+$('footer').outerHeight()));
+	$rootScope.resize = function (e) {
+		$('#main').css('min-height', $(window).innerHeight() - ($('header').outerHeight() + $('footer').outerHeight()));
 	};
-	$(window).resize(resize);
-	resize();
+	$(window).resize($rootScope.resize);
+	$rootScope.resize();
 
 	$rootScope.$on('stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-		resize();
+		$rootScope.resize();
 	});
 
 	$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
