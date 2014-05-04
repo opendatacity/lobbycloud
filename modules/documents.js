@@ -451,13 +451,18 @@ module.exports = documents = function(config, db, l){
 	documents.search = function(q, callback) {
 		l.elastic.search('document', q, 'text', function (err, hits) {
 			if (err) return callback(err);
-			var ids = Object.keys(hits);
+			var _hits = {};
+			var ids = hits.map(function(hit){
+				_hits[hit.id] = hit;
+				return hit.id;
+			});
 			if (ids.length === 0) return callback(null, []);
 			documents.list(ids, function (err, result) {
 				if (err) return callback(err);
-				/* add score to result */
+				/* add score & highlights to result */
 				result.map(function (r) {
-					r.score = hits[r.id];
+					r.score = _hits[r.id].score;
+					r.highlights = _hits[r.id].highlights;
 				});
 				/* sort by score */
 				result.sort(function (a, b) {

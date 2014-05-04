@@ -99,7 +99,7 @@ module.exports = function (config, es) {
 						"query_string": {
 							"fields": fields,
 							"query": query + '*~',
-							"fuzzy_prefix_length" : 3,
+							"fuzzy_prefix_length": 3,
 							analyze_wildcard: true
 						}
 					}
@@ -125,6 +125,10 @@ module.exports = function (config, es) {
 
 	me.search = function (type, query, field, callback) {
 
+
+		var highlight = {"fields": {}};
+		highlight.fields[field] = {"number_of_fragments": 3};
+
 		es.search(
 			{
 				index: config.index,
@@ -135,7 +139,8 @@ module.exports = function (config, es) {
 							"fields": [field],
 							"query": query
 						}
-					}
+					},
+					"highlight": highlight
 				}
 			},
 			function (err, result) {
@@ -145,13 +150,14 @@ module.exports = function (config, es) {
 
 				if (result.total === 0) return callback(null, []);
 
-				var searchresult = {};
-
-				result.hits.forEach(function (hit) {
-					searchresult[hit._id] = hit._score;
+				var r = result.hits.map(function (hit) {
+					return {
+						id: hit._id,
+						score: hit._score,
+						highlights: hit.highlight[field]
+					};
 				});
-
-				callback(err, searchresult);
+				callback(err, r);
 			}
 		);
 	};
