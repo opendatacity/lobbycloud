@@ -612,6 +612,31 @@ header {
 		
 	}
 
+	#main .search {}
+
+		#main .search .search-bar {
+			
+			background-color: #f6f6f6;
+			margin: -30px -35px 0px;
+			padding: 20px 35px;
+			box-shadow: 0px 10px 10px -10px rgba(0,0,0,0.25) inset;
+			border-bottom: 1px solid #eee;
+			
+		}
+		
+			#main .search .search-bar .col-md-6 {
+			
+				text-align: center;
+				
+			}
+
+			#main .search .search-bar form {
+			
+				display: inline-block;
+				margin: 0px auto;
+			
+			}
+
 	#main .index {}
 
 		#main .index .document-stack {
