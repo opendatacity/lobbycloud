@@ -39,7 +39,7 @@ app.factory('AuthenticationService', function ($http, $rootScope, $cookieStore) 
 			if (user === undefined) {
 				user = currentUser;
 			}
-			return user.role.title === userRoles.user.title || user.role.title === userRoles.admin.title;
+			return user.role.title === userRoles.user.title || user.role.title === userRoles.editor.title || user.role.title === userRoles.admin.title;
 		},
 		check: function (success, error) {
 			$http.post('/api/backend/user')

@@ -37,6 +37,11 @@
     display: none;
 }
 
+.ng-table th.sortable.sort-desc, .ng-table th.sortable.sort-asc {
+    background-color: inherit;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+}
+
 /* modals */
 
 .modal-dialog {
@@ -60,7 +65,7 @@
 }
 
 .btn-sm {
-  /*padding: 2px;*/
+    /*padding: 2px;*/
 }
 
 /* central start page */

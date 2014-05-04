@@ -3,7 +3,7 @@ module.exports = function (lobbycloud, i18n) {
 
 	var validateUser = function (res, err, user, cb) {
 		if ((!user) && (!err)) err = 'Unknown Error';
-		if (err) return res.send(400, err.toString());
+		if (err) return res.send(400, err.message || err);
 		cb();
 	};
 
@@ -181,6 +181,7 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.user,
 			execute: function (req, res) {
 				lobbycloud.documents.all(function (err, data) {
+					if (err) return res.send(400, err.message || err);
 					var result = [];
 					var prepare = function (index) {
 						if (index >= data.length) {
@@ -207,6 +208,7 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				lobbycloud.topics.all(function (err, data) {
+					if (err) return res.send(400, err.message || err);
 					res.json(data.map(function (t) {
 						return {id: t.id, label: t.label};
 					}));
@@ -218,6 +220,7 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				lobbycloud.topics.all(function (err, data) {
+					if (err) return res.send(400, err.message || err);
 					res.json(data.map(function (t) {
 						return prepareClientTopic(t);
 					}));
@@ -230,7 +233,7 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.topics.delete(req.body.id, function (err) {
-					if (err) return res.json(400, err.message);
+					if (err) return res.send(400, err.message || err);
 					res.send(200);
 				});
 			}
@@ -241,7 +244,7 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.topic)) return res.send(400);
 				lobbycloud.topics.add(req.body.topic, function (err, topic) {
-					if (err) return res.send(400, err.message);
+					if (err) return res.send(400, err.message || err);
 					res.json(prepareClientTopic(topic));
 				});
 			}
@@ -252,7 +255,7 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.topic)) return res.send(400);
 				lobbycloud.topics.update(req.body.topic.id, req.body.topic, function (err, topic) {
-					if (err) return res.send(400, err.message);
+					if (err) return res.send(400, err.message || err);
 					res.json(prepareClientTopic(topic));
 				});
 			}
@@ -284,7 +287,7 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.queue.get(req.body.id, function (err, data) {
-						if (err) return res.send(400, err.message);
+						if (err) return res.send(400, err.message || err);
 						prepareClientQueue(data, true, function (qitem) {
 							res.json(qitem);
 						});
@@ -301,7 +304,7 @@ module.exports = function (lobbycloud, i18n) {
 				req.body.doc.topic = req.body.doc.topic ? (req.body.doc.topic.id || req.body.doc.topic.new) : null;
 				req.body.doc.organisation = req.body.doc.organisation ? (req.body.doc.organisation.id || req.body.doc.organisation.new) : null;
 				lobbycloud.queue.update(req.body.id, req.body.doc, function (err, data) {
-						if (err) return res.send(400, err.message);
+						if (err) return res.send(400, err.message || err);
 						prepareClientQueue(data, true, function (qitem) {
 							res.json(qitem);
 						});
@@ -315,7 +318,7 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.queue.accept(req.body.id, function (err, data) {
-						if (err) return res.send(400, err.message);
+						if (err) return res.send(400, err.message || err);
 						res.send(200);
 					}
 				);
@@ -327,7 +330,8 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.queue.decline(req.body.id, function (err, data) {
-						if (err) return res.send(400, err.message);
+						console.log(err);
+						if (err) return res.send(400, err.message || err);
 						res.send(200);
 					}
 				);
@@ -339,7 +343,7 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.queue.delete(req.body.id, function (err, data) {
-						if (err) return res.send(400, err.message);
+						if (err) return res.send(400, err.message || err);
 						res.send(200);
 					}
 				);
@@ -350,6 +354,7 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				lobbycloud.organisations.all(function (err, data) {
+					if (err) return res.send(400, err.message || err);
 					res.json(data.map(function (t) {
 						return {id: t.id, label: t.name + ' - ' + t.fullname};
 					}));
@@ -361,6 +366,7 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				lobbycloud.organisations.all(function (err, data) {
+					if (err) return res.send(400, err.message || err);
 					res.json(data.map(function (t) {
 						return prepareClientOrganisation(t);
 					}));
@@ -373,7 +379,7 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				lobbycloud.organisations.delete(req.body.id, function (err) {
-					if (err) return res.json(400, err.message);
+					if (err) return res.send(400, err.message || err);
 					res.send(200);
 				});
 			}
@@ -384,7 +390,7 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.organisation)) return res.send(400);
 				lobbycloud.organisations.add(req.body.organisation, function (err, organisation) {
-					if (err) return res.send(400, err.message);
+					if (err) return res.send(400, err.message || err);
 					res.json(prepareClientOrganisation(organisation));
 				});
 			}
@@ -395,7 +401,7 @@ module.exports = function (lobbycloud, i18n) {
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.organisation)) return res.send(400);
 				lobbycloud.organisations.update(req.body.organisation.id, req.body.organisation, function (err, organisation) {
-					if (err) return res.send(400, err.message);
+					if (err) return res.send(400, err.message || err);
 					res.json(prepareClientOrganisation(organisation));
 				});
 			}
@@ -405,6 +411,7 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				lobbycloud.users.list(null, null, function (err, users) {
+					if (err) return res.send(400, err.message || err);
 					var users = users.map(function (u) {
 						return prepareClientUser(u);
 					});
