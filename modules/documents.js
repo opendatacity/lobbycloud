@@ -8,7 +8,6 @@ var crypto = require("crypto");
 /* get dirname of main module */
 var __root = path.dirname(process.mainModule.filename);
 
-module.exports = documents = function(config, db, es, l){
 module.exports = documents = function(config, db, l){
 	
 	var documents = this;
