@@ -601,6 +601,17 @@ header {
 
 		}
 
+	#main .contribute .upload-advice {
+		
+		padding: 10% 15%;
+		font-size: 3em;
+		line-height: 1.4em;
+		text-align: center;
+		color: #ccc;
+		font-weight: bold;
+		
+	}
+
 	#main .index {}
 
 		#main .index .document-stack {

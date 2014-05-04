@@ -294,6 +294,10 @@ app.get('/contribute/:id?', function (req, res) {
 	if (!req.user) return render(req, res, 'contribute', {});
 	l.queue.user(req.user.id, function(err, queue){
 
+		queue = queue.filter(function(item){
+			return (item.stage < 3 || item.stage == 4);
+		});
+
 		/* check for empty queue */
 		if (queue.length === 0) return render(req, res, 'contribute', {});
 		
@@ -762,12 +766,15 @@ app.post('/users/verification/request', function (req, res) {
 var render = function (req, res, name, opt) {
 	var opt = (opt || {});
 	opt._user = req.user;
-	opt._user._is_admin = (req.user.role === "admin");
-	opt._user._is_editor = (req.user.role === "admin" || req.user.role === "editor");
 	opt._url = config.url;
 	opt._storage = config.storage;
 	opt._userrole = {};
 	if (req.user) {
+		
+		/* FIXME: this is ambiguous */
+		opt._user._is_admin = (req.user.role === "admin");
+		opt._user._is_editor = (req.user.role === "admin" || req.user.role === "editor");
+
 		opt._userrole[opt._user.role] = true;
 		if (opt._user.role == l.users.roles.admin) {
 			opt._userrole[l.users.roles.editor] = true;
