@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="btn-group pull-left">
-                <button type="button" class="btn btn-default" ng-click="newDialog()" translate>New User</button>
+                <button type="button" class="btn btn-primary" ng-click="newDialog()" translate>New User</button>
                 <div class="list-title pull-left" translate translate-n="users.length" translate-plural="{{users.length}} users">One user</div>
             </div>
         </div>
@@ -52,8 +52,8 @@
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
                         <div ng-if="!rowuser.$processing">
-                            <i class="btn btn-default fa fa-edit clickable" title="{{'Edit User'|translate}}" ng-click="editDialog(rowuser)"/>
-                            <i class="btn btn-default fa fa-trash-o clickable" title="{{'Delete User'|translate}}" ng-click="deleteDialog(rowuser)"/>
+                            <i class="btn btn-primary fa fa-edit clickable" title="{{'Edit User'|translate}}" ng-click="editDialog(rowuser)"/>
+                            <i class="btn btn-primary fa fa-trash-o clickable" title="{{'Delete User'|translate}}" ng-click="deleteDialog(rowuser)"/>
                         </div>
                     </td>
                 </tr>

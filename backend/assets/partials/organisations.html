@@ -36,7 +36,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="btn-group pull-left">
-                <button type="button" class="btn btn-default" ng-click="newDialog()" translate>New Organisation</button>
+                <button type="button" class="btn btn-primary" ng-click="newDialog()" translate>New Organisation</button>
                 <div class="list-title pull-left" translate translate-n="organisations.length" translate-plural="{{organisations.length}} organisations">One organisation</div>
             </div>
         </div>
@@ -67,8 +67,8 @@
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
                         <div ng-show="!org.$processing">
-                            <a href="" class="btn btn-default btn-sm" title="{{'Edit Organisation'|translate}}" ng-click="editDialog(org)"><i class="fa fa-edit" /></a>
-                            <a href="" class="btn btn-default btn-sm" title="{{'Delete Organisation'|translate}}" ng-click="deleteDialog(org)"><i class="fa fa-trash-o" /></a>
+                            <a href="" class="btn btn-primary btn-sm" title="{{'Edit Organisation'|translate}}" ng-click="editDialog(org)"><i class="fa fa-edit" /></a>
+                            <a href="" class="btn btn-primary btn-sm" title="{{'Delete Organisation'|translate}}" ng-click="deleteDialog(org)"><i class="fa fa-trash-o" /></a>
                         </div>
                     </td>
                 </tr>
