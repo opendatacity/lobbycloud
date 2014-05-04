@@ -186,5 +186,12 @@
 	"Notes": "Notes",
 	"Title": "Title",
 	"Author": "Author",
-	"Copy to clipboard": "Copy to clipboard"
+	"Copy to clipboard": "Copy to clipboard",
+	"PDF Viewer": "PDF Viewer",
+	"Extracted Text": "Extracted Text",
+	"Topic:": "Topic:",
+	"Search in Documents": "Search in Documents",
+	"more": "more",
+	"details": "details",
+	"View topic": "View topic"
 }

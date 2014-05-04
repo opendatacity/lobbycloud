@@ -324,15 +324,57 @@ app.get('/documents', function (req, res) {
 
 /* document */
 app.get('/document/:id', function (req, res) {
-	l.documents.get(req.param("id"), function(err, doc){
-		if (err) return send404(req, res);
-		doc.data.info.size_readable = filesize(doc.data.info.size);
-		doc.data.info.creationdate_readable = moment(doc.data.info.creationdate).lang(req.locale||"en").format("LLL");
-		doc.data.info.moddate_readable = moment(doc.data.info.moddate).lang(req.locale||"en").format("LLL");
+	l.documents.check(req.param("id"), function(err, exists, id){
+		if (err) return send500(req, res, err);
+		if (!exists) return send404(req, res);
+		l.documents.get(id, function(err, doc){
+			if (err) return send500(req, res, err);
+			l.documents.add_topic(doc, function(err, doc){
+				if (err) return send500(req, res, err);
+				l.documents.add_organisation(doc, function(err, doc){
+					if (err) return send500(req, res, err);
 
-		render(req, res, 'document', {
-			error: err,
-			document: doc
+					/* prepare some stuff */
+					doc.data.text_lines = doc.data.text.split(/\n/g);
+					doc.data.info.size_readable = filesize(doc.data.info.size);
+					doc.data.info.creationdate_readable = moment(doc.data.info.creationdate).lang(req.locale||"en").format("LLL");
+					doc.data.info.moddate_readable = moment(doc.data.info.moddate).lang(req.locale||"en").format("LLL");
+
+					/* render */
+					render(req, res, 'document', {
+						error: err,
+						document: doc
+					});
+				
+					/* count the view */
+					l.documents.count_view(id);
+				
+				});
+			});
+		});
+	});
+});
+
+/* download document */
+app.get('/document/:id/download', function (req, res) {
+	l.documents.check(req.param("id"), function(err, exists, id){
+		if (err) return send500(req, res, err);
+		if (!exists) return send404(req, res);
+		l.documents.get(id, function(err, doc){
+			if (err) return send500(req, res, err);
+
+			// FIXME: put this in some lib
+			var _file = path.resolve(__dirname, config.storage, doc.file);
+			fs.exists(_file, function(exists){
+				if (!exists) return send404(req, res);
+				res.setHeader('Content-disposition', 'attachment; filename=' + doc.orig);
+				res.setHeader('Content-type', "application/pdf"); // FIXME: get this from db
+				fs.createReadStream(_file).pipe(res);
+
+				/* count the donload */
+				l.documents.count_download(id);
+
+			});
 		});
 	});
 });
@@ -349,8 +391,25 @@ app.get('/topics', function (req, res) {
 });
 
 /* topic */
-app.get('/topics/:id', function (req, res) {
-	render(req, res, 'topics', {});
+app.get('/topic/:id', function (req, res) {
+	l.topics.check(req.param("id"), function(err, exists, id){
+		if (err) return send500(req, res, err);
+		if (!exists) return send404(req, res);
+		l.topics.get(id, function(err, topic){
+			if (err) return send500(req, res, err);
+			/* get documents for organisation */
+			l.documents.by_topic(id, function(err, docs){
+				if (err) return send500(req, res, err);
+				docs.map(function(doc){
+					doc.created_ago = moment(doc.created).lang(req.locale||"en").calendar(true);
+				});
+				render(req, res, 'topic', {
+					topic: topic,
+					documents: docs
+				});
+			});
+		});
+	});
 });
 
 /* browse organisations */

@@ -152,6 +152,7 @@ header {
 			
 			background: rgba(255,255,255,0.1) url(../img/intro-pattern.png) center center repeat;
 			padding-top: 20px;
+			border-radius: 0px;
 			
 		}
 
@@ -484,13 +485,14 @@ header {
 			background: rgba(255,255,255,0.1) url(../img/intro-pattern.png) center center repeat;
 			padding: 10px 35px 20px;
 			margin: -20px -35px 30px;
-			box-shadow: 0px 10px 10px -5px rgba(0,0,0,0.25);
+			box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.25);
 	
 		}
 
 			#main .content .headline h1 {
 
 				color: #fff;
+				text-shadow: 0px 0px 5px rgba(0,0,0,0.25);
 		
 			}
 			
@@ -502,8 +504,10 @@ header {
 
 				#main .content .headline h1 small {
 
+					display: block;
 					color: #f9f9f9;
 					font-size: 0.8em;
+					margin-top: 5px;
 	
 				}
 
@@ -513,6 +517,25 @@ header {
 				font-size: 1.2em;
 		
 			}
+
+				#main .content .headline p a {
+				
+					color: #fff;
+					text-decoration: none;
+					
+				}
+
+			#main .content .headline p.tags {
+				
+				text-align: right;
+				font-size: 1.4em;
+				padding: 30px 0px 0px;
+				
+			}
+			
+				#main .content .headline p.tags .label {
+					margin: 5px;
+				}
 
 	#main .content.err {
 
@@ -535,6 +558,41 @@ header {
 			font-size: 3em;
 
 		}
+
+	#main .topics {}
+
+		#main .topics .item {
+			
+			display: block;
+			position: relative;
+			padding: 1px 20px 10px;
+			border-radius: 5px;
+			box-shadow: 0px 0px 10px -5px rgba(0,0,0,0.25);
+			background-color: #fff;
+			margin-bottom: 20px;
+			
+		}
+		
+			#main .topics .item h2 a {
+				
+				color: #333;
+				text-decoration: none;
+				
+			}
+
+			#main .topics .item p.subject a {
+				
+				color: #666;
+				text-decoration: none;
+				
+			}
+
+			#main .topics .item p.description {
+				
+				color: #333;
+				font-size: .9em;
+
+			}
 
 	#main .organisations {}
 
@@ -594,6 +652,27 @@ header {
 
 	#main .document {}
 
+		#main .document .text {
+		
+			display: block;
+			position: relative;
+			background-color: #fff;
+			padding: 30px;
+			border: 1px solid #ddd;
+			border-top-width: 0px;
+			max-height: 500px;
+			overflow: hidden;
+			overflow-x: hidden;
+			overflow-y: scroll;
+			
+		}
+			#main .document .text p:last-child {
+			
+				margin-bottom: 30px;
+				
+			}
+			
+
 		#main .document .viewer {
 			
 			display: block;
@@ -615,7 +694,12 @@ header {
 				background-color: #fff;
 				box-shadow: 0px 0px 20px -15px rgba(0,0,0,0.25);
 				margin-bottom: 20px;
-				
+				pointer-events: none;
+				user-select: none;
+				-o-user-select:none;
+				-moz-user-select: none;
+				-khtml-user-select: none;
+				-webkit-user-select: none;
 			}
 			
 		#main .document .list-group-item strong {
