@@ -16,7 +16,7 @@
     <div class="row">
 		{{#items}}
 			<hr />
-				 <div class="col-md-3 col-sm-4 col-xs-12">
+				 <div class="col-md-4">
 					 <div class="doc">
 						 <div class="thumb">
 							 <a href="{{_url}}/document/{{id}}"><img src="{{_url}}/{{_storage}}/{{thumb}}" class="responsive-image"></a>
@@ -34,6 +34,11 @@
 						 {{#created_ago}}<a href="{{_url}}/document/{{id}}" class="created">{{created_ago}}</a>{{/created_ago}}
 					 </div>
 				 </div>
+				<div class="col-md-8">
+                   {{#highlights}}
+					   <p>...{{{.}}}...</p>
+				   {{/highlights}}
+				</div>
 		{{/items}}
 		{{#query}}
 			{{^items}}
