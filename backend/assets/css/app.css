@@ -24,6 +24,14 @@
     background-color: #fff;
 }
 
+.carousel-indicators {
+    display: none;
+}
+
+.carousel-control, .carousel-control span {
+    cursor: pointer;
+}
+
 .form-control-feedback {
     margin-top: -24px;
 }
@@ -92,11 +100,6 @@
 
 .row-item td .carousel {
     margin-right: 30px;
-}
-
-.row-item td .carousel-indicators {
-    bottom: 10px;
-    color: #000;
 }
 
 .row-item td .carousel-indicators {

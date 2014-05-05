@@ -59,7 +59,7 @@ var listModalDialog = function ($modal, data, cb) {
 //			$log.info('Modal dismissed at: ' + new Date());
 	});
 };
-var deleteModalDialog = function ($modal, data, cb) {
+var okcancelModalDialog = function ($modal, data, cb) {
 	var modalInstance = $modal.open({
 		templateUrl: 'partials/ask.html',
 		controller: function ($scope, $modalInstance, data) {
@@ -452,8 +452,18 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 		);
 	};
 
+	$scope.declineDialog = function (doc) {
+		okcancelModalDialog($modal, {
+			headline: 'Decline Document',
+			question: 'Are you sure to decline ' + doc.orig + '?'
+		}, function (ok) {
+			if (!ok) return;
+			$scope.decline(doc);
+		});
+	};
+
 	$scope.deleteDialog = function (doc) {
-		deleteModalDialog($modal, {
+		okcancelModalDialog($modal, {
 			headline: 'Delete Document',
 			question: 'Are you sure to delete ' + doc.orig + '?'
 
@@ -807,7 +817,7 @@ app.controller('UsersController', function ($scope, $state, $modal, $filter, ngT
 	};
 
 	$scope.deleteDialog = function (user) {
-		deleteModalDialog($modal, {
+		okcancelModalDialog($modal, {
 			headline: 'Delete User',
 			question: 'Are you sure to delete ' + user.id + '?'
 		}, function (ok) {
@@ -968,7 +978,7 @@ app.controller('TopicsController', function ($scope, $state, $modal, $filter, ng
 	};
 
 	$scope.deleteDialog = function (topic) {
-		deleteModalDialog($modal, {
+		okcancelModalDialog($modal, {
 			headline: 'Delete Topic',
 			question: 'Are you sure to delete ' + topic.label + '?'
 		}, function (ok) {
@@ -1130,7 +1140,7 @@ app.controller('OrganisationsController', function ($scope, $state, $modal, $fil
 	};
 
 	$scope.deleteDialog = function (organisation) {
-		deleteModalDialog($modal, {
+		okcancelModalDialog($modal, {
 			headline: 'Delete Organisation',
 			question: 'Are you sure to delete ' + organisation.name + '?'
 		}, function (ok) {
