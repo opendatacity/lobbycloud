@@ -133,15 +133,15 @@
 						</h3>
 						<div class="panel-buttons">
 							{{#cancelable}}
-							<a href="javascript:;" class="cancel _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Cancel publishing{{/__}}"><i class="fa fa-times-circle"></i></a>
+							<a href="{{{_url}}}/contribute/{{id}}/cancel" class="cancel _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Cancel publishing{{/__}}"><i class="fa fa-times-circle"></i></a>
 							{{/cancelable}}
 							{{#_user._is_editor}}
 							{{#acceptable}}
-							<a href="javascript:;" class="accept _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Publish this{{/__}}"><i class="fa fa-check-circle"></i></a>
+							<a href="{{{_url}}}/contribute/{{id}}/accept" class="accept _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Publish this{{/__}}"><i class="fa fa-check-circle"></i></a>
 							{{/acceptable}}
 							{{/_user._is_editor}}
 							{{#editable}}
-							<a href="{{{_url}}}/contribute/{{id}}" class="edit _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Edit this{{/__}}"><i class="fa fa-pencil"></i></a>
+							<a href="{{{_url}}}/contribute/{{id}}#{{id}}" class="edit _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Edit this{{/__}}"><i class="fa fa-pencil"></i></a>
 							{{/editable}}
 						</div>
 					</div>

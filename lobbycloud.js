@@ -361,8 +361,6 @@ app.post('/contribute/:id/update', function (req, res) {
 			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user "+req.user.id+" ("+req.user.role+") tried to access queue item "+id));
 			if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document "+id+" stage "+doc.stage));
 
-			console.log(req.body);
-
 			l.queue.update(id, {
 				topic: (req.body.topic || null),
 				organisation: (req.body.organisation || null),
@@ -381,6 +379,64 @@ app.post('/contribute/:id/update', function (req, res) {
 		
 	});
 	
+});
+
+/* cancel */
+app.get('/contribute/:id/cancel', function (req, res){
+	/* only for users */
+	if (!req.user) return res.redirect("/contribute");
+	
+	l.queue.check(req.param("id"), function(err, exists, id){
+		if (err) return send500(req, res, err);
+		if (!exists) return send404(req, res);
+	
+		l.queue.get(id, function(err, doc){
+			if (err) return send500(req, res, err);
+
+			/* check privileges */
+			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user "+req.user.id+" ("+req.user.role+") tried to access queue item "+id));
+			if (doc.stage >= 3) return send500(req, res, new Error("stage violation: document "+id+" stage "+doc.stage));
+
+			l.queue.update(id, {
+				stage: 5
+			}, function(err, data){
+				if (err) return send500(req, res, err);
+
+				/* redirect to index :) */
+				res.redirect("/contribute");
+				
+			});
+			
+		});
+		
+	});
+	
+});
+
+/* quick accept for admins and so */
+app.get('/contribute/:id/accept', function (req, res){
+	/* only for users */
+	if (!req.user) return res.redirect("/contribute");
+	
+	l.queue.check(req.param("id"), function(err, exists, id){
+		if (err) return send500(req, res, err);
+		if (!exists) return send404(req, res);
+	
+		l.queue.get(id, function(err, doc){
+			if (err) return send500(req, res, err);
+
+			/* check privileges */
+			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user "+req.user.id+" ("+req.user.role+") tried to access queue item "+id));
+			if (doc.stage !== 1) return send500(req, res, new Error("stage violation: document "+id+" stage "+doc.stage));
+
+			l.queue.accept(req.param("id"), function(err){
+				if (err) return send500(req, res, err);
+
+				/* redirect to index :) */
+				res.redirect("/contribute");
+			});
+		});
+	});
 });
 
 /* profile */
@@ -893,7 +949,6 @@ app.get('/research', function (req, res) {
 	// FIXME: put /search here or so
 	res.redirect("/search");
 });
-
 
 /* search */
 app.all('/search', function (req, res) {

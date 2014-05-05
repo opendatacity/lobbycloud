@@ -391,8 +391,6 @@ module.exports = queue = function(config, db, l){
 						/* set last modified */
 						update.updated = (new Date());
 
-						console.log(update);
-
 						db.collection("queue").findAndModify({"query":{"id":id},"update":{"$set":update},"new":true}, function(err, doc){
 							if (err) return callback(err);
 
