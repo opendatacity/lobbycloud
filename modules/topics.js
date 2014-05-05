@@ -174,7 +174,7 @@ module.exports = function (opts, db, es) {
 			var callback = num;
 			var num = 1;
 		}
-		db.collection("topics").find().sort({"created": 1}).limit(num, function(err, result) {
+		db.collection("topics").find().sort({"created": -1}).limit(num, function(err, result) {
 			if (err) return callback(err);
 			result.forEach(function(r) {
 				cache[r.id] = r;

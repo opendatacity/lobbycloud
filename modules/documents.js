@@ -230,7 +230,7 @@ module.exports = documents = function(config, db, l){
 			var callback = num;
 			var num = 1;
 		}
-		db.collection("documents").find().sort({"created": 1}).limit(num, function(err, result) {
+		db.collection("documents").find().sort({"created": -1}).limit(num, function(err, result) {
 			if (err) return callback(err);
 			if (result.length === 0) return callback(null, []);
 			result.forEach(function(r) {
@@ -243,7 +243,6 @@ module.exports = documents = function(config, db, l){
 			});
 		});
 	};
-
 
 	/* get documents for user */
 	documents.by_user = function(user_id, callback) {
@@ -448,6 +447,7 @@ module.exports = documents = function(config, db, l){
 		});
 	};
 
+	/* search documents */
 	documents.search = function(q, callback) {
 		l.elastic.search('document', q, 'text', function (err, hits) {
 			if (err) return callback(err);
