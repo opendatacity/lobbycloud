@@ -79,6 +79,19 @@ header {
 				padding: 5px 9px;
 			
 			}
+
+		header #navbar .navbar-nav .open .dropdown-menu a {
+		
+			background-color: #fff;
+			
+		}
+
+		header #navbar .navbar-nav .open .dropdown-menu a:hover {
+		
+			color: #333;
+			
+		}
+
 		
 		header #navbar .navbar-toggle span {
 			
@@ -133,7 +146,7 @@ header {
 				
 				}
 		
-	
+		
 #main {
 	
 	padding-bottom: 20px;
