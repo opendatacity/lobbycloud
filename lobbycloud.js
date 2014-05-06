@@ -462,6 +462,14 @@ app.get('/about', function (req, res) {
 	render(req, res, 'about', {});
 });
 
+
+/* shop */
+app.get('/shop', function (req, res) {
+	render(req, res, 'shop', {});
+});
+
+
+
 /* contribution guidelines */
 app.get('/contribution-guidelines', function (req, res) {
 	render(req, res, 'contribution-guidelines', {});
