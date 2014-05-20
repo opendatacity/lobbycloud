@@ -1107,9 +1107,13 @@ footer {
 	footer a.greens-efa {
 		
 		display: inline-block;
+		position: relative;
+		top: -4px;
+		margin-bottom: -8px;
 		text-indent: -99999px;
-		width: 50px;
+		width: 260px;
 		background: url(../img/greens-efa.png) center center no-repeat;
+		height: 32px;
 		
 	}
 	
