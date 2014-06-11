@@ -24,6 +24,7 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 * My (ppublished) Documents
 * Revamp Upload to All-Page-Dragndrop
 * Pagination
+* Wrong Login Error Message
 
 ## Content
 
