@@ -165,6 +165,24 @@ app.configure(function() {
 	app.use(passport.initialize());
 	app.use(passport.session());
 
+	/* auth by apikey */
+	app.use(function(req, res, next){
+		if (req.user) return next();
+		if (req.hasOwnProperty("body") && req.body.hasOwnProperty("apikey")) {
+			var _apikey = req.body.apikey;
+		} else if (req.hasOwnProperty("params") && req.params.hasOwnProperty("apikey")) {
+			var _apikey = req.params.apikey;
+		} else if (req.headers.hasOwnProperty("x-apikey")) {
+			var _apikey = req.headers["x-apikey"];
+		} else {
+			return next();
+		}
+		l.users.apikey(_apikey, function(err, user){
+			if (err) return next();
+			if (user) req.user = user;
+			next();
+		});
+	});
 });
 
 /* routes */
@@ -729,6 +747,8 @@ app.post('/api/contribute', function (req, res) {
 
 /* upload */
 app.post('/api/upload', function (req, res) {
+
+	if (!req.user) return res.json({"status": "error", "message": i18n.__("Please log in to upload files")});
 
 	if (!req.files.hasOwnProperty("_upload")) return res.json({"status": "error"});
 
