@@ -2,6 +2,13 @@
 
 This is just for the LobbyCloud team to keep track of things we would otherwise forget.
 
+
+
+
+## Setup
+
+* Secure MongoDB and Elasticsearch HTTP Interfaces against mischief
+
 ## Code
 
 * Delete old tmp files
@@ -13,8 +20,10 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 * queue for thumnails, resize, etc in extract.js
 * typeahead sends every keystroke as a suggest-search, maybe a little delay for typing?
 
+
 ## Views
 
+* Edit Documents
 * Browse Organisations
 * Browse Documents
 * Browse Topics
