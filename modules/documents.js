@@ -426,6 +426,8 @@ module.exports = documents = function(config, db, l){
 	documents.add_organisations = function(list, callback) {
 		if (list.length === 0) return callback(null, list);
 		var _completed = 0;
+		var _total = 0;
+		list.forEach(function(item){ _total += item.organisations.length; });
 		list.forEach(function(item){
 			item.organisations_data = [];
 			item.organisations.forEach(function(organisation){
@@ -433,19 +435,20 @@ module.exports = documents = function(config, db, l){
 					/* be fault tolerant */
 					if (!err) item.organisations_data.push(organisation_data);
 					_completed++;
-					if (_completed === list.length) {
+					if (_completed === _total) {
 						callback(null, list);
 					}
 				});
 			});
 		});	
 	};
-
 	
 	/* add topic data to an array of documents */
 	documents.add_topics = function(list, callback) {
 		if (list.length === 0) return callback(null, list);
 		var _completed = 0;
+		var _total = 0;
+		list.forEach(function(item){ _total += item.topics.length; });
 		list.forEach(function(item){
 			item.topics_data = [];
 			item.topics.forEach(function(topic){
@@ -453,7 +456,7 @@ module.exports = documents = function(config, db, l){
 					/* be fault tolerant */
 					if (!err) item.topics_data.push(topic_data);
 					_completed++;
-					if (_completed === list.length) {
+					if (_completed === _total) {
 						callback(null, list);
 					}
 				});
