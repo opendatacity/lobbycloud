@@ -97,6 +97,57 @@ var _totags = function (tags) {
 	}
 };
 
+/* http helpers */
+var send404 = function(req, res) {
+	if (config.debug) console.error("[404]", req.method, req.originalUrl);
+	res.status(404);
+	render(req, res, '404', {});
+};
+
+var send500 = function(req, res, err) {
+	if (err) console.error("[500]", err);
+	res.status(500);
+	render(req, res, '500', {});
+};
+
+var sendProfile = function (profile, req, res) {
+	render(req, res, 'profile', {
+		"is_own": (profile) && (req.user) && (profile.id == req.user.id),
+		"profile": profile,
+		"moment": function () {
+			return function (text, render) {
+				return moment(new Date(render(text))).format("LLL");
+			}
+		}
+	});
+};
+
+var render = function (req, res, name, opt) {
+	var opt = (opt || {});
+	opt._user = req.user;
+	opt._url = config.url;
+	opt._storage = config.storage;
+	opt._userrole = {};
+	if (req.user) {
+		
+		/* FIXME: this is ambiguous */
+		opt._user._is_admin = (req.user.role === "admin");
+		opt._user._is_editor = (req.user.role === "admin" || req.user.role === "editor");
+
+		opt._userrole[opt._user.role] = true;
+		if (opt._user.role == l.users.roles.admin) {
+			opt._userrole[l.users.roles.editor] = true;
+			opt._userrole[l.users.roles.user] = true;
+		}
+		if (opt._user.role == l.users.roles.editor) {
+			opt._userrole[l.users.roles.user] = true;
+		}
+	}
+	opt._headers = {};
+	opt._headers[name] = true;
+	res.render(name, opt);
+};
+
 /* launch express */
 var app = express();
 
@@ -287,30 +338,6 @@ app.post('/beta', function (req, res) {
 		});
 	});
 });
-
-var send404 = function(req, res) {
-	if (config.debug) console.error("[404]", req.method, req.originalUrl);
-	res.status(404);
-	render(req, res, '404', {});
-};
-
-var send500 = function(req, res, err) {
-	if (err) console.error("[500]", err);
-	res.status(500);
-	render(req, res, '500', {});
-};
-
-var sendProfile = function (profile, req, res) {
-	render(req, res, 'profile', {
-		"is_own": (profile) && (req.user) && (profile.id == req.user.id),
-		"profile": profile,
-		"moment": function () {
-			return function (text, render) {
-				return moment(new Date(render(text))).format("LLL");
-			}
-		}
-	});
-};
 
 /* contributions */
 app.get('/contribute/:id?', function (req, res) {
@@ -826,32 +853,6 @@ app.post('/users/verification/request', function (req, res) {
 	});
 });
 
-var render = function (req, res, name, opt) {
-	var opt = (opt || {});
-	opt._user = req.user;
-	opt._url = config.url;
-	opt._storage = config.storage;
-	opt._userrole = {};
-	if (req.user) {
-		
-		/* FIXME: this is ambiguous */
-		opt._user._is_admin = (req.user.role === "admin");
-		opt._user._is_editor = (req.user.role === "admin" || req.user.role === "editor");
-
-		opt._userrole[opt._user.role] = true;
-		if (opt._user.role == l.users.roles.admin) {
-			opt._userrole[l.users.roles.editor] = true;
-			opt._userrole[l.users.roles.user] = true;
-		}
-		if (opt._user.role == l.users.roles.editor) {
-			opt._userrole[l.users.roles.user] = true;
-		}
-	}
-	opt._headers = {};
-	opt._headers[name] = true;
-	res.render(name, opt);
-};
-
 /* check validation e-mail key */
 app.get('/users/verification/:key', function (req, res) {
 	if (!req.param("key")) return res.send(400);
@@ -877,7 +878,10 @@ app.post('/users/reset/request', function (req, res) {
 	});
 });
 
-var resetPasswordCmd = function (req, res) {
+/* passwort reset */
+app.all('/users/reset/:key', function (req, res) {
+	if (req.method !== "GET" && req.method !== "POST") return send500();
+
 	var _form = function (message) {
 		render(req, res, 'reset', {
 			"message": message,
@@ -923,13 +927,7 @@ var resetPasswordCmd = function (req, res) {
 	} else {
 		_reset();
 	}
-};
-
-/* passwort reset site */
-app.get('/users/reset/:key', resetPasswordCmd);
-
-/* passwort reset */
-app.post('/users/reset/:key', resetPasswordCmd);
+});
 
 /* backend api login */
 app.post('/api/backend/login', passport.authenticate('local', {}), function (req, res) {
