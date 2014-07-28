@@ -21,6 +21,32 @@ module.exports = documents = function(config, db, l){
 	db.collection("documents").ensureIndex("created", {"background": true});
 	/* waaaay more indexes! */
 
+	/* fix documents without topics and organisations fields */
+	db.collection("documents").find({"topics":{"$exists":false}}, function(err, result){
+		if (err) return;
+		/* change */
+		result.forEach(function(doc){
+			db.collection("documents").findAndModify({"query": {"id": doc.id}, "update": {
+				"$set": {
+					"topics": [doc.topic].filter(function(topic){ return (topic !== null) }),
+					"organisations": [doc.organisation].filter(function(organisation){ return (organisation !== null) })
+				},
+				"$unset": {
+					"topic": "",
+					"organisation": ""
+				}
+			}, "new": true}, function (err, doc) {
+				if (err) return;
+				/* update cache */
+				cache[doc.id] = doc;
+				/* update elasticsearch index */
+				var es_store = ["lang","user","tags","topics","organisations","created","updated","text"];
+				if (l.elastic.hasUpdateField(doc, es_store)) l.elastic.update('document', doc.id, l.elastic.prepareFieldsObj(doc, es_store));
+				if (config.debug) console.log("[documents] fixed document ["+doc.id+"]");
+			});
+		});
+	});
+	
 	/* check a document id */
 	documents.checkid = function(id) {
 		return /^([a-z0-9]{8})$/.test(id);
@@ -37,56 +63,100 @@ module.exports = documents = function(config, db, l){
 				if (!doc.hasOwnProperty("stage") || doc.stage !== 3) return callback(new Error("queue item is not approved"));
 				
 				/* check if organisation is an id */
-				if (doc.hasOwnProperty("organisation") && doc.organisation !== null && !doc.organisation.hasOwnProperty("id")) return callback(new Error("organisation must be specified by id"));
+				if (doc.hasOwnProperty("organisations") && (!(doc.organisation instanceof Array))) return callback(new Error("organisations must be an array"));
 
 				/* check if topic is an id */
-				if (doc.hasOwnProperty("topic") && doc.topic !== null && !doc.topic.hasOwnProperty("id")) return callback(new Error("topic must be specified by id"));
+				if (doc.hasOwnProperty("topics") && (!(doc.topics instanceof Array))) return callback(new Error("topcis must be an array"));
+
+				/* check organisations for existance */
+				var check_organisations = function(_callback) {
+					if (doc.organisations.length === 0) return _callback(null);
+					var _checked = 0;
+					var _error = null;
+					doc.organisations.forEach(function(organisation,index){
+						if (organisation.hasOwnProperty("new")) {
+							/* create organisation */
+							return l.organisations.add({
+								name: organisation.new,
+							}, function(err, org){
+								_checked++;
+								if (err) {
+									_error = new Error("organisation could not be created");
+								} else {
+									doc.organisations[index] = org.id;
+								}
+								if (_checked === doc.organisations.length) {
+									_callback(_error);
+								}
+							});
+						} else if (doc.organisation.hasOwnProperty("id")) { 
+							organisations.check(doc.organisation.id, function(err, exists){
+								_checked++;
+								if (err) { 
+									_error = (new Error(err));
+								} else if (!exists) {
+									_error = (new Error("organisation does not exist"));
+								}
+								if (_checked === doc.organisations.length) {
+									_callback(_error);
+								}
+							});
+						} else {
+							_checked++;
+							_error = (new Error("organisation has to be created"));
+							if (_checked === doc.organisations.length) {
+								_callback(_error);
+							}
+						}
+					});
+				};
 				
-				/* check if an organisation exists */
-				var check_organisation = function(_callback) {
-					if (doc.organisation === null) return _callback(null);
-					if (doc.organisation.hasOwnProperty("new")) {
-						/* create organisation */
-						return l.organisations.add({
-							name: doc.organisation.new,
-						}, function(err, org){
-							if (err) _callback(new Error("organisation could not be created"));
-							doc.organisation = org.id;
-							_callback(null);
-						});
-					};
-					if (!doc.organisation.hasOwnProperty("id")) return _callback(new Error("organisation has to be created"));
-					organisations.check(doc.organisation.id, function(err, exists){
-						if (err) return _callback(new Error(err));
-						if (!exists) return _callback(new Error("organisation does not exist"));
-						_callback(null);
+				/* check topics for existance */
+				var check_topics = function(_callback) {
+					if (doc.topics.length === 0) return _callback(null);
+					var _checked = 0;
+					var _error = null;
+					doc.topics.forEach(function(topic,index){
+						if (topic.hasOwnProperty("new")) {
+							/* create topic */
+							return l.topics.add({
+								name: topic.new,
+							}, function(err, top){
+								_checked++;
+								if (err) {
+									_error = new Error("topic could not be created");
+								} else {
+									doc.topics[index] = top.id;
+								}
+								if (_checked === doc.topics.length) {
+									_callback(_error);
+								}
+							});
+						} else if (doc.topic.hasOwnProperty("id")) { 
+							topics.check(doc.topic.id, function(err, exists){
+							_checked++;
+								if (err) { 
+									_error = (new Error(err));
+								} else if (!exists) {
+									_error = (new Error("topic does not exist"));
+								}
+								if (_checked === doc.topics.length) {
+									_callback(_error);
+								}
+							});
+						} else {
+							_checked++;
+							_error = (new Error("topic has to be created"));
+							if (_checked === doc.topics.length) {
+								_callback(_error);
+							}
+						}
 					});
 				};
-		
-				/* check if a topic exists */
-				var check_topic = function(_callback) {
-					if (doc.topic === null) return _callback(null);
-					if (doc.topic.hasOwnProperty("new")) {
-						/* create organisation */
-						return l.topic.add({
-							label: doc.topic.new,
-						}, function(err, topic){
-							if (err) _callback(new Error("topic could not be created"));
-							doc.topic = topic.id;
-							_callback(null);
-						});
-					};
-					if (!doc.topic.hasOwnProperty("id")) return _callback(new Error("topic has to be created"));
-					l.topics.check(doc.topic.id, function(err, exists){
-						if (err) return _callback(new Error(err));
-						if (!exists) return _callback(new Error("topic does not exist"));
-						_callback(null);
-					});
-				};
-		
-				check_organisation(function(err){
+				
+				check_organisations(function(err){
 					if (err) return callback(err);
-					check_topic(function(err){
+					check_topics(function(err){
 						if (err) return callback(err);
 
 						/* save */
@@ -100,8 +170,8 @@ module.exports = documents = function(config, db, l){
 							orig: doc.orig,
 							lang: doc.lang,
 							tags: doc.tags,
-							topic: ((doc.topic && doc.topic.hasOwnProperty("id")) ? doc.topic.id : null),
-							organisation: ((doc.organisation && doc.organisation.hasOwnProperty("id")) ? doc.organisation.id : null),
+							topics: doc.topics,
+							organisations: doc.organisations,
 							comments: [], // comments without places
 							notes: [], // comments with places
 							changesets: [], // for lobbyplag
@@ -139,15 +209,14 @@ module.exports = documents = function(config, db, l){
 		if (!documents.checkid(id)) return callback(new Error("invaild id"));
 		documents.get(id, function(err, doc){
 			if (err) return callback(err);
-			l.elastic.create('document', doc.id,{
+			l.elastic.create('document', doc.id,{ 
 				lang: doc.lang,
 				user: doc.user,
 				tags: doc.tags.join(','),
-				topic: doc.topic,
-				organisation: doc.organisation,
+				topics: doc.topics.join(','),
+				organisations: doc.organisations.join(','),
 				created: doc.created,
-				updated: doc.updated
-				,
+				updated: doc.updated,
 				text: doc.data.text
 			}, function(err,resp){
 				if (err) return console.log("[documents] creation of search index for ["+doc.id+"] failed", err);
@@ -288,10 +357,10 @@ module.exports = documents = function(config, db, l){
 		/* devise statement according to query */
 		if (topic_id instanceof Array) {
 			/* get all stages */
-			var find = {"topic": {"$in": topic_id}};
+			var find = {"topics": {"$in": topic_id}};
 		} else if (typeof topic_id === "string") {
 			/* get particular stage */
-			var find = {"topic": topic_id};
+			var find = {"topics": topic_id};
 		} else {
 			/* nope */
 			return callback(new Error("no topic specified"));
@@ -324,9 +393,9 @@ module.exports = documents = function(config, db, l){
 
 		/* devise statement according to query */
 		if (organisation_id instanceof Array) {
-			var find = {"organisation": {"$in": organisation_id}};
+			var find = {"organisations": {"$in": organisation_id}};
 		} else if (typeof organisation_id === "string") {
-			var find = {"organisation": organisation_id};
+			var find = {"organisations": organisation_id};
 		} else {
 			return callback(new Error("no organisation specified"));
 		}
@@ -352,59 +421,80 @@ module.exports = documents = function(config, db, l){
 			});
 		});
 	};
-	
-	/* add organisation data to an array of organisations */
+
+	/* add organisation data to an array of documents */
 	documents.add_organisations = function(list, callback) {
 		if (list.length === 0) return callback(null, list);
 		var _completed = 0;
 		list.forEach(function(item){
-			l.organisations.get(item.organisation, function(err, org){
-				/* be fault tolerant */
-				if (!err) item.organisation_data = org;
-				_completed++;
-				if (_completed === list.length) {
-					callback(null, list);
-				}
+			item.organisations_data = [];
+			item.organisations.forEach(function(organisation){
+				l.organisations.get(organisation, function(err, organisation_data){
+					/* be fault tolerant */
+					if (!err) item.organisations_data.push(organisation_data);
+					_completed++;
+					if (_completed === list.length) {
+						callback(null, list);
+					}
+				});
 			});
 		});	
 	};
+
 	
-	/* add topic data to an array of organisations */
+	/* add topic data to an array of documents */
 	documents.add_topics = function(list, callback) {
 		if (list.length === 0) return callback(null, list);
 		var _completed = 0;
 		list.forEach(function(item){
-			l.topics.get(item.topic, function(err, topic){
+			item.topics_data = [];
+			item.topics.forEach(function(topic){
+				l.topics.get(topic, function(err, topic_data){
+					/* be fault tolerant */
+					if (!err) item.topics_data.push(topic_data);
+					_completed++;
+					if (_completed === list.length) {
+						callback(null, list);
+					}
+				});
+			});
+		});	
+	};
+	
+	/* add organisation data to a document */
+	documents.extend_organisations = function(list, callback) {
+		if (list.length === 0) return callback(null, list);
+		var _completed = 0;
+		var data = [];
+		list.forEach(function(item){
+			l.organisations.get(item, function(err, org){
 				/* be fault tolerant */
-				if (!err) item.topic_data = topic;
+				if (!err) data.push(org);
 				_completed++;
 				if (_completed === list.length) {
-					callback(null, list);
+					callback(null, data);
+				}
+			});
+		});	
+	};
+
+	/* add organisation data to a document */
+	documents.extend_topics = function(list, callback) {s
+		if (list.length === 0) return callback(null, list);
+		var _completed = 0;
+		var data = [];
+		list.forEach(function(item){
+			l.topics.get(item, function(err, topic){
+				/* be fault tolerant */
+				if (!err) data.push(topic);
+				_completed++;
+				if (_completed === list.length) {
+					callback(null, data);
 				}
 			});
 		});	
 	};
 	
-	/* add organisation data to an array of organisations */
-	documents.add_organisation = function(item, callback) {
-		if (!item.hasOwnProperty("organisation") || item.organisation === null) return callback(null, item);
-		l.organisations.get(item.organisation, function(err, org){
-			/* be fault tolerant */
-			if (!err) item.organisation_data = org;
-			callback(null, item);
-		});
-	};
-	
-	/* add topic data to an array of organisations */
-	documents.add_topic = function(item, callback) {
-		if (!item.hasOwnProperty("topic") || item.topic === null) return callback(null, item);
-		l.topics.get(item.topic, function(err, topic){
-			/* be fault tolerant */
-			if (!err) item.topic_data = topic;
-			callback(null, item);
-		});
-	};
-
 	/* increments stats.views by one */
 	documents.count_view = function(id, callback) {
 		db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$inc": {"stats.views": 1}}, "new": true}, function (err, doc) {

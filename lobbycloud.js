@@ -505,10 +505,20 @@ app.get('/document/:id', function (req, res) {
 		if (!exists) return send404(req, res);
 		l.documents.get(id, function(err, doc){
 			if (err) return send500(req, res, err);
-			l.documents.add_topic(doc, function(err, doc){
+			l.documents.extend_topics(doc.topics, function(err, topics_data){
 				if (err) return send500(req, res, err);
-				l.documents.add_organisation(doc, function(err, doc){
+				l.documents.extend_organisations(doc.organisations, function(err, organisations_data){
 					if (err) return send500(req, res, err);
+
+					if (topics_data.length > 0) topics_data[(topics_data.length-1)].last = true;
+					if (organisations_data.length > 0) organisations_data[(organisations_data.length-1)].last = true;
+
+					doc.organisations = organisations_data;
+					doc.topics = topics_data;
+					doc.has_organisations = (organisations_data.length > 0);
+					doc.has_topics = (topics_data.length > 0);
+					doc.has_topics_or_organisations = (doc.has_topics || doc.has_organisations);
+					doc.has_topics_and_organisations = (doc.has_topics && doc.has_organisations);
 
 					/* prepare some stuff */
 					doc.data.text_lines = doc.data.text.split(/\n/g);

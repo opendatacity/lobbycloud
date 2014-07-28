@@ -148,19 +148,27 @@ module.exports = queue = function(config, db, l){
 					doc.source = null;
 				}
 
-				/* check for topic */
+				/* check for topics */
+				doc.topics = [];
 				if (data.hasOwnProperty("topic") && typeof data.topic === "string" && data.topic !== "") {
-					doc.topic = data.topic;
-				} else {
-					doc.topic = null;
-				}
+					doc.topics.push(data.topic);
+				};
+				if (data.hasOwnProperty("topics") && (data.topics instanceof Array)) {
+					data.topics.forEach(function(topic){
+						if (typeof topic === "string" && topic !== "") doc.topics.push(topic);
+					});
+				};
 		
-				/* check for organisation */
+				/* check for organisations */
+				doc.organisations = [];
 				if (data.hasOwnProperty("organisation") && typeof data.organisation === "string" && data.organisation !== "") {
-					doc.organisation = data.organisation;
-				} else {
-					doc.organisation = null;
-				}
+					doc.organisations.push(data.organisation);
+				};
+				if (data.hasOwnProperty("organisations") && (data.organisations instanceof Array)) {
+					data.organisations.forEach(function(organisation){
+						if (typeof organisation === "string" && organisation !== "") doc.organisations.push(organisation);
+					});
+				};
 		
 				/* check for comment */
 				if (data.hasOwnProperty("comment") && typeof data.comment === "string" && data.comment !== "") {
@@ -191,40 +199,52 @@ module.exports = queue = function(config, db, l){
 					doc.tags = [];
 				}
 		
-				/* check if an organisation exists */
-				var check_organisation = function(_callback) {
-					if (doc.organisation === null) return _callback();
-					organisations.check(doc.organisation, function(err, exists, org_id){
-						if (err) {
-							doc.organisation = null;
-							return _callback();
-						} else if (exists) {
-							doc.organisation = {"id": org_id};
-						} else {
-							doc.organisation = {"new": doc.organisation};
-						}
-						_callback();
+				/* check any organisation for its existance */
+				var check_organisations = function(_callback) {
+					if (doc.organisations.length === 0) return _callback();
+					var _checked = 0;
+					doc.organisations.forEach(function(organisation, index){
+						organisations.check(organisation, function(err, exists, org_id){
+							_checked++;
+							if (err) {
+								doc.organisations[index] = null;
+							} else if (exists) {
+								doc.organisations[index] = {"id": org_id};
+							} else {
+								doc.organisations[index] = {"new": doc.organisation};
+							}
+							if (_checked === doc.organisations.length) {
+								doc.organisations.filter(function(organisation){ return (organisation !== null); });
+								_callback();
+							}
+						});
 					});
-				}
+				};
 		
-				/* check if an organisation exists */
-				var check_topic = function(_callback) {
-					if (doc.topic === null) return _callback();
-					topics.check(doc.topic, function(err, exists, topic_id){
-						if (err) {
-							doc.topic = null;
-							return _callback();
-						} else if (exists) {
-							doc.topic = {"id": topic_id};
-						} else {
-							doc.topic = {"new": doc.topic};
-						}
-						_callback();
+				/* check any topic for its existance */
+				var check_topics = function(_callback) {
+					if (doc.topics.length === 0) return _callback();
+					var _checked = 0;
+					doc.topics.forEach(function(topic, index){
+						topics.check(topic, function(err, exists, topic_id){
+							_checked++;
+							if (err) {
+								doc.topics[index] = null;
+							} else if (exists) {
+								doc.topics[index] = {"id": topic_id};
+							} else {
+								doc.topics[index] = {"new": topic};
+							}
+							if (_checked === doc.topics.length) {
+								doc.topics.filter(function(topic){ return (topic !== null); });
+								_callback();
+							}
+						});
 					});
-				}
+				};
 		
-				check_organisation(function(){
-					check_topic(function(){
+				check_organisations(function(){
+					check_topics(function(){
 				
 						/* generate an id */
 						queue.idgen(function(err,id){
@@ -355,36 +375,68 @@ module.exports = queue = function(config, db, l){
 					update.comment = data.comment;
 				}
 
-				/* check if an organisation exists */
-				var check_organisation = function(_callback) {
-					if (!data.hasOwnProperty("organisation")) return _callback();
-					organisations.check(data.organisation, function(err, exists, org_id){
-						if (err) return _callback();
-						if (exists) {
-							update.organisation = {"id": org_id};
+				/* check any unchecked organisation for its existance */
+				var check_organisations = function(_callback) {
+					if (doc.organisations.length === 0) return _callback();
+					var _checked = 0;
+					doc.organisations.forEach(function(organisation, index){
+						if (typeof organisation === "object" && (organisation.hasOwnProperty("id") || organisation.hasOwnProperty("new"))) {
+							_checked++;
+							if (_checked === doc.organisations.length) {
+								doc.organisations.filter(function(organisation){ return (organisation !== null); });
+								_callback();
+							}
 						} else {
-							update.organisation = {"new": data.organisation};
+							organisations.check(organisation, function(err, exists, org_id){
+								_checked++;
+								if (err) {
+									doc.organisations[index] = null;
+								} else if (exists) {
+									doc.organisations[index] = {"id": org_id};
+								} else {
+									doc.organisations[index] = {"new": doc.organisation};
+								}
+								if (_checked === doc.organisations.length) {
+									doc.organisations.filter(function(organisation){ return (organisation !== null); });
+									_callback();
+								}
+							});
 						}
-						_callback();
 					});
-				}
+				};
 		
-				/* check if a topic exists */
-				var check_topic = function(_callback) {
-					if (!data.hasOwnProperty("topic")) return _callback();
-					topics.check(data.topic, function(err, exists, topic_id){
-						if (err) return _callback();
-						if (exists) {
-							update.topic = {"id": topic_id};
+				/* check any unchecked topic for its existance */
+				var check_topics = function(_callback) {
+					if (doc.topics.length === 0) return _callback();
+					var _checked = 0;
+					doc.topics.forEach(function(topic, index){
+						if (typeof topic === "object" && (topic.hasOwnProperty("id") || topic.hasOwnProperty("new"))) {
+							_checked++;
+							if (_checked === doc.topics.length) {
+								doc.topics.filter(function(topic){ return (topic !== null); });
+								_callback();
+							}
 						} else {
-							update.topic = {"new": data.topic};
+							topics.check(topic, function(err, exists, topic_id){
+								_checked++;
+								if (err) {
+									doc.topics[index] = null;
+								} else if (exists) {
+									doc.topics[index] = {"id": topic_id};
+								} else {
+									doc.topics[index] = {"new": topic};
+								}
+								if (_checked === doc.topics.length) {
+									doc.topics.filter(function(topic){ return (topic !== null); });
+									_callback();
+								}
+							});
 						}
-						_callback();
 					});
-				}
+				};
 		
-				check_organisation(function(){
-					check_topic(function(){
+				check_organisations(function(){
+					check_topics(function(){
 
 						// FIXME: check if anything to update
 

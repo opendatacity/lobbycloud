@@ -5,17 +5,19 @@
 		<div class="row">
 			<div class="col-md-8">
 				<h1>{{#__}}Document{{/__}} <strong>{{id}}</strong></h1>
-				{{#topic}}
+				{{#has_topics_or_organisations}}
 				<p>
-					{{#__}}Topic{{/__}}: 
-					<a href="{{_url}}/topic/{{topic}}" title="{{topic_data.subject}}"><strong>{{topic_data.label}}</strong></a>
-					{{#organisation}}<br />{{/organisation}}
-				{{/topic}}
-				{{#organisation}}
-					{{#__}}Organisation{{/__}}:
-					<a href="{{_url}}/organisation/{{organisation}}" title="{{organisation_data.fullname}}"><strong>{{organisation_data.name}}</strong></a>
+					{{#__}}Topics{{/__}}: 
+					{{#topics}}
+						<a href="{{_url}}/topic/{{id}}" title="{{subject}}"><strong>{{label}}</strong></a>{{^last}},{{/last}}
+					{{/topics}}
+					{{#has_topics_and_organisations}}<br/>{{/has_topics_and_organisations}}
+					{{#__}}Organisations{{/__}}:
+					{{#organisations}}
+						<a href="{{_url}}/organisation/{{id}}" title="{{fullname}}"><strong>{{name}}</strong></a>{{^last}},{{/last}}
+					{{/organisations}}
 				</p>
-				{{/organisation}}
+				{{/has_topics_or_organisations}}
 			</div>
 			<div class="col-md-4">
 				<p class="tags">
