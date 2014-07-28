@@ -198,6 +198,11 @@ app.get('/', function (req, res) {
 	});
 });
 
+/* redirects */
+app.get('/research', function (req, res) {
+	res.redirect("/search");
+});
+
 /* frontend login & logout */
 app.get('/login', function (req, res) {
 	render(req, res, 'login', {
@@ -662,36 +667,26 @@ app.get('/organisation/:id', function (req, res) {
 	});
 });
 
-/* upload */
-/*
-app.get('/upload', function (req, res) {
-	if (!req.user) return res.redirect('/login?redirect=/upload');
-	l.queue.user(req.user.id, function(err, queue){
-		queue.map(function(item){
-			item["stage-"+item.stage] = true;
-			item["cancelable"] = (item.stage < 3);
-			item.created_formatted = moment(item.created).lang(req.locale||"en").format("YY-MM-DD HH:mm:ss");
-			item.created_relative = moment(item.created).lang(req.locale||"en").fromNow();
-			item.updated_relative = moment(item.created).lang(req.locale||"en").fromNow();
-			if (item.stage === 1 || item.stage >= 3) item.processed = true;
-		});
-		render(req, res, 'upload', {
-			queue: queue
-		});
+/* search */
+app.all('/search', function (req, res) {
+	var q = (req.body.query || req.query.query || "").replace(/\*/g,'');
+	if (q === null || q === "") return render(req, res, 'search', {});
+	l.documents.search(q, function(err, result){
+		render(req, res, 'search', {
+			query: q,
+			items: result
+		})
 	});
 });
-*/
 
 /**
  API
  **/
 
 /* api index FIXME: doc here */
-/*
 app.get('/api/', function (req, res) {
-	res.json("not implemented");
+	res.json("not implemented yet");
 });
-*/
 
 /* contribute. it's like upload, but different */
 app.post('/api/contribute', function (req, res) {
@@ -819,24 +814,6 @@ app.post('/api/upload', function (req, res) {
 	});
 
 });
-
-/* invites testing endpoint REMOVEME */
-/*
-app.get('/api/test/invites/:create?', function (req, res) {
-	if (req.param("create")) l.invites.create(req.param("create"));
-	res.json(l.invites.all());
-});
-*/
-
-/* accept testing endpoint REMOVEME */
-/*
-app.get('/api/test/accept/:id', function (req, res) {
-	l.queue.accept(req.param("id"), function(err){
-		if (err) return res.json({"error": err.toString()});
-		res.json({"id": req.param("id")});
-	});
-});
-*/
 
 /* manual validation e-mail request */
 app.post('/users/verification/request', function (req, res) {
@@ -966,30 +943,6 @@ app.post('/api/backend/:cmd', function (req, res) {
 	} else {
 		l.backendapi.request(req, res);
 	}
-});
-
-/* dummy api endpoint */
-/*
-app.get('/api/whatever', function (req, res) {
-	res.json("not implemented");
-});
-*/
-
-app.get('/research', function (req, res) {
-	// FIXME: put /search here or so
-	res.redirect("/search");
-});
-
-/* search */
-app.all('/search', function (req, res) {
-	var q = (req.body.query || req.query.query || "").replace(/\*/g,'');
-	if (q === null || q === "") return render(req, res, 'search', {});
-	l.documents.search(q, function(err, result){
-		render(req, res, 'search', {
-			query: q,
-			items: result
-		})
-	});
 });
 
 /* topic suggestions */
