@@ -128,7 +128,15 @@ app.factory('DocsService', function ($resource) {
 				method: 'POST',
 				params: {cmd: 'docs'},
 				isArray: true
-			}
+			},
+			item: {
+				method: 'POST',
+				params: {cmd: 'docs.get'}
+			},
+			update: {
+				method: 'POST',
+				params: {cmd: 'docs.update'}
+			},
 		}
 	);
 });

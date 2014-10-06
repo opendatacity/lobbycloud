@@ -124,8 +124,6 @@ module.exports = function (config, es) {
 	};
 
 	me.search = function (type, query, field, callback) {
-
-
 		var highlight = {"fields": {}};
 		highlight.fields[field] = {"number_of_fragments": 3};
 

@@ -475,12 +475,21 @@ module.exports = queue = function(config, db, l){
 				/* check for stage */
 				if (doc.stage !== 1) return callback(new Error("this queue element cannot be accepted"));
 				
-				/* check if organisation is an id */
-				if (!doc.hasOwnProperty("organisation") || doc.organisation !== null && !doc.organisation.hasOwnProperty("id")) return callback(new Error("organisation must be specified"));
+				/* check if organisations are set */
+				if (!doc.hasOwnProperty("organisations") ||
+					doc.organisations == null ||
+					doc.organisations.length ==0 ||
+					doc.organisations.filter(function(o){return o.id}).length!==doc.organisations.length
+				) return callback(new Error("organisations must be specified"));
 
-				/* check if topic is an id */
-				if (!doc.hasOwnProperty("topic") || doc.topic !== null && !doc.topic.hasOwnProperty("id")) return callback(new Error("topic must be specified"));
-								
+				/* check if topics are set */
+				if (!doc.hasOwnProperty("topics") ||
+					doc.topics == null ||
+					doc.topics.length ==0 ||
+					doc.topics.filter(function(o){return o.id}).length!==doc.topics.length
+				) return callback(new Error("topics must be specified"));
+
+
 				/* update to stage 3 */
 				queue.update(id, {stage: 3}, function(err, doc){
 					if (err) return callback(err);

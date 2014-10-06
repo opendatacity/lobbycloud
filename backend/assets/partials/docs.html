@@ -49,8 +49,8 @@
 						{{doc.orig}}
 					</td>
 					<td sortable="'created'">{{doc.created | amDateFormat:'LLL'}}</td>
-					<td><span ng-repeat="o in doc.topics">{{o.label}}</span></td>
-					<td><span ng-repeat="o in doc.organisation">{{o.label}}</span></td>
+					<td>{{doc.topics|listLabels}}</td>
+					<td>{{doc.organisations|listLabels}}</span></td>
 					<td sortable="'info.pages'">{{doc.info.pages}}</td>
 					<td class="doc-actions">
 						<div ng-show="doc.$processing">

@@ -488,8 +488,12 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 	$scope.resize();
 });
 
-app.controller('QueueItemController', function ($scope, $state, $stateParams, $timeout, $modal, AuthenticationService, QueueService, TopicsService, OrganisationsService, LangsService) {
+app.controller('DocController', function ($scope, $state, $stateParams, $timeout, $modal, AuthenticationService, QueueService, DocsService, TopicsService, OrganisationsService, LangsService) {
 	'use strict';
+
+	$scope.isQueue = ($state.current.name !== "docitem");
+
+	var service = $scope.isQueue ? QueueService : DocsService;
 
 	//typeahead callbacks
 	var dataset = function (prop) {
@@ -662,7 +666,7 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 
 		$scope.loading = true;
 		loadLangs(function () {
-			QueueService.item({id: $stateParams.id},
+			service.item({id: $stateParams.id},
 				function (data) {
 					$scope.initData(data);
 					$scope.loading = false;
@@ -697,7 +701,7 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 		//if (doc.topic) {
 		//	update.topic = (doc.topic.id ? {id: doc.topic.id} : {new: doc.topic.label});
 		//}
-		QueueService.update({id: $stateParams.id, doc: update},
+		service.update({id: $stateParams.id, doc: update},
 			function (data) {
 				$scope.initData(data);
 				$scope.sending = false;
@@ -714,6 +718,27 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 					$scope.errormessage = err.data;
 				}
 			});
+	};
+
+	//decline the document
+	$scope.decline = function () {
+		$scope.update(function () {
+			$scope.sending = true;
+			QueueService.decline({id: $stateParams.id},
+				function () {
+					$state.go('queue');
+					$scope.sending = false;
+				},
+				function (err) {
+					$scope.sending = false;
+					if (err.status == 401) {
+						AuthenticationService.reset();
+						$state.go('login');
+					} else if (err.status == 400) {
+						$scope.errormessage = err.data;
+					}
+				});
+		});
 	};
 
 	//accept the document

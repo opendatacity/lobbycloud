@@ -130,7 +130,6 @@ module.exports = function (lobbycloud, i18n) {
 		});
 	};
 
-
 	/* strips down document obj to values needed by ui */
 	var prepareClientDoc = function (doc, full, callback) {
 		if (!doc) return callback(null);
@@ -207,6 +206,32 @@ module.exports = function (lobbycloud, i18n) {
 					};
 					prepare(0);
 				});
+			}
+		},
+		'docs.get': {
+			access: lobbycloud.users.roles.user,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				lobbycloud.documents.get(req.body.id, function (err, data) {
+						if (err) return res.send(400, err.message || err);
+						prepareClientDoc(data, true, function (qitem) {
+							res.json(qitem);
+						});
+					}
+				);
+			}
+		},
+		'docs.update': {
+			access: lobbycloud.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id) || (!req.body.doc)) return res.send(400);
+				lobbycloud.documents.update(req.body.id, req.body.doc, function (err, data) {
+						if (err) return res.send(400, err.message || err);
+						prepareClientDoc(data, true, function (qitem) {
+							res.json(qitem);
+						});
+					}
+				);
 			}
 		},
 		'user': {

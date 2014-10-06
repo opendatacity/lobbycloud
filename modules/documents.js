@@ -54,7 +54,7 @@ module.exports = documents = function(config, db, l){
 
 	/* import a document from the queue */
 	documents.import = function(id, callback) {
-		if (!documents.checkid(id)) return callback(new Error("invaild id"));
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
 		l.queue.check(id, function(err, exists){
 			if (err) return callback(err);
 			if (!exists) return callback(new Error("not in queue"));
@@ -63,7 +63,7 @@ module.exports = documents = function(config, db, l){
 				if (!doc.hasOwnProperty("stage") || doc.stage !== 3) return callback(new Error("queue item is not approved"));
 				
 				/* check if organisation is an id */
-				if (doc.hasOwnProperty("organisations") && (!(doc.organisation instanceof Array))) return callback(new Error("organisations must be an array"));
+				if (doc.hasOwnProperty("organisations") && (!(doc.organisations instanceof Array))) return callback(new Error("organisations must be an array"));
 
 				/* check if topic is an id */
 				if (doc.hasOwnProperty("topics") && (!(doc.topics instanceof Array))) return callback(new Error("topcis must be an array"));
@@ -89,8 +89,8 @@ module.exports = documents = function(config, db, l){
 									_callback(_error);
 								}
 							});
-						} else if (doc.organisation.hasOwnProperty("id")) { 
-							organisations.check(doc.organisation.id, function(err, exists){
+						} else if (organisation.hasOwnProperty("id")) {
+							organisations.check(organisation.id, function(err, exists){
 								_checked++;
 								if (err) { 
 									_error = (new Error(err));
@@ -132,8 +132,8 @@ module.exports = documents = function(config, db, l){
 									_callback(_error);
 								}
 							});
-						} else if (doc.topic.hasOwnProperty("id")) { 
-							topics.check(doc.topic.id, function(err, exists){
+						} else if (topic.hasOwnProperty("id")) {
+							topics.check(topic.id, function(err, exists){
 							_checked++;
 								if (err) { 
 									_error = (new Error(err));
@@ -206,7 +206,7 @@ module.exports = documents = function(config, db, l){
 	/* create elastic search index for document */
 	documents.index = function(id, callback) {
 		if (typeof callback !== "function") var callback = function(){};
-		if (!documents.checkid(id)) return callback(new Error("invaild id"));
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
 		documents.get(id, function(err, doc){
 			if (err) return callback(err);
 			l.elastic.create('document', doc.id,{ 
@@ -219,7 +219,10 @@ module.exports = documents = function(config, db, l){
 				updated: doc.updated,
 				text: doc.data.text
 			}, function(err,resp){
-				if (err) return console.log("[documents] creation of search index for ["+doc.id+"] failed", err);
+				if (err) {
+					console.log("[documents] creation of search index for ["+doc.id+"] failed", err);
+					return callback(err);
+				}
 				if (config.debug) console.log("[documents] created new search index for ["+doc.id+"]");
 
 				// FIXME: seperate indexes for comments and notes
@@ -240,7 +243,7 @@ module.exports = documents = function(config, db, l){
 
 	/* check if a document exists */
 	documents.check = function(id, callback) {
-		if (!documents.checkid(id)) return callback(new Error("invaild id"));
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
 		if (cache.hasOwnProperty(id)) return callback(null, true, id);
 		db.collection("documents").find({id: id}, {_id: 1}).limit(1, function(err, result){
 			if (err) return callback(err);
@@ -250,19 +253,153 @@ module.exports = documents = function(config, db, l){
 
 	/* update a document */
 	documents.update = function(id, data, callback) {
-		if (!documents.checkid(id)) return callback(new Error("invaild id"));
-		callback(new Error("not implemented yet"));
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
+		documents.get(id, function(err, doc){
+			if (err) return callback(err);
+
+			var update = {};
+
+			/* check tags */
+			if (data.hasOwnProperty("tags")) {
+				if (data.tags instanceof Array) {
+					/* everything is fine */
+					update.tags = data.tags;
+				} else if (typeof data.tags === "string") {
+					if (data.tags !== "") {
+						/* split by linefeeds, returns, pounds, commas and semicolons */
+						update.tags = data.tags.split(/[,;\r\n\#]+/g).map(function(tag){ return tag.replace(/^\s+|\s+$/g,'') });
+						/* if there is only one tag, this wasn't effective. split by any whitespace then */
+						if (update.tags.length === 1) update.tags = update.tags[0].split(/\s+/g);
+					}
+				}
+			}
+			if ((update.tags) && (
+				update.tags.filter(function(o){
+					return (typeof o === "string");
+				}).length !== update.tags.length
+				)) {
+					return callback(new Error("invalid tag"));
+			}
+
+			/* check for language */
+			if (data.hasOwnProperty("lang") && typeof data.lang === "string" && data.lang !== "" && l.lang.check(data.lang)) {
+				update.lang = data.lang;
+			}
+			if ((update.lang) && (typeof update.lang !== "string"))
+				return callback(new Error("invalid language"));
+
+			/* check for comment */
+			if (data.hasOwnProperty("comment") && typeof data.comment === "string" && data.comment !== "") {
+				update.comment = data.comment;
+			}
+
+			if ((update.comment) && (typeof update.comment !== "string"))
+				return callback(new Error("invalid language"));
+
+			/* check any unchecked organisation for its existance */
+			var check_organisations = function(_callback) {
+				if (!data.hasOwnProperty("organisations")) return _callback();
+				if (!data.organisations instanceof Array) data.organisations = [data.organisations];
+				var _checked = 0;
+				data.organisations.forEach(function(organisation, index){
+					if (typeof organisation === "object" && (organisation.hasOwnProperty("id") || organisation.hasOwnProperty("new"))) {
+						_checked++;
+						if (_checked === data.organisations.length) {
+							update.organisations = data.organisations.filter(function(organisation){ return (organisation !== null); });
+							_callback();
+						}
+					} else {
+						organisations.check(organisation, function(err, exists, org_id){
+							_checked++;
+							if (err) {
+								data.organisations[index] = null;
+							} else if (exists) {
+								data.organisations[index] = {"id": org_id};
+							} else {
+								data.organisations[index] = null;
+							}
+							if (_checked === data.organisations.length) {
+								update.organisations = data.organisations.filter(function(organisation){ return (organisation !== null); });
+								_callback();
+							}
+						});
+					}
+				});
+			};
+
+			/* check any unchecked topic for its existance */
+			var check_topics = function(_callback) {
+				if (!data.hasOwnProperty("topics")) return _callback();
+				if (!data.topics instanceof Array) data.topics = [data.topics];
+				var _checked = 0;
+				data.topics.forEach(function(topic, index){
+					if (typeof topic === "object" && topic.hasOwnProperty("id") && typeof topic.id === "string") {
+						_checked++;
+						if (_checked === data.topics.length) {
+							update.topics=data.topics.filter(function(topic){ return (topic !== null); });
+							_callback();
+						}
+					} else {
+						topics.check(topic, function(err, exists, topic_id){
+							_checked++;
+							if (err) {
+								data.topics[index] = null;
+							} else if (exists) {
+								data.topics[index] = {"id": topic_id};
+							} else {
+								data.topics[index] = null;
+							}
+							if (_checked === data.topics.length) {
+								update.topics=data.topics.filter(function(topic){ return (topic !== null); });
+								_callback();
+							}
+						});
+					}
+				});
+			};
+
+			check_organisations(function(){
+				check_topics(function(){
+
+					if (update.organisations) {
+						if (update.organisations.length!==data.organisations.length)
+							return callback(new Error("invalid organisation"));
+					}
+					if (update.topics) {
+						if (update.topics.length!==data.topics.length)
+							return callback(new Error("invalid topic"));
+					}
+
+								// FIXME: check if anything to update
+					/* set last modified */
+					update.modified = (new Date());
+
+					db.collection("documents").findAndModify({"query":{"id":id},"update":{"$set":update},"new":true}, function(err, doc){
+						if (err) return callback(err);
+						/* update cache */
+						cache[id] = doc;
+						/* update elastic search */
+						var es_store = ["lang","tags","topics","organisations","modified"];
+						if (l.elastic.hasUpdateField(update, es_store)) {
+							l.elastic.update('document', doc.id, l.elastic.prepareFieldsObj(doc, es_store));
+						}
+					});
+				});
+			});
+
+		});
+
 	};
 
 	/* delete a document */
 	documents.delete = function(id, callback) {
-		if (!documents.checkid(id)) return callback(new Error("invaild id"));
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
 		callback(new Error("not implemented yet"));
 	};
 	
 	/* get by id */
 	documents.get = function(id, callback){
-		if (!documents.checkid(id)) return callback(new Error("invaild id"));
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
 		if (cache.hasOwnProperty(id)) return callback(null, cache[id]);
 		db.collection("documents").findOne({id: id}, function(err, result){
 			if (err) return callback(err);
