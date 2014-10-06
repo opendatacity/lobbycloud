@@ -1,103 +1,103 @@
 <h1 translate>Manage Queue</h1>
 
 <div class="row" ng-show="loading">
-    <div class="col-md-9">
-        <div>
-            <i class="fa fa-spinner fa-spin"></i> <span translate>Loading...</span>
-        </div>
-    </div>
+	<div class="col-md-9">
+		<div>
+			<i class="fa fa-spinner fa-spin"></i> <span translate>Loading...</span>
+		</div>
+	</div>
 </div>
 
 <div ng-show="!loading">
-    <div class="row hidden">
-        <form class="form" role="form">
-            <div class="form-group col-md-6">
-                <label translate>Filter Filename</label>
-                <input class="form-group" type="text" ng-model="filter.title" placeholder="{{'Filter Title' | translate}}">
-            </div>
-            <div class="form-group col-md-6">
-                <label><input type="checkbox" ng-model="filter.range_enabled"> <span translate>Filter Date</span></label>
-                <input class="input-daterange form-group" type="daterange" format="L" ng-model="filter.range">
-            </div>
-        </form>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="btn-group pull-left">
-                <div class="list-title pull-left" translate translate-n="docs.length" translate-plural="{{docs.length}} documents">One document</div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <table class="table table-responsive table-hover table-docs ng-table-rowselected" ng-table="tableParams" show-filter="true">
-                <thead>
-                <tr>
-                    <th ng-repeat="head in tablecolumns" class="sortable" ng-class="{
+	<div class="row hidden">
+		<form class="form" role="form">
+			<div class="form-group col-md-6">
+				<label translate>Filter Filename</label>
+				<input class="form-group" type="text" ng-model="filter.title" placeholder="{{'Filter Title' | translate}}">
+			</div>
+			<div class="form-group col-md-6">
+				<label><input type="checkbox" ng-model="filter.range_enabled"> <span translate>Filter Date</span></label>
+				<input class="input-daterange form-group" type="daterange" format="L" ng-model="filter.range">
+			</div>
+		</form>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="btn-group pull-left">
+				<div class="list-title pull-left" translate translate-n="docs.length" translate-plural="{{docs.length}} documents">One document</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table table-responsive table-hover table-docs ng-table-rowselected" ng-table="tableParams" show-filter="true">
+				<thead>
+				<tr>
+					<th ng-repeat="head in tablecolumns" class="sortable" ng-class="{
                     'sort-asc': tableParams.isSortBy(head.sortable, 'asc'),
                     'sort-desc': tableParams.isSortBy(head.sortable, 'desc')}"
-                        ng-click="o={}; o[head.sortable]=tableParams.isSortBy(head.sortable, 'asc') ? 'desc' : 'asc'; tableParams.sorting(o);">
-                        <div>{{head.name}}</div>
-                    </th>
-                    <th translate>Actions</th>
-                </tr>
-                </thead>
-                <tbody ng-repeat="doc in $data" class="row-item">
-                <tr ng-class="{'selected': doc.$selected}">
-                    <td class="clickable" ng-click="selectRow(doc)" filter="{ 'orig': 'text' }" sortable="'orig'">
-                        <img class="thumb" ng-src="{{doc.thumbs[0].file}}"/>
-                        {{doc.orig}}
-                    </td>
-                    <td sortable="'created'">{{doc.created | amDateFormat:'LLL'}}</td>
-                    <td sortable="'topic.label'">{{doc.topic.label}}</td>
-                    <td sortable="'organisation.label'">{{doc.organisation.label}}</td>
-                    <td sortable="'info.pages'">{{doc.info.pages}}</td>
-                    <td class="row-actions">
-                        <div ng-show="doc.$processing">
-                            <i class="fa fa-spinner fa-spin"></i>
-                        </div>
-                        <div ng-show="!doc.$processing">
-                            <a href="" class="btn btn-primary btn-sm" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"><i class="fa fa-edit"/></a>
-                            <a href="" class="btn btn-primary btn-sm" title="{{'Decline Document'|translate}}" ng-click="declineDialog(doc)" eat-click><i class="fa fa-ban"/></a>
-                            <!--<a href="" class="btn btn-primary btn-sm" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(doc)" eat-click><i class="fa fa-trash-o"/></a>-->
-                        </div>
-                    </td>
-                </tr>
-                <tr ng-if="doc.$selected" class="dropdown-row">
-                    <td colspan="6">
-                        <carousel class="thumbnails inlineblock">
-                            <slide ng-repeat="slide in doc.thumbs" active="slide.active">
-                                <img ng-src="{{slide.file}}">
+						ng-click="o={}; o[head.sortable]=tableParams.isSortBy(head.sortable, 'asc') ? 'desc' : 'asc'; tableParams.sorting(o);">
+						<div>{{head.name}}</div>
+					</th>
+					<th translate>Actions</th>
+				</tr>
+				</thead>
+				<tbody ng-repeat="doc in $data" class="row-item">
+				<tr ng-class="{'selected': doc.$selected}">
+					<td class="clickable" ng-click="selectRow(doc)" filter="{ 'orig': 'text' }" sortable="'orig'">
+						<img class="thumb" ng-src="{{doc.thumbs[0].file}}"/>
+						{{doc.orig}}
+					</td>
+					<td sortable="'created'">{{doc.created | amDateFormat:'LLL'}}</td>
+					<td>{{doc.topics|listLabels}}</td>
+					<td>{{doc.organisations|listLabels}}</td>
+					<td sortable="'info.pages'">{{doc.info.pages}}</td>
+					<td class="row-actions">
+						<div ng-show="doc.$processing">
+							<i class="fa fa-spinner fa-spin"></i>
+						</div>
+						<div ng-show="!doc.$processing">
+							<a href="" class="btn btn-primary btn-sm" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"><i class="fa fa-edit"/></a>
+							<a href="" class="btn btn-primary btn-sm" title="{{'Decline Document'|translate}}" ng-click="declineDialog(doc)" eat-click><i class="fa fa-ban"/></a>
+							<!--<a href="" class="btn btn-primary btn-sm" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(doc)" eat-click><i class="fa fa-trash-o"/></a>-->
+						</div>
+					</td>
+				</tr>
+				<tr ng-if="doc.$selected" class="dropdown-row">
+					<td colspan="6">
+						<carousel class="thumbnails inlineblock">
+							<slide ng-repeat="slide in doc.thumbs" active="slide.active">
+								<img ng-src="{{slide.file}}">
 
-                                <div class="carousel-caption">
-                                    <strong style="color: #000"><span translate>Page</span> {{$index+1}}</strong>
-                                </div>
-                            </slide>
-                        </carousel>
+								<div class="carousel-caption">
+									<strong style="color: #000"><span translate>Page</span> {{$index+1}}</strong>
+								</div>
+							</slide>
+						</carousel>
 
-                        <div class="doc-info inlineblock">
-                            <ul class="list-unstyled">
-                                <li class="text-info">Meta Informations</li>
-                                <li><span translate>Topic</span> {{doc.topic.label}}</li>
-                                <li><span translate>Organisation</span> {{doc.organisation.label}}</li>
-                                <li><span translate>Tags</span> {{doc.tags.join(',')}}</li>
-                                <li><span translate>Language</span> {{doc.lang}}</li>
-                            </ul>
-                            <ul class="list-unstyled">
-                                <li class="text-info">File Informations</li>
-                                <li><span translate>Filename</span> {{doc.orig}}</li>
-                                <li><span translate>Uploaded</span> {{doc.created | amDateFormat:'LLL'}}</li>
-                                <li><span translate>Title</span> {{doc.info.title}}</li>
-                                <li><span translate>Subject</span> {{doc.info.subject}}</li>
-                                <li><span translate>Author</span> {{doc.info.author}}</li>
-                                <li><span translate>Keywords</span> {{doc.info.keywords}}</li>
-                                <li><span translate>Pages</span> {{doc.info.pages}}</li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+						<div class="doc-info inlineblock">
+							<ul class="list-unstyled">
+								<li class="text-info">Meta Informations</li>
+								<li><span translate>Topics</span> {{doc.topics|listLabels}}</li>
+								<li><span translate>Organisations</span> {{doc.organisations|listLabels}}</li>
+								<li><span translate>Tags</span> {{doc.tags|join}}</li>
+								<li><span translate>Language</span> {{doc.lang}}</li>
+							</ul>
+							<ul class="list-unstyled">
+								<li class="text-info">File Informations</li>
+								<li><span translate>Filename</span> {{doc.orig}}</li>
+								<li><span translate>Uploaded</span> {{doc.created | amDateFormat:'LLL'}}</li>
+								<li><span translate>Title</span> {{doc.info.title}}</li>
+								<li><span translate>Subject</span> {{doc.info.subject}}</li>
+								<li><span translate>Author</span> {{doc.info.author}}</li>
+								<li><span translate>Keywords</span> {{doc.info.keywords}}</li>
+								<li><span translate>Pages</span> {{doc.info.pages}}</li>
+							</ul>
+						</div>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>

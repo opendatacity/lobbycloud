@@ -12,17 +12,21 @@ msgstr ""
 "X-Generator: Poedit 1.6.4\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: assets/partials/user.html
+msgid "(leave empty for no changes)"
+msgstr "(leer lassen um nichts zu ändern)"
+
 #: assets/partials/docs.html assets/partials/organisations.html
 #: assets/partials/queue.html assets/partials/topics.html
 #: assets/partials/users.html
 msgid "Actions"
 msgstr "Aktion"
 
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html
 msgid "Add Organisation"
 msgstr "Organisation hinzufügen"
 
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html
 msgid "Add Topic"
 msgstr "Thema hinzufügen"
 
@@ -34,12 +38,14 @@ msgstr "Administration"
 msgid "Apply"
 msgstr "Anwenden"
 
+#: assets/partials/doc.html assets/partials/docs.html
 #: assets/partials/queue.html assets/partials/queueitem.html
 msgid "Author"
 msgstr "Autor"
 
-#: assets/partials/list.html assets/partials/organisation.html
-#: assets/partials/queueitem.html assets/partials/topic.html
+#: assets/partials/ask.html assets/partials/doc.html assets/partials/list.html
+#: assets/partials/organisation.html assets/partials/queueitem.html
+#: assets/partials/topic.html assets/partials/user.html
 #: assets/js/directives.js
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -48,7 +54,7 @@ msgstr "Abbrechen"
 msgid "Choose files"
 msgstr "Datei auswählen"
 
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/queueitem.html
 msgid "Comment"
 msgstr "Kommentar"
 
@@ -56,7 +62,14 @@ msgstr "Kommentar"
 msgid "Comment for the review"
 msgstr "Kommentar für die Überprüfung"
 
-#: assets/partials/organisations.html assets/partials/topics.html
+#: assets/partials/queueitem.html
+msgid "Create Organisation Entry"
+msgstr "Eintrag für Organisation anlegen"
+
+#: assets/partials/queueitem.html
+msgid "Create Topic Entry"
+msgstr "Thema anlegen"
+
 #: assets/partials/users.html
 msgid "Created"
 msgstr "Erstellt am"
@@ -65,7 +78,7 @@ msgstr "Erstellt am"
 msgid "Decline Document"
 msgstr "Dokument ablehnen"
 
-#: assets/partials/docs.html assets/partials/queue.html
+#: assets/partials/queue.html
 msgid "Delete Document"
 msgstr "Dokument löschen"
 
@@ -85,9 +98,8 @@ msgstr "Konto löschen"
 msgid "Depublish Document"
 msgstr "Dokument depublizieren"
 
-#: assets/partials/organisation.html assets/partials/organisations.html
-#: assets/partials/topic.html assets/partials/topics.html
-#: assets/partials/users.html
+#: assets/partials/organisation.html assets/partials/topic.html
+#: assets/partials/user.html
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -99,21 +111,14 @@ msgstr "Dokumente"
 msgid "Drop files here"
 msgstr "Dateien hierher ziehen"
 
+#: assets/partials/doc.html assets/partials/docs.html
 #: assets/partials/queue.html
 msgid "Edit Document"
 msgstr "Dokument bearbeiten"
 
-#: assets/partials/start.html
-msgid "Edit Documents"
-msgstr "Dokumente bearbeiten"
-
 #: assets/partials/organisation.html assets/partials/organisations.html
 msgid "Edit Organisation"
 msgstr "Organisation bearbeiten"
-
-#: assets/partials/start.html
-msgid "Edit Queue"
-msgstr "Queue verwalten"
 
 #: assets/partials/topic.html assets/partials/topics.html
 msgid "Edit Topic"
@@ -123,11 +128,15 @@ msgstr "Thema bearbeiten"
 msgid "Edit Upload"
 msgstr "Upload bearbeiten"
 
-#: assets/partials/users.html
+#: assets/partials/user.html assets/partials/users.html
 msgid "Edit User"
 msgstr "Konto bearbeiten"
 
-#: assets/partials/users.html
+#: assets/partials/user.html
+msgid "Email"
+msgstr "E-Mail"
+
+#: assets/partials/user.html
 msgid "Email adress"
 msgstr "E-Mail"
 
@@ -135,20 +144,12 @@ msgstr "E-Mail"
 msgid "English"
 msgstr "Englisch"
 
-#: assets/partials/users.html
-msgid "Enter password"
-msgstr "Passwort eingeben"
-
-#: assets/partials/users.html
-msgid "Enter password (leave empty for no changes)"
-msgstr "Passwort (leer lassen um es nicht zu ändern)"
-
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/queueitem.html
 msgid "File Informations"
 msgstr "Datei-Informationen"
 
-#: assets/partials/docs.html assets/partials/queue.html
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/docs.html
+#: assets/partials/queue.html assets/partials/queueitem.html
 msgid "Filename"
 msgstr "Dateiname"
 
@@ -191,10 +192,9 @@ msgstr "von"
 
 #: assets/index.html
 msgid "Frontpage"
-msgstr ""
+msgstr "Frontpage"
 
-#: assets/partials/organisation.html assets/partials/organisations.html
-#: assets/partials/users.html
+#: assets/partials/organisation.html assets/partials/user.html
 msgid "Full name"
 msgstr "Voller Name"
 
@@ -210,25 +210,28 @@ msgstr "Deutsch"
 msgid "Gravatar"
 msgstr "Gravatar"
 
+#: assets/partials/doc.html assets/partials/docs.html
 #: assets/partials/queue.html assets/partials/queueitem.html
 msgid "Keywords"
 msgstr "Schlüsselwörter"
 
-#: assets/partials/topic.html assets/partials/topics.html
+#: assets/partials/topic.html
 msgid "Label"
 msgstr "Label"
 
+#: assets/partials/doc.html assets/partials/docs.html
 #: assets/partials/queue.html assets/partials/queueitem.html
 msgid "Language"
 msgstr "Sprache"
 
-#: assets/partials/docs.html assets/partials/organisations.html
-#: assets/partials/queue.html assets/partials/queueitem.html
-#: assets/partials/topics.html assets/partials/users.html
+#: assets/partials/doc.html assets/partials/docs.html
+#: assets/partials/organisations.html assets/partials/queue.html
+#: assets/partials/queueitem.html assets/partials/topics.html
+#: assets/partials/users.html
 msgid "Loading..."
 msgstr "Daten werden geladen..."
 
-#: assets/partials/users.html
+#: assets/partials/user.html assets/partials/users.html
 msgid "Location"
 msgstr "Ort"
 
@@ -240,11 +243,11 @@ msgstr "Abmeldung..."
 msgid "Login"
 msgstr "Einloggen"
 
-#: assets/partials/users.html
+#: assets/partials/user.html assets/partials/users.html
 msgid "Login name"
 msgstr "Login-Name"
 
-#: assets/partials/organisation.html assets/partials/organisations.html
+#: assets/partials/organisation.html
 msgid "Logo"
 msgstr "Logo"
 
@@ -272,8 +275,7 @@ msgstr "Themen verwalten"
 msgid "Manage Users"
 msgstr "Konten verwalten"
 
-#: assets/partials/organisation.html assets/partials/organisations.html
-#: assets/partials/users.html
+#: assets/partials/organisation.html assets/partials/users.html
 msgid "Name"
 msgstr "Name"
 
@@ -285,12 +287,13 @@ msgstr "Neue Organisation"
 msgid "New Topic"
 msgstr "Neues Topic"
 
-#: assets/partials/users.html
+#: assets/partials/user.html assets/partials/users.html
 msgid "New User"
 msgstr "Neuer Account"
 
-#: assets/partials/list.html assets/partials/organisation.html
-#: assets/partials/topic.html
+#: assets/partials/ask.html assets/partials/list.html
+#: assets/partials/organisation.html assets/partials/topic.html
+#: assets/partials/user.html
 msgid "OK"
 msgstr "OK"
 
@@ -318,33 +321,35 @@ msgid_plural "{{users.length}} users"
 msgstr[0] "Ein Konto"
 msgstr[1] "{{docs.length}} Konten"
 
-#: assets/partials/docs.html assets/partials/queue.html
-#: assets/partials/queueitem.html assets/partials/users.html
+#: assets/partials/doc.html assets/partials/queueitem.html
+#: assets/partials/user.html assets/partials/users.html
 msgid "Organisation"
 msgstr "Organisation"
 
-#: assets/index.html assets/partials/start.html
+#: assets/index.html assets/partials/docs.html assets/partials/queue.html
+#: assets/partials/start.html
 msgid "Organisations"
 msgstr "Organisationen"
 
-#: assets/partials/queue.html assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/queue.html
+#: assets/partials/queueitem.html
 msgid "Page"
 msgstr "Seite"
 
-#: assets/partials/docs.html assets/partials/queue.html
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/docs.html
+#: assets/partials/queue.html assets/partials/queueitem.html
 msgid "Pages"
 msgstr "Seitenanzahl"
 
-#: assets/partials/login.html
+#: assets/partials/login.html assets/partials/user.html
 msgid "Password"
 msgstr "Passwort"
 
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/queueitem.html
 msgid "Publish"
 msgstr "Veröffentlichen"
 
-#: assets/index.html
+#: assets/index.html assets/partials/start.html
 msgid "Queue"
 msgstr "Queue"
 
@@ -352,7 +357,7 @@ msgstr "Queue"
 msgid "Reference Data"
 msgstr "Referenzdaten"
 
-#: assets/partials/users.html
+#: assets/partials/user.html assets/partials/users.html
 msgid "Role"
 msgstr "Rolle"
 
@@ -364,36 +369,39 @@ msgstr "Für diesen Bereich ist eine Anmeldung nötig"
 msgid "Select"
 msgstr "Auswahl:"
 
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/queueitem.html
 msgid "Select Language"
 msgstr "Sprache auswählen"
 
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/queueitem.html
 msgid "Select Organisation"
 msgstr "Organisation auswählen"
 
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/queueitem.html
 msgid "Select Topic"
 msgstr "Thema auswählen"
 
+#: assets/partials/doc.html assets/partials/docs.html
 #: assets/partials/queue.html assets/partials/queueitem.html
-#: assets/partials/topic.html assets/partials/topics.html
+#: assets/partials/topic.html
 msgid "Subject"
 msgstr "Betreff"
 
-#: assets/partials/docs.html assets/partials/queue.html
-#: assets/partials/queueitem.html assets/partials/upload.html
+#: assets/partials/doc.html assets/partials/docs.html
+#: assets/partials/queue.html assets/partials/queueitem.html
+#: assets/partials/upload.html
 msgid "Tags"
 msgstr "Tags"
 
-#: assets/partials/queueitem.html assets/partials/upload.html
+#: assets/partials/doc.html assets/partials/upload.html
 msgid "Tags, separated by comma"
 msgstr "Tags, mit Kommas getrennt"
 
 #: assets/index.html
 msgid "The Greens | EFA in the European Parliament"
-msgstr ""
+msgstr "The Greens | EFA in the European Parliament"
 
+#: assets/partials/doc.html assets/partials/docs.html
 #: assets/partials/queue.html assets/partials/queueitem.html
 msgid "Title"
 msgstr "Titel"
@@ -406,21 +414,22 @@ msgstr "bis"
 msgid "Toggle navigation"
 msgstr "Navigation ein-/ausblenden"
 
-#: assets/partials/docs.html assets/partials/queue.html
-#: assets/partials/queueitem.html assets/partials/upload.html
+#: assets/partials/doc.html assets/partials/queueitem.html
+#: assets/partials/upload.html
 msgid "Topic"
 msgstr "Thema"
 
-#: assets/index.html assets/partials/start.html
+#: assets/index.html assets/partials/docs.html assets/partials/queue.html
+#: assets/partials/start.html
 msgid "Topics"
 msgstr "Themen"
 
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/queueitem.html
 msgid "Update"
 msgstr "Aktualisieren"
 
-#: assets/partials/docs.html assets/partials/queue.html
-#: assets/partials/queueitem.html
+#: assets/partials/doc.html assets/partials/docs.html
+#: assets/partials/queue.html assets/partials/queueitem.html
 msgid "Uploaded"
 msgstr "Hochgeladen"
 
@@ -436,12 +445,11 @@ msgstr "Konten"
 msgid "Verified"
 msgstr "Bestätigt"
 
-#: assets/partials/organisation.html
+#: assets/partials/organisation.html assets/partials/user.html
 msgid "Website"
 msgstr "Webseite"
 
-#: assets/partials/organisation.html assets/partials/organisations.html
-#: assets/partials/users.html
+#: assets/partials/organisation.html assets/partials/user.html
 msgid "Website URL"
 msgstr "Webseite URL"
 
@@ -460,6 +468,15 @@ msgstr "Gemacht von"
 #: assets/index.html
 msgid "with support of"
 msgstr "mit Unterstützung durch"
+
+#~ msgid "Edit Documents"
+#~ msgstr "Dokumente bearbeiten"
+
+#~ msgid "Edit Queue"
+#~ msgstr "Queue verwalten"
+
+#~ msgid "Enter password"
+#~ msgstr "Passwort eingeben"
 
 #~ msgid "Invites"
 #~ msgstr "Einladungen"
@@ -487,9 +504,6 @@ msgstr "mit Unterstützung durch"
 
 #~ msgid "Create User"
 #~ msgstr "Account anlegen"
-
-#~ msgid "Email"
-#~ msgstr "E-Mail"
 
 #~ msgid "Hello {{account.name||account.id}}!"
 #~ msgstr "Hallo {{account.name||account.id}}!"

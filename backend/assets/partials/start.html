@@ -1,31 +1,36 @@
 <div id="headline">
-    <h1>LobbyCloudCentral</h1>
+	<h1>LobbyCloudCentral</h1>
 </div>
-
-<!--<h2 translate>Hello {{account.name||account.id}}!</h2>-->
 
 <div class="row central">
 
-    <div ng-class="{'col-md-offset-3':!access(accessLevels.admin)}" class="col-md-4">
-        <h3><i class="fa fa-files-o"></i> <span translate>Documents</span></h3>
-        <p><a role="button" class="btn btn-primary" href="javascript:;" ui-sref="queue"><span translate>Queue</span></a></p>
-        <p> <a role="button" class="btn btn-primary" href="javascript:;" ui-sref="docs"><span translate>Documents</span></a></p>
-    </div>
+	<div ng-class="{'col-md-offset-3':!access(accessLevels.admin)}" class="col-md-4">
+		<h3><i class="fa fa-files-o"></i> <span translate>Documents</span></h3>
 
-    <div ng-show="access(accessLevels.editor)" class="col-md-4">
-        <h3><i class="fa fa-building-o"></i> <span translate>Reference Data</span></h3>
-        <p><a role="button" class="btn btn-primary" href="javascript:;" ui-sref="topics"><span translate>Topics</span></a></p>
-        <p><a role="button" class="btn btn-primary" href="javascript:;" ui-sref="organisations"><span translate>Organisations</span></a></p>
-    </div>
+		<p><a role="button" class="btn btn-primary" href="javascript:;" ui-sref="queue"><span translate>Queue</span> <i class="fa fa-arrow-right"></i></a></p>
 
-    <div ng-show="access(accessLevels.admin)" class="col-md-4">
-        <h3><i class="fa fa-users"></i> <span translate>Administration</span></h3>
-        <p><a role="button" class="btn btn-primary" href="javascript:;" ui-sref="users"><span translate>Users</span></a></p>
-        <p><a role="button" class="btn btn-primary" href="javascript:;" ng-click="genInvite()"><span translate>Generate Invite</span></a></p>
-        <div class="well" ng-if="invite">
-            {{invite.invite}}
-        </div>
-    </div>
+		<p><a role="button" class="btn btn-primary" href="javascript:;" ui-sref="docs"><span translate>Documents</span> <i class="fa fa-arrow-right"></i></a></p>
+	</div>
+
+	<div ng-show="access(accessLevels.editor)" class="col-md-4">
+		<h3><i class="fa fa-building-o"></i> <span translate>Reference Data</span></h3>
+
+		<p><a role="button" class="btn btn-primary" href="javascript:;" ui-sref="topics"><span translate>Topics</span> <i class="fa fa-arrow-right"></i></a></p>
+
+		<p><a role="button" class="btn btn-primary" href="javascript:;" ui-sref="organisations"><span translate>Organisations</span> <i class="fa fa-arrow-right"></i></a></p>
+	</div>
+
+	<div ng-show="access(accessLevels.admin)" class="col-md-4">
+		<h3><i class="fa fa-users"></i> <span translate>Administration</span></h3>
+
+		<p><a role="button" class="btn btn-primary" href="javascript:;" ui-sref="users"><span translate>Users</span> <i class="fa fa-arrow-right"></i></a></p>
+
+		<p><a role="button" class="btn btn-primary" href="javascript:;" ng-click="genInvite()"><span translate>Generate Invite</span></a></p>
+
+		<div class="well" ng-if="invite">
+			{{invite.invite}}
+		</div>
+	</div>
 
 </div>
 

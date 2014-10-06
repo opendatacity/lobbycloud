@@ -1,80 +1,80 @@
 <div class="row">
-    <div class="col-md-12">
-        <h1 translate>Manage Topics</h1>
-    </div>
+	<div class="col-md-12">
+		<h1 translate>Manage Topics</h1>
+	</div>
 </div>
 
 <div class="row" ng-show="loading">
-    <div class="col-md-12">
-        <div>
-            <i class="fa fa-spinner fa-spin"></i> <span translate>Loading...</span>
-        </div>
-    </div>
+	<div class="col-md-12">
+		<div>
+			<i class="fa fa-spinner fa-spin"></i> <span translate>Loading...</span>
+		</div>
+	</div>
 </div>
 
 <div ng-show="!loading">
-    <div class="row hidden">
-        <form class="form" role="form">
-            <div class="form-group col-md-3">
-                <label translate>Filter Label</label>
-                <input class="form-control" type="text" ng-model="filter.label" placeholder="{{'Filter Label' | translate}}">
-            </div>
-            <div class="form-group col-md-3">
-                <label translate>Filter Subject</label>
-                <input class="form-control" type="text" ng-model="filter.subject" placeholder="{{'Filter Subject' | translate}}">
-            </div>
-            <div class="form-group col-md-3">
-                <label translate>Filter Description</label>
-                <input class="form-control" type="text" ng-model="filter.description" placeholder="{{'Filter Description' | translate}}">
-            </div>
-            <div class="form-group col-md-3">
-                <label><input type="checkbox" ng-model="filter.range_enabled"> <span translate>Filter Date</span></label>
-                <input class="input-daterange form-control" type="daterange" format="L" ng-model="filter.range">
-            </div>
-        </form>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="btn-group pull-left">
-                <button type="button" class="btn btn-primary" ng-click="newDialog()" translate>New Topic</button>
-                <div class="list-title pull-left" translate translate-n="topics.length" translate-plural="{{topics.length}} topics">One topic</div>
-            </div>
-        </div>
-    </div>
-    <hr/>
-    <div class="row">
-        <div class="col-md-12">
-            <table class="table table-responsive table-topics table-hover ng-table-rowselected" ng-table="tableParams" show-filter="true">
-                <thead>
-                <tr>
-                    <th ng-repeat="head in tablecolumns" class="sortable" ng-class="{
+	<div class="row hidden">
+		<form class="form" role="form">
+			<div class="form-group col-md-3">
+				<label translate>Filter Label</label>
+				<input class="form-control" type="text" ng-model="filter.label" placeholder="{{'Filter Label' | translate}}">
+			</div>
+			<div class="form-group col-md-3">
+				<label translate>Filter Subject</label>
+				<input class="form-control" type="text" ng-model="filter.subject" placeholder="{{'Filter Subject' | translate}}">
+			</div>
+			<div class="form-group col-md-3">
+				<label translate>Filter Description</label>
+				<input class="form-control" type="text" ng-model="filter.description" placeholder="{{'Filter Description' | translate}}">
+			</div>
+			<div class="form-group col-md-3">
+				<label><input type="checkbox" ng-model="filter.range_enabled"> <span translate>Filter Date</span></label>
+				<input class="input-daterange form-control" type="daterange" format="L" ng-model="filter.range">
+			</div>
+		</form>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="btn-group pull-left">
+				<button type="button" class="btn btn-primary" ng-click="newDialog()" translate>New Topic</button>
+				<div class="list-title pull-left" translate translate-n="topics.length" translate-plural="{{topics.length}} topics">One topic</div>
+			</div>
+		</div>
+	</div>
+	<hr/>
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table table-responsive table-topics table-hover ng-table-rowselected" ng-table="tableParams" show-filter="true">
+				<thead>
+				<tr>
+					<th ng-repeat="head in tablecolumns" class="sortable" ng-class="{
                     'sort-asc': tableParams.isSortBy(head.sortable, 'asc'),
                     'sort-desc': tableParams.isSortBy(head.sortable, 'desc')}"
-                        ng-click="o={}; o[head.sortable]=tableParams.isSortBy(head.sortable, 'asc') ? 'desc' : 'asc'; tableParams.sorting(o);">
-                        <div>{{head.name}}</div>
-                    </th>
-                    <th translate>Actions</th>
-                </tr>
-                </thead>
+						ng-click="o={}; o[head.sortable]=tableParams.isSortBy(head.sortable, 'asc') ? 'desc' : 'asc'; tableParams.sorting(o);">
+						<div>{{head.name}}</div>
+					</th>
+					<th translate>Actions</th>
+				</tr>
+				</thead>
 
-                <tr ng-repeat="topic in $data" ng-class="{'selected': topic.$selected}" ng-click="topic.$selected = !topic.$selected" class="row-item">
-                    <td filter="{ 'label': 'text' }" sortable="'label'">{{topic.label}}</td>
-                    <td filter="{ 'subject': 'text' }" sortable="'subject'">{{topic.subject}}</td>
-                    <td filter="{ 'description': 'text' }" sortable="'description'">{{topic.description}}</td>
-                    <td sortable="'created'">{{topic.created | amDateFormat:'LLL'}}</td>
-                    <td class="row-actions">
-                        <div ng-if="topic.$processing">
-                            <i class="fa fa-spinner fa-spin"></i>
-                        </div>
-                        <div ng-show="!topic.$processing">
-                            <a href="" class="btn btn-primary btn-sm" title="{{'Edit Topic'|translate}}" ng-click="editDialog(topic)"><i class="fa fa-edit"/></a>
-                            <a href="" class="btn btn-primary btn-sm" title="{{'Delete Topic'|translate}}" ng-click="deleteDialog(topic)"><i class="fa fa-trash-o"/></a>
-                        </div>
-                    </td>
-                </tr>
+				<tr ng-repeat="topic in $data" ng-class="{'selected': topic.$selected}" ng-click="topic.$selected = !topic.$selected" class="row-item">
+					<td filter="{ 'label': 'text' }" sortable="'label'">{{topic.label}}</td>
+					<td filter="{ 'subject': 'text' }" sortable="'subject'">{{topic.subject}}</td>
+					<td filter="{ 'description': 'text' }" sortable="'description'">{{topic.description}}</td>
+					<td sortable="'created'">{{topic.created | amDateFormat:'LLL'}}</td>
+					<td class="row-actions">
+						<div ng-if="topic.$processing">
+							<i class="fa fa-spinner fa-spin"></i>
+						</div>
+						<div ng-show="!topic.$processing">
+							<a href="" class="btn btn-primary btn-sm" title="{{'Edit Topic'|translate}}" ng-click="editDialog(topic)"><i class="fa fa-edit"/></a>
+							<a href="" class="btn btn-primary btn-sm" title="{{'Delete Topic'|translate}}" ng-click="deleteDialog(topic)"><i class="fa fa-trash-o"/></a>
+						</div>
+					</td>
+				</tr>
 
-            </table>
+			</table>
 
-        </div>
-    </div>
+		</div>
+	</div>
 </div>

@@ -95,7 +95,7 @@ app.controller('BodyController', function ($scope, $state, $window, Authenticati
 		$window.moment.lang(lng.substr(0, 2));
 		gettextCatalog.currentLanguage = lng;
 		if (!noreload)
-			$state.go($state.$current, null, { reload: true });
+			$state.go($state.$current, null, {reload: true});
 	};
 
 //	$scope.setLang('de_DE', true);
@@ -152,6 +152,7 @@ app.controller('StartController', function ($scope, InvitesService, Authenticati
 	$scope.genInvite = function () {
 		$scope.invite = InvitesService.create();
 	};
+	$(window).resize();
 });
 
 app.controller('InvitesController', function ($scope, $state, $modal, $filter, ngTableParams, AuthenticationService, InvitesService) {
@@ -428,13 +429,11 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 	//check if doc can be accepted
 	$scope.canPublish = function (doc) {
 		return (
-			(doc) &&
-			(doc.topic) &&
-			(doc.topic.id) &&
-			(doc.organisation) &&
-			(doc.organisation.id) &&
-			(doc.lang)
-			);
+		(doc) &&
+		(doc.topics.length > 0) &&
+		(doc.organisations.length > 0) &&
+		(doc.lang)
+		);
 	};
 
 	$scope.decline = function (doc) {
@@ -503,30 +502,110 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 		};
 	};
 
-	$scope.typeaheadOptions = {
+	$scope.typeaheadOptionsOrgs = {
 		minLength: 3,
 		highlight: true
 	};
-	$scope.typeaheadOptions2 = {
+
+	$scope.typeaheadOptionsLang = {
 		minLength: 1,
 		highlight: true
 	};
 	$scope.datasetOrganisation = dataset('organisation');
 	$scope.datasetTopic = dataset('topic');
 
-	var select = function (sender, object, suggestion, daset) {
-		if ($scope.doc && daset)
-			$scope.doc[daset.prop] = suggestion;
+	$scope.edit = {
+		organisation: {
+			label: ''
+		},
+		topic: {
+			label: ''
+		},
+		tag: ''
 	};
+
+	var select = function (sender, object, suggestion, daset) {
+		console.log('select', suggestion);
+		if (daset) {
+			$scope.edit[daset.prop] = suggestion;
+		}
+	};
+
+	$scope.canSelectOrganisation = function () {
+		return (
+		$scope.doc &&
+		($scope.edit.organisation.id) &&
+		($scope.doc.organisations.filter(function (o) {
+			return o.id == $scope.edit.organisation.id
+		}).length == 0)
+		);
+	};
+
+	$scope.selectOrganisation = function () {
+		if ($scope.canSelectOrganisation()) {
+			$scope.doc.organisations.push({
+				id: $scope.edit.organisation.id,
+				label: $scope.edit.organisation.label
+			});
+			$scope.edit.organisation.label = '';
+			$scope.edit.organisation.id = '';
+		}
+	};
+
+	$scope.canSelectTopic = function () {
+		return (
+		$scope.doc &&
+		($scope.edit.topic.id) &&
+		($scope.doc.topics.filter(function (o) {
+			return o.id == $scope.edit.topic.id
+		}).length == 0)
+		);
+	};
+
+	$scope.canSelectTag = function () {
+		return (
+		$scope.doc &&
+		($scope.edit.tag.length > 0) &&
+		($scope.doc.tags.filter(function (o) {
+			return o == $scope.edit.tag
+		}).length == 0)
+		);
+	};
+
+	$scope.selectTag = function () {
+		if ($scope.canSelectTag()) {
+			$scope.doc.tags.push($scope.edit.tag);
+			$scope.edit.tag = '';
+		}
+	};
+
+	$scope.selectTopic = function () {
+		if ($scope.canSelectTopic()) {
+			$scope.doc.topics.push({
+				id: $scope.edit.topic.id,
+				label: $scope.edit.topic.label
+			});
+			$scope.edit.topic.label = '';
+			$scope.edit.topic.id = '';
+		}
+	};
+
+	$scope.$on("typeahead:enter", function (sender, event, value, daset) {
+		console.log('enter', sender, value, daset);
+		if (daset.prop == 'organisation') $scope.selectOrganisation();
+	});
 	$scope.$on("typeahead:selected", select);
 	$scope.$on("typeahead:autocompleted", select);
 	$scope.$on("typeahead:changed", function (sender, value, daset) {
-		if ($scope.doc && daset)
-			$scope.doc[daset.prop].id = '';
+		if (daset.prop == 'organisation') {
+			$scope.edit[daset.prop].id = '';
+		}
+		console.log('changed', $scope.edit[daset.prop]);
 	});
 
-	//cache all languages
-	//TODO: cache global
+
+	////cache all languages
+	////TODO: cache global
 	$scope.langs = [];
 
 	//typeahead dataset language
@@ -553,14 +632,15 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 			$scope.lang = data.lang;
 			data.lang = {label: data.lang};
 		}
-		//prepare tags edit
-		data.tags = data.tags ? data.tags.join(',') : '';
 		//expand img urls
 		if (data.images) {
 			data.images.forEach(function (i) {
 				i.file = '../storage/' + i.file;
 			})
 		}
+		data.tags = data.tags || [];
+		data.organisations = data.organisations || [];
+		data.topics = data.topics || [];
 		$scope.doc = data;
 	};
 
@@ -599,19 +679,24 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 
 	//update the document
 	$scope.update = function (success) {
+		$scope.selectTag();
+		$scope.selectTopic();
+		$scope.selectOrganisation();
 		$scope.sending = true;
 		var doc = $scope.doc;
 		var update = {
-			tags: (doc.tags || '').split(','),
+			tags: doc.tags,
 			comment: doc.comment,
-			lang: doc.lang.id
+			lang: doc.lang.id,
+			organisations: doc.organisations,
+			topics: doc.topics
 		};
-		if (doc.organisation) {
-			update.organisation = (doc.organisation.id ? {id: doc.organisation.id} : {new: doc.organisation.label});
-		}
-		if (doc.topic) {
-			update.topic = (doc.topic.id ? {id: doc.topic.id} : {new: doc.topic.label});
-		}
+		//if () {
+		//	update.organisation = (doc.organisation.id ? {id: doc.organisation.id} : {new: doc.organisation.label});
+		//}
+		//if (doc.topic) {
+		//	update.topic = (doc.topic.id ? {id: doc.topic.id} : {new: doc.topic.label});
+		//}
 		QueueService.update({id: $stateParams.id, doc: update},
 			function (data) {
 				$scope.initData(data);
@@ -656,26 +741,24 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 	//check if doc can be accepted
 	$scope.canPublish = function () {
 		return (
-			($scope.doc) &&
-			($scope.doc.topic) &&
-			($scope.doc.topic.id) &&
-			($scope.doc.organisation) &&
-			($scope.doc.organisation.id) &&
-			($scope.doc.lang) &&
-			($scope.doc.lang.id)
-			);
+		($scope.doc) &&
+		(($scope.edit.topic && $scope.edit.topic.id) || ($scope.doc.topics.length > 0)) &&
+		(($scope.edit.organisation && $scope.edit.organisation.id) || ($scope.doc.organisations.length > 0)) &&
+		($scope.doc.lang) &&
+		($scope.doc.lang.id)
+		);
 	};
 
 	$scope.addOrganisationDialog = function () {
 		editModalDialog($modal, {
 			organisation: {
 				create: true,
-				name: $scope.doc.organisation.label
+				name: $scope.edit.organisation.label
 			}
 		}, 'partials/organisation.html', function (data) {
 			if (data) {
 				OrganisationsService.add({organisation: data.organisation}, function (org) {
-					$scope.doc.organisation = {
+					$scope.edit.organisation = {
 						id: org.id,
 						label: org.name
 					}
@@ -695,15 +778,71 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 			listModalDialog($modal, {
 				list: list,
 				prop: 'Organisation',
-				selected: $scope.doc.organisation
+				selected: $scope.edit.organisation
 			}, function (data) {
 				if (data) {
-					$scope.doc.organisation = data;
+					$scope.edit.organisation = data;
 				}
 			});
 
 		}, function (err) {
 			alert(err.data);
+		});
+	};
+
+	$scope.removeOrganisation = function (o) {
+		$scope.doc.organisations = $scope.doc.organisations.filter(function (eo) {
+			return eo !== o;
+		})
+	};
+
+	$scope.removeTopic = function (o) {
+		$scope.doc.topics = $scope.doc.topics.filter(function (eo) {
+			return eo !== o;
+		})
+	};
+
+	$scope.removeTag = function (o) {
+		$scope.doc.tags = $scope.doc.tags.filter(function (eo) {
+			return eo !== o;
+		})
+	};
+
+	$scope.selectTopicDialog = function () {
+
+		TopicsService.index(function (list) {
+			list.sort(function (a, b) {
+				return a.label - b.label;
+			});
+			listModalDialog($modal, {
+				list: list,
+				prop: 'Topics',
+				selected: $scope.edit.topic
+			}, function (data) {
+				if (data) {
+					$scope.edit.topic = data;
+				}
+			});
+
+		}, function (err) {
+			alert(err.data);
+		});
+	};
+
+	$scope.createTopicDialog = function () {
+		editModalDialog($modal, {
+			topic: {
+				create: true,
+				label: $scope.edit.topic.label
+			}
+		}, 'partials/topic.html', function (data) {
+			if (data) {
+				TopicsService.add({topic: data.topic}, function (topic) {
+					$scope.edit.topic = topic;
+				}, function (err) {
+					alert(err.data);
+				});
+			}
 		});
 	};
 
@@ -721,47 +860,11 @@ app.controller('QueueItemController', function ($scope, $state, $stateParams, $t
 		});
 
 	};
-	$scope.selectTopicDialog = function () {
-
-		TopicsService.index(function (list) {
-			list.sort(function (a, b) {
-				return a.label - b.label;
-			});
-			listModalDialog($modal, {
-				list: list,
-				prop: 'Topics',
-				selected: $scope.doc.topic
-			}, function (data) {
-				if (data) {
-					$scope.doc.topic = data;
-				}
-			});
-
-		}, function (err) {
-			alert(err.data);
-		});
-	};
-
-	$scope.addTopicDialog = function () {
-		editModalDialog($modal, {
-			topic: {
-				create: true,
-				label: $scope.doc.topic.label
-			}
-		}, 'partials/topic.html', function (data) {
-			if (data) {
-				TopicsService.add({topic: data.topic}, function (topic) {
-					$scope.doc.topic = topic;
-				}, function (err) {
-					alert(err.data);
-				});
-			}
-		});
-	};
 
 	//startup
 	$scope.load();
 	$scope.resize();
+
 });
 
 app.controller('DocsUploadController', function ($scope) {

@@ -1,3 +1,5 @@
+var async = require("async");
+
 module.exports = function (lobbycloud, i18n) {
 	var api = this;
 
@@ -18,7 +20,7 @@ module.exports = function (lobbycloud, i18n) {
 			gravatar: user.gravatar,
 			url: user.url || null, //convert false to null, because angular displays value of boolean instead of nothing in ui, and: input fields validation fails, because val is set
 			description: user.description,
-			organisation: user.organisation,
+			organisations: user.organisations,
 			location: user.location,
 			verified: user.verified,
 			created: new Date(user.created).valueOf()
@@ -51,47 +53,58 @@ module.exports = function (lobbycloud, i18n) {
 		}
 	};
 
-	var fillOrganisation = function (item, cb) {
-		if (item.organisation && item.organisation.id) {
-			lobbycloud.organisations.get(item.organisation.id, function (err, org) {
+	var fillOrganisation = function (organisation, cb) {
+		if (organisation.id) {
+			lobbycloud.organisations.get(organisation.id, function (err, org) {
 				if ((!err) && org) {
-					item.organisation.id = org.id;
-					item.organisation.label = org.name;
+					organisation.id = org.id;
+					organisation.label = org.name;
 				}
 				cb();
 			});
 		} else {
-			if ((item.organisation) && (item.organisation.new)) {
-				item.organisation = {
-					label: item.organisation.new
-				};
-			}
+			if (organisation.new)
+				organisation.label = organisation.new
 			cb();
 		}
 	};
 
-	var fillTopic = function (item, cb) {
-		if (item.topic && item.topic.id) {
-			lobbycloud.topics.get(item.topic.id, function (err, topic) {
-				if ((!err) && topic) {
-					item.topic.id = topic.id;
-					item.topic.label = topic.label;
+	var fillOrganisations = function (item, cb) {
+		if (item.organisations && (item.organisations.length > 0)) {
+			var q = async.queue(fillOrganisation, 1);
+			q.drain = cb;
+			q.push(item.organisations);
+		} else
+			cb();
+	};
+
+	var fillTopic = function (topic, cb) {
+		if (topic.id) {
+			lobbycloud.topics.get(topic.id, function (err, t) {
+				if ((!err) && t) {
+					topic.id = t.id;
+					topic.label = t.label;
 				}
 				cb();
 			});
 		} else {
-			if ((item.topic) && (item.topic.new)) {
-				item.topic = {
-					label: item.topic.new
-				};
-			}
+			if (topic.new)
+				topic.label = topic.new;
 			cb();
 		}
+	};
+
+	var fillTopics = function (item, cb) {
+		if (item.topics && (item.topics.length > 0)) {
+			var q = async.queue(fillTopic, 1);
+			q.drain = cb;
+			q.push(item.topics);
+		} else
+			cb();
 	};
 
 	/* strips down queue obj to values needed by ui */
 	var prepareClientQueue = function (item, full, callback) {
-
 		if (!item) return callback(null);
 		var qitem = {
 			id: item.id,
@@ -99,8 +112,8 @@ module.exports = function (lobbycloud, i18n) {
 			orig: item.orig,
 			lang: item.lang,
 			stage: item.stage,
-			topic: item.topic,
-			organisation: item.organisation,
+			topics: item.topics,
+			organisations: item.organisations,
 			comment: item.comment,
 			tags: item.tags,
 			created: new Date(item.created).valueOf(),
@@ -110,8 +123,8 @@ module.exports = function (lobbycloud, i18n) {
 			text: (full && item.data ? item.data.text : null)
 		};
 
-		fillTopic(qitem, function () {
-			fillOrganisation(qitem, function () {
+		fillTopics(qitem, function () {
+			fillOrganisations(qitem, function () {
 				callback(qitem);
 			})
 		});
@@ -129,8 +142,8 @@ module.exports = function (lobbycloud, i18n) {
 			orig: doc.orig,
 			lang: doc.lang,
 			tags: doc.tags,
-			topic: {id: doc.topic},
-			organisation: {id: doc.organisation},
+			topics: doc.topics,
+			organisations: doc.organisations,
 			stats: doc.stats,
 			indexed: doc.indexed,
 			stage: doc.stage,
@@ -144,8 +157,8 @@ module.exports = function (lobbycloud, i18n) {
 			notes: (full && doc.notes.length > 0 ? doc.notes : null)
 		};
 
-		fillTopic(d, function () {
-			fillOrganisation(d, function () {
+		fillTopics(d, function () {
+			fillOrganisations(d, function () {
 				callback(d);
 			})
 		});
@@ -228,7 +241,7 @@ module.exports = function (lobbycloud, i18n) {
 			}
 		},
 		'topics.delete': {
-			//delete topic, returns nothing if successfull
+			//delete topic, returns nothing if successful
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
@@ -300,9 +313,6 @@ module.exports = function (lobbycloud, i18n) {
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id) || (!req.body.doc)) return res.send(400);
-				//TODO: update method awaits id & label mixed, better use subobject as delivered
-				req.body.doc.topic = req.body.doc.topic ? (req.body.doc.topic.id || req.body.doc.topic.new) : null;
-				req.body.doc.organisation = req.body.doc.organisation ? (req.body.doc.organisation.id || req.body.doc.organisation.new) : null;
 				lobbycloud.queue.update(req.body.id, req.body.doc, function (err, data) {
 						if (err) return res.send(400, err.message || err);
 						prepareClientQueue(data, true, function (qitem) {
@@ -313,7 +323,7 @@ module.exports = function (lobbycloud, i18n) {
 			}
 		},
 		'queue.accept': {
-			//updates a queue item & returns nothing if successfull
+			//updates a queue item & returns nothing if successful
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
@@ -325,7 +335,7 @@ module.exports = function (lobbycloud, i18n) {
 			}
 		},
 		'queue.decline': {
-			//declines a queue item & returns nothing if successfull
+			//declines a queue item & returns nothing if successful
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
@@ -374,7 +384,7 @@ module.exports = function (lobbycloud, i18n) {
 			}
 		},
 		'organisations.delete': {
-			//delete organisation, returns nothing if successfull
+			//delete organisation, returns nothing if successful
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
@@ -426,7 +436,7 @@ module.exports = function (lobbycloud, i18n) {
 			}
 		},
 		'users.delete': {
-			//delete user, returns nothing if successfull
+			//delete user, returns nothing if successful
 			access: lobbycloud.users.roles.editor,
 			execute: function (req, res) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);

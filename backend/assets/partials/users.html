@@ -1,65 +1,65 @@
 <h1 translate>Manage Users</h1>
 
 <div class="row" ng-show="loading">
-    <div class="col-md-9">
-        <div>
-            <i class="fa fa-spinner fa-spin"></i> <span translate>Loading...</span>
-        </div>
-    </div>
+	<div class="col-md-9">
+		<div>
+			<i class="fa fa-spinner fa-spin"></i> <span translate>Loading...</span>
+		</div>
+	</div>
 </div>
 
 <div ng-show="!loading">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="btn-group pull-left">
-                <button type="button" class="btn btn-primary" ng-click="newDialog()" translate>New User</button>
-                <div class="list-title pull-left" translate translate-n="users.length" translate-plural="{{users.length}} users">One user</div>
-            </div>
-        </div>
-    </div>
-    <hr/>
-    <div class="row">
-        <div class="col-md-12">
-            <table class="table table-responsive table-hover" ng-show="users.length">
-                <thead>
-                <tr>
-                    <th translate>Gravatar</th>
-                    <th translate>Login name</th>
-                    <th translate>Name</th>
-                    <th translate>Organisation</th>
-                    <th translate>Location</th>
-                    <th translate>Role</th>
-                    <th translate>Created</th>
-                    <th translate>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="rowuser in users">
-                    <td><img ng-src="http://www.gravatar.com/avatar/{{rowuser.gravatar}}.png?s=36&amp;d=mm&amp;r=pg" width="36" height="36"></td>
-                    <td>{{rowuser.id}}<br/>
-                        <i ng-if="rowuser.email" class="fa fa-envelope-o" popover="{{rowuser.email}}" popover-trigger="mouseenter"></i>
-                        <i ng-if="rowuser.verified" class="fa fa-check-circle" title="{{'Verified'|translate}}"></i>
-                        <i ng-if="rowuser.description" class="fa fa-info-circle" popover="{{rowuser.description}}" popover-trigger="mouseenter"></i>
-                        <a ng-if="rowuser.url" href="{{rowuser.url}}"><i class="fa fa-link" popover="{{rowuser.url}}" popover-trigger="mouseenter"></i></a>
-                    </td>
-                    <td>{{rowuser.name}}</td>
-                    <td>{{rowuser.organisation}}</td>
-                    <td>{{rowuser.location}}</td>
-                    <td>{{rowuser.role}}</td>
-                    <td>{{rowuser.created | amDateFormat:'LLL'}}</td>
-                    <td>
-                        <div ng-if="rowuser.$processing">
-                            <i class="fa fa-spinner fa-spin"></i>
-                        </div>
-                        <div ng-if="!rowuser.$processing">
-                            <i class="btn btn-primary fa fa-edit clickable" title="{{'Edit User'|translate}}" ng-click="editDialog(rowuser)"/>
-                            <i class="btn btn-primary fa fa-trash-o clickable" title="{{'Delete User'|translate}}" ng-click="deleteDialog(rowuser)"/>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="btn-group pull-left">
+				<button type="button" class="btn btn-primary" ng-click="newDialog()" translate>New User</button>
+				<div class="list-title pull-left" translate translate-n="users.length" translate-plural="{{users.length}} users">One user</div>
+			</div>
+		</div>
+	</div>
+	<hr/>
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table table-responsive table-hover" ng-show="users.length">
+				<thead>
+				<tr>
+					<th translate>Gravatar</th>
+					<th translate>Login name</th>
+					<th translate>Name</th>
+					<th translate>Organisation</th>
+					<th translate>Location</th>
+					<th translate>Role</th>
+					<th translate>Created</th>
+					<th translate>Actions</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="rowuser in users">
+					<td><img ng-src="http://www.gravatar.com/avatar/{{rowuser.gravatar}}.png?s=36&amp;d=mm&amp;r=pg" width="36" height="36"></td>
+					<td>{{rowuser.id}}<br/>
+						<i ng-if="rowuser.email" class="fa fa-envelope-o" popover="{{rowuser.email}}" popover-trigger="mouseenter"></i>
+						<i ng-if="rowuser.verified" class="fa fa-check-circle" title="{{'Verified'|translate}}"></i>
+						<i ng-if="rowuser.description" class="fa fa-info-circle" popover="{{rowuser.description}}" popover-trigger="mouseenter"></i>
+						<a ng-if="rowuser.url" href="{{rowuser.url}}"><i class="fa fa-link" popover="{{rowuser.url}}" popover-trigger="mouseenter"></i></a>
+					</td>
+					<td>{{rowuser.name}}</td>
+					<td>{{rowuser.organisation}}</td>
+					<td>{{rowuser.location}}</td>
+					<td>{{rowuser.role}}</td>
+					<td>{{rowuser.created | amDateFormat:'LLL'}}</td>
+					<td>
+						<div ng-if="rowuser.$processing">
+							<i class="fa fa-spinner fa-spin"></i>
+						</div>
+						<div ng-if="!rowuser.$processing">
+							<i class="btn btn-primary fa fa-edit clickable" title="{{'Edit User'|translate}}" ng-click="editDialog(rowuser)"/>
+							<i class="btn btn-primary fa fa-trash-o clickable" title="{{'Delete User'|translate}}" ng-click="deleteDialog(rowuser)"/>
+						</div>
+					</td>
+				</tr>
+				</tbody>
 
-            </table>
-        </div>
-    </div>
+			</table>
+		</div>
+	</div>
 </div>

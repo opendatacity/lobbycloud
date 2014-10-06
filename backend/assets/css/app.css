@@ -163,3 +163,40 @@
     min-height: 400px;
     padding: 20px;
 }
+
+.list-sel-ctn{
+	width: 100%;
+	min-height: 20px;
+	background: none repeat scroll 0 0 #f3f3f3;
+	border: 1px solid #ddd;
+}
+
+.list-sel-ctn .list-sel-item {
+	background: none repeat scroll 0 0 #f3f3f3;
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	color: #000;
+	font-size: 12px;
+	margin: 3px 0 1px;
+	padding: 3px 5px;
+	display: inline-block;
+}
+
+.list-sel-ctn .list-sel-item i {
+	padding-left: 4px;
+	padding-top: 4px;
+	color: #999;
+}
+
+.list-sel-ctn .list-sel-item i:hover {
+	cursor: pointer;
+	color: #000;
+}
+
+.central .btn {
+	min-width: 200px;
+}
+
+.central {
+	text-align: center;
+}

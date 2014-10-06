@@ -377,27 +377,28 @@ module.exports = queue = function(config, db, l){
 
 				/* check any unchecked organisation for its existance */
 				var check_organisations = function(_callback) {
-					if (doc.organisations.length === 0) return _callback();
+					if (!data.hasOwnProperty("organisations")) return _callback();
+					if (!data.organisations instanceof Array) data.organisations = [data.organisations];
 					var _checked = 0;
-					doc.organisations.forEach(function(organisation, index){
+					data.organisations.forEach(function(organisation, index){
 						if (typeof organisation === "object" && (organisation.hasOwnProperty("id") || organisation.hasOwnProperty("new"))) {
 							_checked++;
-							if (_checked === doc.organisations.length) {
-								doc.organisations.filter(function(organisation){ return (organisation !== null); });
+							if (_checked === data.organisations.length) {
+								update.organisations = data.organisations.filter(function(organisation){ return (organisation !== null); });
 								_callback();
 							}
 						} else {
 							organisations.check(organisation, function(err, exists, org_id){
 								_checked++;
 								if (err) {
-									doc.organisations[index] = null;
+									data.organisations[index] = null;
 								} else if (exists) {
-									doc.organisations[index] = {"id": org_id};
+									data.organisations[index] = {"id": org_id};
 								} else {
-									doc.organisations[index] = {"new": doc.organisation};
+									data.organisations[index] = {"new": organisation};
 								}
-								if (_checked === doc.organisations.length) {
-									doc.organisations.filter(function(organisation){ return (organisation !== null); });
+								if (_checked === data.organisations.length) {
+									update.organisations = data.organisations.filter(function(organisation){ return (organisation !== null); });
 									_callback();
 								}
 							});
@@ -407,27 +408,28 @@ module.exports = queue = function(config, db, l){
 		
 				/* check any unchecked topic for its existance */
 				var check_topics = function(_callback) {
-					if (doc.topics.length === 0) return _callback();
+					if (!data.hasOwnProperty("topics")) return _callback();
+					if (!data.topics instanceof Array) data.topics = [data.topics];
 					var _checked = 0;
-					doc.topics.forEach(function(topic, index){
+					data.topics.forEach(function(topic, index){
 						if (typeof topic === "object" && (topic.hasOwnProperty("id") || topic.hasOwnProperty("new"))) {
 							_checked++;
-							if (_checked === doc.topics.length) {
-								doc.topics.filter(function(topic){ return (topic !== null); });
+							if (_checked === data.topics.length) {
+								update.topics=data.topics.filter(function(topic){ return (topic !== null); });
 								_callback();
 							}
 						} else {
 							topics.check(topic, function(err, exists, topic_id){
 								_checked++;
 								if (err) {
-									doc.topics[index] = null;
+									data.topics[index] = null;
 								} else if (exists) {
-									doc.topics[index] = {"id": topic_id};
+									data.topics[index] = {"id": topic_id};
 								} else {
-									doc.topics[index] = {"new": topic};
+									data.topics[index] = {"new": topic};
 								}
-								if (_checked === doc.topics.length) {
-									doc.topics.filter(function(topic){ return (topic !== null); });
+								if (_checked === data.topics.length) {
+									update.topics=data.topics.filter(function(topic){ return (topic !== null); });
 									_callback();
 								}
 							});
@@ -439,7 +441,6 @@ module.exports = queue = function(config, db, l){
 					check_topics(function(){
 
 						// FIXME: check if anything to update
-
 						/* set last modified */
 						update.updated = (new Date());
 

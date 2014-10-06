@@ -56,7 +56,7 @@ app.directive('input', function ($compile, $parse, gettextCatalog) {
 
 			$scope.$watch($attributes.ngModel, function (modelValue) {
 				if (!modelValue || (!modelValue.startDate)) {
-					ngModel.$setViewValue({ startDate: moment().startOf('day'), endDate: moment().startOf('day') });
+					ngModel.$setViewValue({startDate: moment().startOf('day'), endDate: moment().startOf('day')});
 					return;
 				}
 				$element.data('daterangepicker').startDate = modelValue.startDate;
@@ -68,7 +68,7 @@ app.directive('input', function ($compile, $parse, gettextCatalog) {
 
 			$element.daterangepicker(options, function (start, end) {
 				$scope.$apply(function () {
-					ngModel.$setViewValue({ startDate: start, endDate: end });
+					ngModel.$setViewValue({startDate: start, endDate: end});
 					ngModel.$render();
 				});
 			});
@@ -85,11 +85,19 @@ app.directive('ngtypeahead', function () {
 			datasets: '='       // The typeahead datasets to use (https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#datasets)
 		},
 		link: function (scope, element, attrs, ngModel) {
-
 			// Flag if user is selecting or not
 			var selecting = false;
 			// Create the typeahead on the element
 			element.typeahead(scope.options, scope.datasets);
+
+			element.keypress(function (e) {
+				if (e.which == 13) {
+					scope.$apply(function () {
+						scope.$emit('typeahead:enter', e, element.val(), scope.datasets);
+					});
+					return true;
+				}
+			});
 
 			// Parses what is going to be set to model
 			ngModel.$parsers.push(function (fromView) {
@@ -102,6 +110,7 @@ app.directive('ngtypeahead', function () {
 				}
 				return fromView;
 			});
+
 
 			function getCursorPosition(element) {
 				var position = 0;
@@ -136,13 +145,13 @@ app.directive('ngtypeahead', function () {
 
 			function updateScope(event, object, suggestion, dataset) {
 				// for some reason $apply will place [Object] into element, this hacks around it
-//				var preserveVal = element.val();
+				//var preserveVal = element.val();
 				scope.$apply(function () {
 					selecting = false;
 					ngModel.$setViewValue(suggestion[scope.datasets.displayKey]);
 					scope.$emit(event, object, suggestion, scope.datasets);
 				});
-//				element.val(preserveVal);
+				//element.val(preserveVal);
 			}
 
 			// Update the value binding when a value is manually selected from the dropdown.
@@ -162,6 +171,7 @@ app.directive('ngtypeahead', function () {
 
 			// Propagate the closed event
 			element.bind('typeahead:closed', function () {
+				element.val(ngModel.$viewValue);
 				scope.$emit('typeahead:closed');
 			});
 
@@ -171,25 +181,80 @@ app.directive('ngtypeahead', function () {
 			});
 
 			// Update the value binding when the user manually enters some text
-			element.bind('input', function () {
-				var preservePos = getCursorPosition(element);
-				scope.$apply(function () {
-					var value = element.val();
-					selecting = true;
-					ngModel.$setViewValue(value);
-					scope.$emit('typeahead:changed', value, scope.datasets);
-				});
-				setCursorPosition(element, preservePos);
-			});
+			element.bind('input',
+				function () {
+					var preservePos = getCursorPosition(element);
+					scope.$apply(function () {
+						var value = element.val();
+						selecting = true;
+						ngModel.$setViewValue(value);
+					});
+					setCursorPosition(element, preservePos);
+					scope.$emit('typeahead:changed', element.val(), scope.datasets);
+				}
+			);
 		}
 	};
 });
 
-app.directive('eatClick', function() {
-	return function(scope, element, attrs) {
-		$(element).click(function(event) {
+app.directive('eatClick', function () {
+	return function (scope, element, attrs) {
+		$(element).click(function (event) {
 			event.preventDefault();
 			return true;
 		});
 	}
 });
+
+app.filter('listLabels', function () {
+	return function (value, format, preprocess) {
+		if (!value) return '';
+		return value.map(function (o) {
+			return o.label;
+		}).join(", ");
+	};
+});
+
+app.filter('join', function () {
+	return function (value, format, preprocess) {
+		if (!value) return '';
+		return value.join(", ");
+	};
+});
+
+
+app.constant('keyCodes', {
+	esc: 27,
+	space: 32,
+	enter: 13,
+	tab: 9,
+	backspace: 8,
+	shift: 16,
+	ctrl: 17,
+	alt: 18,
+	capslock: 20,
+	numlock: 144
+})
+	.directive('keyBind', ['keyCodes', function (keyCodes) {
+		function map(obj) {
+			var mapped = {};
+			for (var key in obj) {
+				var action = obj[key];
+				if (keyCodes.hasOwnProperty(key)) {
+					mapped[keyCodes[key]] = action;
+				}
+			}
+			return mapped;
+		}
+
+		return function (scope, element, attrs) {
+			var bindings = map(scope.$eval(attrs.keyBind));
+			element.bind("keypress", function (event) {
+				if (bindings.hasOwnProperty(event.which)) {
+					scope.$apply(function () {
+						scope.$eval(bindings[event.which]);
+					});
+				}
+			});
+		};
+	}]);
