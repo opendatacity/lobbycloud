@@ -26,13 +26,17 @@
 			<div class="btn-group pull-left">
 				<div class="list-title pull-left" translate translate-n="docs.length" translate-plural="{{docs.length}} documents">One document</div>
 			</div>
+			<div class="pull-right">
+				<input type="text" ng-model="quickfilter" placeholder="{{'Filter'|translate}}" key-bind="{ enter: 'filterQuick()'}">
+			</div>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<table class="table table-responsive table-hover table-docs ng-table-rowselected" ng-table="tableParams" show-filter="true">
+			<table class="table table-responsive table-hover table-docs ng-table-rowselected table-docs" ng-table="tableParams" template-pagination="partials/pagination.html" show-filter="true">
 				<thead>
 				<tr>
+					<th></th>
 					<th ng-repeat="head in tablecolumns" class="sortable" ng-class="{
                     'sort-asc': tableParams.isSortBy(head.sortable, 'asc'),
                     'sort-desc': tableParams.isSortBy(head.sortable, 'desc')}"
@@ -44,13 +48,15 @@
 				</thead>
 				<tbody ng-repeat="doc in $data" class="row-item">
 				<tr ng-class="{'selected': doc.$selected}">
-					<td class="clickable" ng-click="selectRow(doc)" filter="{ 'orig': 'text' }" sortable="'orig'">
+					<td class="clickable" ng-click="selectRow(doc)">
 						<img class="thumb" ng-src="{{doc.thumbs[0].file}}"/>
-						{{doc.orig}}
 					</td>
-					<td sortable="'created'">{{doc.created | amDateFormat:'LLL'}}</td>
-					<td>{{doc.topics|listLabels}}</td>
-					<td>{{doc.organisations|listLabels}}</span></td>
+					<td filter="{ 'orig': 'text' }" sortable="'orig'">
+						<span class="filename">{{doc.orig}}</span>
+					</td>
+					<td sortable="'created'">{{doc.created | amDateFormat:'DD.MM.YYYY HH:mm'}}</td>
+					<td sortable="'topics'">{{doc.topics|listLabels}}</td>
+					<td sortable="'organisations'">{{doc.organisations|listLabels}}</td>
 					<td sortable="'info.pages'">{{doc.info.pages}}</td>
 					<td class="doc-actions">
 						<div ng-show="doc.$processing">

@@ -4,24 +4,22 @@
 		<h1>{{#__}}Topics{{/__}}</h1>
 	</div>
 	{{#topics}}
-	<div class="row">
-		{{#list}}
-		<div class="col-md-4">
-			<div class="item clearfix">
-				<h2><a href="{{_url}}/topic/{{id}}">{{label}}</a></h2>
-				<p class="subject"><a href="{{_url}}/topic/{{id}}"><strong>{{subject}}</strong></a></p>
-				{{#description}}
-				<p class="description">
-					{{description}}
-				</p>
-				<p>
-					<a href="{{_url}}/topic/{{id}}" class="btn btn-xs btn-primary pull-right">{{#__}}View topic{{/__}} <i class="fa fa-arrow-right"></i></a>
-				</p>
-				{{/description}}
-			</div>
+		<div class="row">
+			{{#list}}
+				<div class="col-md-4">
+					<div class="item clearfix">
+						<h2><a href="{{_url}}/topic/{{id}}">{{label}}</a></h2>
+
+						<p class="subject"><a href="{{_url}}/topic/{{id}}"><strong>{{subject}}</strong></a></p>
+						{{#description}}
+							<p class="description">{{description}}</p>
+
+							<p><a href="{{_url}}/topic/{{id}}" class="btn btn-xs btn-primary pull-right">{{#__}}View topic{{/__}} <i class="fa fa-arrow-right"></i></a></p>
+						{{/description}}
+					</div>
+				</div>
+			{{/list}}
 		</div>
-		{{/list}}
-	</div>
 	{{/topics}}
 </div>
 {{>footer}}

@@ -1,49 +1,51 @@
 {{>header}}
 <div id="content" class="content organisation">
 	{{#organisation}}
-	<div class="headline clearfix">
-		<h1><strong>{{name}}</strong> {{#fullname}}<small>{{fullname}}</small>{{/fullname}}</h1>
-		{{#description}}
-		<p>{{description}}</p>
-		{{/description}}
-		{{^description}}
-		<p><em>{{#__}}No description{{/__}}</em></p>
-		{{/description}}
-		{{#logo}}<!--
+		<div class="headline clearfix">
+			<h1><strong>{{name}}</strong> {{#fullname}}
+				<small>{{fullname}}</small>{{/fullname}}</h1>
+			{{#description}}
+				<p>{{description}}</p>
+			{{/description}}
+			{{^description}}
+				<p><em>{{#__}}No description{{/__}}</em></p>
+			{{/description}}
+			{{#logo}}<!--
 		<div class="organisation-logo">
 			<img src="{{{logo}}}" class="img-responsive">
 		</div>
 		-->{{/logo}}
-	</div>
+		</div>
 	{{/organisation}}
-	<div class="row documents">		
+	<div class="row documents">
 		<div class="col-md-12">
 			<h2>{{#__}}Documents{{/__}}</h2>
 			{{^documents}}
-			<p><em>{{#__}}There are no documents by this organisation.{{/__}}</em></p>
+				<p><em>{{#__}}There are no documents by this organisation.{{/__}}</em></p>
 			{{/documents}}
 		</div>
 		{{#documents}}
-		<div class="col-md-3 col-sm-4 col-xs-12">
-			<div class="doc">
-				<div class="thumb">
-					<a href="{{_url}}/document/{{id}}"><img src="{{_url}}/{{_storage}}/{{thumb}}" class="responsive-image"></a>
+			<div class="col-md-3 col-sm-4 col-xs-12">
+				<div class="doc">
+					<div class="thumb">
+						<a href="{{_url}}/document/{{id}}"><img src="{{_url}}/{{_storage}}/{{thumb}}" class="responsive-image"></a>
+					</div>
+					<p class="id"><a href="{{_url}}/document/{{id}}">{{id}}</a></p>
+
+					<div class="badges">
+						<a href="{{_url}}/document/{{id}}">
+							{{#topics}}<span class="topic" title="{{subject}}">{{label}}</span>{{/topics}}
+							{{#organisations}}<span class="organisation" title="{{fullname}}">{{name}}</span>{{/organisations}}
+							{{#stats.comments}}<span class="comments">{{stats.comments}} {{#__}}Comments{{/__}}</span>{{/stats.comments}}
+							{{#stats.notes}}<span class="notes">{{stats.notes}} {{#__}}Notes{{/__}}</span>{{/stats.notes}}
+							{{#lang}}<span class="lang">{{lang}}</span>{{/lang}}
+						</a>
+					</div>
+					{{#created_ago}}<a href="{{_url}}/document/{{id}}" class="created">{{created_ago}}</a>{{/created_ago}}
 				</div>
-				<p class="id"><a href="{{_url}}/document/{{id}}">{{id}}</a></p>
-				<div class="badges">
-					<a href="{{_url}}/document/{{id}}">
-						{{#topics_data}}<span class="topic" title="{{subject}}">{{label}}</span>{{/topics_data}}
-						{{#organisations_data}}<span class="organisation" title="{{fullname}}">{{name}}</span>{{/organisations_data}}
-						{{#stats.comments}}<span class="comments">{{stats.comments}} {{#__}}Comments{{/__}}</span>{{/stats.comments}}
-						{{#stats.notes}}<span class="notes">{{stats.notes}} {{#__}}Notes{{/__}}</span>{{/stats.notes}}
-						{{#lang}}<span class="lang">{{lang}}</span>{{/lang}}
-					</a>
-				</div>
-				{{#created_ago}}<a href="{{_url}}/document/{{id}}" class="created">{{created_ago}}</a>{{/created_ago}}
 			</div>
-		</div>
 		{{/documents}}
-		</div>
 	</div>
+</div>
 </div>
 {{>footer}}

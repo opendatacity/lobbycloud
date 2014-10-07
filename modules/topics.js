@@ -2,6 +2,7 @@
 
 /* require local modules */
 var slugmaker = require("./slugmaker");
+var utils = require("./utils");
 
 module.exports = function (opts, db, es) {
 
@@ -135,10 +136,15 @@ module.exports = function (opts, db, es) {
 	topics.list = function (ids, callback) {
 		var list = [];
 		var query = [];
+		ids = ids.map(function (id) {
+			if (typeof id == "string")
+				return id;
+			return id.id;
+		});
 		ids.forEach(function (id) {
 			if (cache.hasOwnProperty(id)) {
 				list.push(cache[id]);
-			} else {
+			} else if (id !== null) {
 				query.push(id);
 			}
 		});
@@ -174,12 +180,28 @@ module.exports = function (opts, db, es) {
 			var callback = num;
 			var num = 1;
 		}
-		db.collection("topics").find().sort({"created": -1}).limit(num, function(err, result) {
+		db.collection("topics").find().sort({"created": -1}).limit(num, function (err, result) {
 			if (err) return callback(err);
-			result.forEach(function(r) {
+			result.forEach(function (r) {
 				cache[r.id] = r;
 			});
 			callback(null, result);
+		});
+	};
+
+	/* recreate elastic search index for all topics */
+	topics.reindex = function (callback) {
+		db.collection("topics").find({}, function (err, result) {
+			if (result.length === 0) return callback();
+			var list = [];
+			result.forEach(function (r) {
+				list.push(r);
+			});
+			utils.queue(list, function (topic, cb) {
+				es.delete('topic', topic.id, function () {
+					es.create('topic', topic.id, es.prepareFieldsObj(topic, es_store), cb);
+				});
+			}, callback);
 		});
 	};
 

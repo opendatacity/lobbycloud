@@ -17,8 +17,11 @@ var mmmagic = require("mmmagic");
 var mongojs = require("mongojs");
 var express = require("express");
 var multer = require("multer");
+var clone = require("clone");
 var moment = require("moment");
 var i18n = require("i18n");
+
+var utils = require("./modules/utils");
 
 /* get local modules */
 var lobbycloud = require("./modules/lobbycloud");
@@ -66,7 +69,7 @@ passport.use(new passportlocal.Strategy(function (username, password, done) {
 	process.nextTick(function () {
 		l.users.auth(username, password, function (result, user) {
 			if ((!result) || (!user)) {
-				done(null, false, { message: 'Invalid Credentials'});
+				done(null, false, {message: 'Invalid Credentials'});
 			} else {
 				done(null, user);
 			}
@@ -98,13 +101,13 @@ var _totags = function (tags) {
 };
 
 /* http helpers */
-var send404 = function(req, res) {
+var send404 = function (req, res) {
 	if (config.debug) console.error("[404]", req.method, req.originalUrl);
 	res.status(404);
 	render(req, res, '404', {});
 };
 
-var send500 = function(req, res, err) {
+var send500 = function (req, res, err) {
 	if (err) console.error("[500]", err);
 	res.status(500);
 	render(req, res, '500', {});
@@ -129,7 +132,7 @@ var render = function (req, res, name, opt) {
 	opt._storage = config.storage;
 	opt._userrole = {};
 	if (req.user) {
-		
+
 		/* FIXME: this is ambiguous */
 		opt._user._is_admin = (req.user.role === "admin");
 		opt._user._is_editor = (req.user.role === "admin" || req.user.role === "editor");
@@ -151,7 +154,7 @@ var render = function (req, res, name, opt) {
 /* launch express */
 var app = express();
 
-app.configure(function() {
+app.configure(function () {
 
 	/* enable compression */
 	app.use(express.compress());
@@ -212,12 +215,12 @@ app.configure(function() {
 
 	/* user & session handling */
 	app.use(express.cookieParser());
-	app.use(express.session({ secret: config.passport.secret, store: new (connectmongo(express))({ db: config.db, auto_reconnect: true }) }));
+	app.use(express.session({secret: config.passport.secret, store: new (connectmongo(express))({db: config.db, auto_reconnect: true})}));
 	app.use(passport.initialize());
 	app.use(passport.session());
 
 	/* auth by apikey */
-	app.use(function(req, res, next){
+	app.use(function (req, res, next) {
 		if (req.user) return next();
 		if (req.hasOwnProperty("body") && req.body.hasOwnProperty("apikey")) {
 			var _apikey = req.body.apikey;
@@ -228,7 +231,7 @@ app.configure(function() {
 		} else {
 			return next();
 		}
-		l.users.apikey(_apikey, function(err, user){
+		l.users.apikey(_apikey, function (err, user) {
 			if (err) return next();
 			if (user) req.user = user;
 			next();
@@ -239,11 +242,12 @@ app.configure(function() {
 /* routes */
 app.get('/', function (req, res) {
 	/* get topics */
-	l.topics.latest(3, function(err, topics){
-		l.documents.latest(15, function(err, documents){
+	l.topics.latest(3, function (err, topics) {
+		l.documents.latest(15, function (err, docs) {
+			if (err) return send500(req, res, err);
 			render(req, res, 'index', {
 				topics: topics,
-				documents: documents
+				documents: docs
 			});
 		});
 	});
@@ -342,39 +346,39 @@ app.post('/beta', function (req, res) {
 /* contributions */
 app.get('/contribute/:id?', function (req, res) {
 	if (!req.user) return render(req, res, 'contribute', {});
-	l.queue.user(req.user.id, function(err, queue){
+	l.queue.user(req.user.id, function (err, queue) {
 
-		queue = queue.filter(function(item){
+		queue = queue.filter(function (item) {
 			return (item.stage < 3 || item.stage == 4);
 		});
 
 		/* check for empty queue */
 		if (queue.length === 0) return render(req, res, 'contribute', {});
-		
-		queue.map(function(item){
-			item["stage-"+item.stage] = true;
+
+		queue.map(function (item) {
+			item["stage-" + item.stage] = true;
 			item["cancelable"] = (item.stage < 2);
 			item["editable"] = (item.stage < 2);
 			item["acceptable"] = (item.stage === 1);
 			item.created_unix = moment(item.created).unix();
-			item.created_formatted = moment(item.created).lang(req.locale||"en").format("YY-MM-DD HH:mm");
-			item.created_relative = moment(item.created).lang(req.locale||"en").fromNow();
-			item.updated_relative = moment(item.updated).lang(req.locale||"en").fromNow();
+			item.created_formatted = moment(item.created).lang(req.locale || "en").format("YY-MM-DD HH:mm");
+			item.created_relative = moment(item.created).lang(req.locale || "en").fromNow();
+			item.updated_relative = moment(item.updated).lang(req.locale || "en").fromNow();
 			if (item.stage === 1 || item.stage >= 3) item.processed = true;
 		});
-		
+
 		/* show queue index */
 		if (!req.param("id")) return render(req, res, 'contribute', {queue: {items: queue}});
-		
-		l.queue.check(req.param("id"), function(err, exists, id){
+
+		l.queue.check(req.param("id"), function (err, exists, id) {
 			if (err) return send500(req, res, err);
 			if (!exists) return send404(req, res);
-			l.queue.get(id, function(err, doc){
+			l.queue.get(id, function (err, doc) {
 				if (err) return send500(req, res, err);
 
 				/* check privileges */
-				if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user "+req.user.id+" ("+req.user.role+") tried to access queue item "+id));
-				if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document "+id+" stage "+doc.stage));
+				if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
+				if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
 
 				/* tags */
 				doc.tags_value = doc.tags.join(",");
@@ -383,7 +387,7 @@ app.get('/contribute/:id?', function (req, res) {
 				if (doc.lang && l.lang.check(doc.lang)) {
 					doc.lang_name = l.lang.get(doc.lang);
 				}
-				
+
 				/* render form */
 				render(req, res, 'contribute', {
 					queue: {items: queue},
@@ -396,90 +400,90 @@ app.get('/contribute/:id?', function (req, res) {
 
 /* contribution update */
 app.post('/contribute/:id/update', function (req, res) {
-	
+
 	/* only for users */
 	if (!req.user) return res.redirect("/contribute");
 
-	l.queue.check(req.param("id"), function(err, exists, id){
+	l.queue.check(req.param("id"), function (err, exists, id) {
 		if (err) return send500(req, res, err);
 		if (!exists) return send404(req, res);
-	
-		l.queue.get(id, function(err, doc){
+
+		l.queue.get(id, function (err, doc) {
 			if (err) return send500(req, res, err);
 
 			/* check privileges */
-			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user "+req.user.id+" ("+req.user.role+") tried to access queue item "+id));
-			if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document "+id+" stage "+doc.stage));
+			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
+			if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
 
 			l.queue.update(id, {
-				topic: (req.body.topic || null),
-				organisation: (req.body.organisation || null),
+				topics: (req.body.topics || null),
+				organisations: (req.body.organisations || null),
 				tags: (req.body.tags || null),
 				lang: (req.body.lang || null),
 				comment: (req.body.comment || null)
-			}, function(err, data){
+			}, function (err, data) {
 				if (err) return send500(req, res, err);
 
 				/* redirect to index :) */
-				res.redirect("/contribute#"+id);
-				
+				res.redirect("/contribute#" + id);
+
 			});
-			
+
 		});
-		
+
 	});
-	
+
 });
 
 /* cancel */
-app.get('/contribute/:id/cancel', function (req, res){
+app.get('/contribute/:id/cancel', function (req, res) {
 	/* only for users */
 	if (!req.user) return res.redirect("/contribute");
-	
-	l.queue.check(req.param("id"), function(err, exists, id){
+
+	l.queue.check(req.param("id"), function (err, exists, id) {
 		if (err) return send500(req, res, err);
 		if (!exists) return send404(req, res);
-	
-		l.queue.get(id, function(err, doc){
+
+		l.queue.get(id, function (err, doc) {
 			if (err) return send500(req, res, err);
 
 			/* check privileges */
-			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user "+req.user.id+" ("+req.user.role+") tried to access queue item "+id));
-			if (doc.stage >= 3) return send500(req, res, new Error("stage violation: document "+id+" stage "+doc.stage));
+			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
+			if (doc.stage >= 3) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
 
 			l.queue.update(id, {
 				stage: 5
-			}, function(err, data){
+			}, function (err, data) {
 				if (err) return send500(req, res, err);
 
 				/* redirect to index :) */
 				res.redirect("/contribute");
-				
+
 			});
-			
+
 		});
-		
+
 	});
-	
+
 });
 
 /* quick accept for admins and so */
-app.get('/contribute/:id/accept', function (req, res){
+app.get('/contribute/:id/accept', function (req, res) {
 	/* only for users */
 	if (!req.user) return res.redirect("/contribute");
-	
-	l.queue.check(req.param("id"), function(err, exists, id){
+
+	l.queue.check(req.param("id"), function (err, exists, id) {
 		if (err) return send500(req, res, err);
 		if (!exists) return send404(req, res);
-	
-		l.queue.get(id, function(err, doc){
+
+		l.queue.get(id, function (err, doc) {
 			if (err) return send500(req, res, err);
 
 			/* check privileges */
-			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user "+req.user.id+" ("+req.user.role+") tried to access queue item "+id));
-			if (doc.stage !== 1) return send500(req, res, new Error("stage violation: document "+id+" stage "+doc.stage));
+			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
+			if (doc.stage !== 1) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
 
-			l.queue.accept(req.param("id"), function(err){
+			l.queue.accept(req.param("id"), function (err) {
 				if (err) return send500(req, res, err);
 
 				/* redirect to index :) */
@@ -519,79 +523,65 @@ app.get('/contribution-guidelines', function (req, res) {
 
 /* browse documents */
 app.get('/documents', function (req, res) {
-	l.documents.all(function(err, documents){
-		documents.map(function(doc){
-			doc.created_ago = moment(doc.created).lang(req.locale||"en").calendar(true);
+	l.documents.all(function (err, docs) {
+		if (err) return send500(req, res, err);
+		docs.forEach(function (doc) {
+			doc.created_ago = moment(doc.created).lang(req.locale || "en").calendar(true);
 		});
 		render(req, res, 'documents', {
 			error: err,
-			documents: documents
+			documents: docs
 		});
 	});
 });
 
 /* document */
 app.get('/document/:id', function (req, res) {
-	l.documents.check(req.param("id"), function(err, exists, id){
+	l.documents.check(req.param("id"), function (err, exists, id) {
 		if (err) return send500(req, res, err);
 		if (!exists) return send404(req, res);
-		l.documents.get(id, function(err, doc){
+		l.documents.get(id, function (err, doc) {
 			if (err) return send500(req, res, err);
-			l.documents.extend_topics(doc.topics, function(err, topics_data){
-				if (err) return send500(req, res, err);
-				l.documents.extend_organisations(doc.organisations, function(err, organisations_data){
-					if (err) return send500(req, res, err);
+			if (doc.topics.length > 0) doc.topics[(doc.topics.length - 1)].last = true;
+			if (doc.organisations.length > 0) doc.organisations[(doc.organisations.length - 1)].last = true;
+			doc.has_organisations = (doc.organisations.length > 0);
+			doc.has_topics = (doc.topics.length > 0);
+			doc.has_topics_or_organisations = (doc.has_topics || doc.has_organisations);
+			doc.has_topics_and_organisations = (doc.has_topics && doc.has_organisations);
 
-					if (topics_data.length > 0) topics_data[(topics_data.length-1)].last = true;
-					if (organisations_data.length > 0) organisations_data[(organisations_data.length-1)].last = true;
+			/* prepare some stuff */
+			doc.data.text_lines = doc.data.text.split(/\n/g);
+			doc.data.info.size_readable = filesize(doc.data.info.size);
+			doc.data.info.creationdate_readable = moment(doc.data.info.creationdate).lang(req.locale || "en").format("LLL");
+			doc.data.info.moddate_readable = moment(doc.data.info.moddate).lang(req.locale || "en").format("LLL");
 
-					doc.organisations = organisations_data;
-					doc.topics = topics_data;
-					doc.has_organisations = (organisations_data.length > 0);
-					doc.has_topics = (topics_data.length > 0);
-					doc.has_topics_or_organisations = (doc.has_topics || doc.has_organisations);
-					doc.has_topics_and_organisations = (doc.has_topics && doc.has_organisations);
-
-					/* prepare some stuff */
-					doc.data.text_lines = doc.data.text.split(/\n/g);
-					doc.data.info.size_readable = filesize(doc.data.info.size);
-					doc.data.info.creationdate_readable = moment(doc.data.info.creationdate).lang(req.locale||"en").format("LLL");
-					doc.data.info.moddate_readable = moment(doc.data.info.moddate).lang(req.locale||"en").format("LLL");
-
-					/* render */
-					render(req, res, 'document', {
-						error: err,
-						document: doc
-					});
-				
-					/* count the view */
-					l.documents.count_view(id);
-				
-				});
+			/* render */
+			render(req, res, 'document', {
+				error: err,
+				document: doc
 			});
+			/* count the view */
+			l.documents.count_view(id);
 		});
 	});
 });
 
 /* download document */
 app.get('/document/:id/download', function (req, res) {
-	l.documents.check(req.param("id"), function(err, exists, id){
+	l.documents.check(req.param("id"), function (err, exists, id) {
 		if (err) return send500(req, res, err);
 		if (!exists) return send404(req, res);
-		l.documents.get(id, function(err, doc){
+		l.documents.get(id, function (err, doc) {
 			if (err) return send500(req, res, err);
-
 			// FIXME: put this in some lib
 			var _file = path.resolve(__dirname, config.storage, doc.file);
-			fs.exists(_file, function(exists){
+			fs.exists(_file, function (exists) {
 				if (!exists) return send404(req, res);
 				res.setHeader('Content-disposition', 'attachment; filename=' + doc.orig);
 				res.setHeader('Content-type', "application/pdf"); // FIXME: get this from db
 				fs.createReadStream(_file).pipe(res);
-
-				/* count the donload */
+				/* count the download */
 				l.documents.count_download(id);
-
 			});
 		});
 	});
@@ -599,7 +589,7 @@ app.get('/document/:id/download', function (req, res) {
 
 /* browse topics */
 app.get('/topics', function (req, res) {
-	l.topics.all(function(err, topics){
+	l.topics.all(function (err, topics) {
 		render(req, res, 'topics', {
 			topics: {
 				list: topics //FIXME: limits, etc
@@ -610,16 +600,16 @@ app.get('/topics', function (req, res) {
 
 /* topic */
 app.get('/topic/:id', function (req, res) {
-	l.topics.check(req.param("id"), function(err, exists, id){
+	l.topics.check(req.param("id"), function (err, exists, id) {
 		if (err) return send500(req, res, err);
 		if (!exists) return send404(req, res);
-		l.topics.get(id, function(err, topic){
+		l.topics.get(id, function (err, topic) {
 			if (err) return send500(req, res, err);
 			/* get documents for organisation */
-			l.documents.by_topic(id, function(err, docs){
+			l.documents.by_topic(id, function (err, docs) {
 				if (err) return send500(req, res, err);
-				docs.map(function(doc){
-					doc.created_ago = moment(doc.created).lang(req.locale||"en").calendar(true);
+				docs.map(function (doc) {
+					doc.created_ago = moment(doc.created).lang(req.locale || "en").calendar(true);
 				});
 				render(req, res, 'topic', {
 					topic: topic,
@@ -632,28 +622,28 @@ app.get('/topic/:id', function (req, res) {
 
 /* browse organisations */
 app.get('/organisations', function (req, res) {
-	l.organisations.all(function(err, orgs){
+	l.organisations.all(function (err, orgs) {
 		if (err) send404(req, res);
 
 		/* sort alphabetically */
 		var _list = {};
 		var _letters = [];
 		var _orgs = [];
-		orgs.forEach(function(org){
+		orgs.forEach(function (org) {
 
 			/* remove fullname if same ar organisation name */
 			if (org.hasOwnProperty("fullname") && org.fullname === org.name) org.fullname = null;
-			
+
 			var _name = (org.hasOwnProperty("fullname") && org.fullname !== null) ? org.fullname : org.name;
-			var _letter = _name.substr(0,1).toUpperCase();
+			var _letter = _name.substr(0, 1).toUpperCase();
 			if (!_list.hasOwnProperty(_letter)) _list[_letter] = [];
 			_list[_letter].push(org);
 			if (_letters.indexOf(_letter) < 0) _letters.push(_letter);
 		});
 		_letters = _letters.sort();
-		var _break = Math.floor(_letters.length/3);
+		var _break = Math.floor(_letters.length / 3);
 		var _breakidx = 0;
-		_letters.forEach(function(letter){
+		_letters.forEach(function (letter) {
 			_orgs.push({
 				letter: letter,
 				items: _list[letter]
@@ -674,16 +664,16 @@ app.get('/organisations', function (req, res) {
 
 /* organisation */
 app.get('/organisation/:id', function (req, res) {
-	l.organisations.check(req.param("id"), function(err, exists, id){
+	l.organisations.check(req.param("id"), function (err, exists, id) {
 		if (err) return send500(req, res, err);
 		if (!exists) return send404(req, res);
-		l.organisations.get(id, function(err, org){
+		l.organisations.get(id, function (err, org) {
 			if (err) return send500(req, res, err);
 			/* get documents for organisation */
-			l.documents.by_organisation(id, function(err, docs){
+			l.documents.by_organisation(id, function (err, docs) {
 				if (err) return send500(req, res, err);
-				docs.map(function(doc){
-					doc.created_ago = moment(doc.created).lang(req.locale||"en").calendar(true);
+				docs.map(function (doc) {
+					doc.created_ago = moment(doc.created).lang(req.locale || "en").calendar(true);
 				});
 				render(req, res, 'organisation', {
 					organisation: org,
@@ -696,13 +686,13 @@ app.get('/organisation/:id', function (req, res) {
 
 /* search */
 app.all('/search', function (req, res) {
-	var q = (req.body.query || req.query.query || "").replace(/\*/g,'');
+	var q = (req.body.query || req.query.query || "").replace(/\*/g, '');
 	if (q === null || q === "") return render(req, res, 'search', {});
-	l.documents.search(q, function(err, result){
+	l.documents.search(q, function (err, docs) {
 		render(req, res, 'search', {
 			query: q,
-			items: result
-		})
+			items: docs || []
+		});
 	});
 });
 
@@ -747,19 +737,19 @@ app.post('/api/contribute', function (req, res) {
 			}
 
 			console.log("[contribute]", "new upload", _filename);
-			
+
 			l.queue.add({
 				file: _filename,
 				orig: path.basename(req.files._upload.path),
-				topic: (req.body.topic || null),
-				organisation: (req.body.organisation || null),
+				topics: (req.body.topics || null),
+				organisations: (req.body.organisations || null),
 				tags: (req.body.tags || null),
 				lang: (req.body.lang || null),
 				comment: (req.body.comment || null),
-				source: "upload,"+(req.headers['x-original-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress),
+				source: "upload," + (req.headers['x-original-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress),
 				user: req.user.id
-			}, function(err, data){
-								
+			}, function (err, data) {
+
 				if (err) {
 					console.error("[contribute]", "adding to queue failed:", err); // FIXME: better logging
 					return res.json({"status": "error"});
@@ -768,7 +758,7 @@ app.post('/api/contribute', function (req, res) {
 				console.log("[contribute]", "queued:", data.id, _filename);
 
 				res.json({"status": "success", "id": data.id});
-				
+
 			});
 
 		});
@@ -812,19 +802,19 @@ app.post('/api/upload', function (req, res) {
 			}
 
 			console.log("[new upload]", _filename);
-			
+
 			l.queue.add({
 				file: _filename,
 				orig: path.basename(req.files._upload.path),
-				topic: (req.body.topic || null),
-				organisation: (req.body.organisation || null),
+				topics: (req.body.topics || null),
+				organisations: (req.body.organisations || null),
 				tags: (req.body.tags || null),
 				lang: (req.body.lang || null),
 				comment: (req.body.comment || null),
-				source: "upload,"+(req.headers['x-original-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress),
+				source: "upload," + (req.headers['x-original-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress),
 				user: req.user.id
-			}, function(err, data){
-								
+			}, function (err, data) {
+
 				console.log("[upload queued]", _filename, data.id);
 
 				if (err) {
@@ -833,7 +823,7 @@ app.post('/api/upload', function (req, res) {
 				}
 
 				res.json({"status": "success"});
-				
+
 			});
 
 		});
@@ -931,7 +921,7 @@ app.all('/users/reset/:key', function (req, res) {
 
 /* backend api login */
 app.post('/api/backend/login', passport.authenticate('local', {}), function (req, res) {
-	l.backendapi.user(req,res);
+	l.backendapi.user(req, res);
 });
 
 /* backend api */
@@ -946,12 +936,12 @@ app.post('/api/backend/:cmd', function (req, res) {
 /* topic suggestions */
 app.all('/api/topic/suggest', function (req, res) {
 	res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
+	var q = (req.body.q || req.query.q || "").replace(/\*/g, '');
 	if (q === null || q === "") return res.json([]);
-	l.topics.suggest(q, function(err, result){
+	l.topics.suggest(q, function (err, result) {
 		if (result && (result.length > 0)) {
-			return res.json(result.map(function(r){
-				return { id: r.id, label: r.label };
+			return res.json(result.map(function (r) {
+				return {id: r.id, label: r.label};
 			}));
 		}
 		res.json([]);
@@ -961,12 +951,12 @@ app.all('/api/topic/suggest', function (req, res) {
 /* topic suggestions */
 app.all('/api/organisation/suggest', function (req, res) {
 	res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-	var q = (req.body.q || req.query.q || "").replace(/\*/g,'');
+	var q = (req.body.q || req.query.q || "").replace(/\*/g, '');
 	if (q === null || q === "") return res.json([]);
-	l.organisations.suggest(q, function(err, result){
+	l.organisations.suggest(q, function (err, result) {
 		if (result && (result.length > 0)) {
-			return res.json(result.map(function(r){
-				return { id: r.id, label: [r.name, r.fullname].join(" - ") };
+			return res.json(result.map(function (r) {
+				return {id: r.id, label: [r.name, r.fullname].join(" - ")};
 			}));
 		}
 		res.json([]);
@@ -979,28 +969,36 @@ app.all('*', function (req, res) {
 });
 
 /* listen */
-if (config.listen.hasOwnProperty("socket")) {
-	var mask = process.umask(0);
-	if (fs.existsSync(config.listen.socket)) {
-		console.log("unlinking old socket");
-		fs.unlinkSync(config.listen.socket);
-	}
-	app.__server = app.listen(config.listen.socket, function () {
-		if (mask) {
-			process.umask(mask);
-			mask = null;
+var start = function () {
+	if (config.listen.hasOwnProperty("socket")) {
+		var mask = process.umask(0);
+		if (fs.existsSync(config.listen.socket)) {
+			console.log("unlinking old socket");
+			fs.unlinkSync(config.listen.socket);
 		}
-		console.log("server listening on socket", config.listen.socket);
-	});
-} else if (config.listen.hasOwnProperty("host")) {
-	app.__server = app.listen(config.listen.port, config.listen.host, function () {
-		console.log("server listening on", [config.listen.host, config.listen.port].join(":"));
-	});
-} else {
-	app.__server = app.listen(config.listen.port, function () {
-		console.log("server listening on", ["*", config.listen.port].join(":"));
-	});
-}
+		app.__server = app.listen(config.listen.socket, function () {
+			if (mask) {
+				process.umask(mask);
+				mask = null;
+			}
+			console.log("server listening on socket", config.listen.socket);
+		});
+	} else if (config.listen.hasOwnProperty("host")) {
+		app.__server = app.listen(config.listen.port, config.listen.host, function () {
+			console.log("server listening on", [config.listen.host, config.listen.port].join(":"));
+		});
+	} else {
+		app.__server = app.listen(config.listen.port, function () {
+			console.log("server listening on", ["*", config.listen.port].join(":"));
+		});
+	}
+};
+
+l.upgrade(function (err) {
+	//l.reindex(function(){});
+	if (!err)
+		start();
+});
 
 /* gracefully shutdown on exit */
 process.on("exit", function () {

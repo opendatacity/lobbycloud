@@ -84,6 +84,21 @@ var okcancelModalDialog = function ($modal, data, cb) {
 //			$log.info('Modal dismissed at: ' + new Date());
 	});
 };
+var orderLabels = function (list, prop, asc) {
+	list.sort(function (a, b) {
+		var as = a[prop].map(function (o) {
+			return o.label
+		}).join(',');
+		var bs = b[prop].map(function (o) {
+			return o.label
+		}).join(',');
+		if (as < bs)
+			return asc ? -1 : 1;
+		if (as > bs)
+			return asc ? 1 : -1;
+		return 0;
+	});
+};
 
 app.controller('BodyController', function ($scope, $state, $window, AuthenticationService, gettextCatalog) {
 	'use strict';
@@ -194,11 +209,11 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 			name: 'Uploaded'
 		},
 		{
-			sortable: 'topic.label',
+			sortable: 'topics',
 			name: 'Topic'
 		},
 		{
-			sortable: 'organisation.label',
+			sortable: 'organisations',
 			name: 'Organisation'
 		},
 		{
@@ -208,6 +223,11 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 	];
 
 	$scope.alldocs = [];
+
+	$scope.quickfilter = '';
+	$scope.filterQuick = function () {
+		$scope.tableParams.reload();
+	};
 
 	$scope.initData = function (data) {
 		//init filter
@@ -238,6 +258,7 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 		$scope.$watch("filter.range_enabled", reloadTable);
 		$scope.$watch("filter.title", reloadTable);
 
+
 		//init table
 		$scope.tableParams = new ngTableParams({
 			page: 1,
@@ -255,7 +276,27 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 						return (value.uploaded >= startDate) && (value.uploaded <= endDate);
 					});
 				}
-				orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
+				if ($scope.quickfilter.length > 0) {
+					orderedData = $filter('filter')(orderedData, function (value) {
+						return (value.orig
+							+ value.topics.map(function (o) {
+								return o.label
+							}).join(',')
+							+ value.organisations.map(function (o) {
+								return o.label
+							}).join(',')
+							+ value.tags.join(',')
+							).indexOf($scope.quickfilter) >= 0;
+					});
+				}
+				var sort = params.sorting();
+				if (sort)
+					if (sort.organisations) {
+						orderLabels(orderedData, 'organisations', sort.organisations === "asc");
+					} else if (sort.topics) {
+						orderLabels(orderedData, 'topics', sort.topics === "asc");
+					} else
+						orderedData = $filter('orderBy')(orderedData, params.orderBy());
 				params.total(orderedData.length);
 				$scope.docs = orderedData;
 				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
@@ -324,11 +365,11 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 			name: 'Uploaded'
 		},
 		{
-			sortable: 'topic.label',
+			sortable: 'topics',
 			name: 'Topic'
 		},
 		{
-			sortable: 'organisation.label',
+			sortable: 'organisations',
 			name: 'Organisation'
 		},
 		{
@@ -338,6 +379,10 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 	];
 
 	$scope.alldocs = [];
+	$scope.quickfilter = '';
+	$scope.filterQuick = function () {
+		$scope.tableParams.reload();
+	};
 
 	$scope.initData = function (data) {
 		$scope.alldocs = data;
@@ -385,7 +430,28 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 						return (value.uploaded >= startDate) && (value.uploaded <= endDate);
 					});
 				}
-				orderedData = params.sorting() ? $filter('orderBy')(orderedData, params.orderBy()) : orderedData;
+				if ($scope.quickfilter.length > 0) {
+					orderedData = $filter('filter')(orderedData, function (value) {
+						return (value.orig
+							+ value.topics.map(function (o) {
+								return o.label
+							}).join(',')
+							+ value.organisations.map(function (o) {
+								return o.label
+							}).join(',')
+							+ value.tags.join(',')
+							).indexOf($scope.quickfilter) >= 0;
+					});
+				}
+
+				var sort = params.sorting();
+				if (sort)
+					if (sort.organisations) {
+						orderLabels(orderedData, 'organisations', sort.organisations === "asc");
+					} else if (sort.topics) {
+						orderLabels(orderedData, 'topics', sort.topics === "asc");
+					} else
+						orderedData = $filter('orderBy')(orderedData, params.orderBy());
 				params.total(orderedData.length);
 				$scope.docs = orderedData;
 				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
@@ -529,7 +595,6 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 	};
 
 	var select = function (sender, object, suggestion, daset) {
-		console.log('select', suggestion);
 		if (daset) {
 			$scope.edit[daset.prop] = suggestion;
 		}
@@ -595,8 +660,8 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 	};
 
 	$scope.$on("typeahead:enter", function (sender, event, value, daset) {
-		console.log('enter', sender, value, daset);
 		if (daset.prop == 'organisation') $scope.selectOrganisation();
+		if (daset.prop == 'topic') $scope.selectTopic();
 	});
 	$scope.$on("typeahead:selected", select);
 	$scope.$on("typeahead:autocompleted", select);
@@ -604,9 +669,7 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 		if (daset.prop == 'organisation') {
 			$scope.edit[daset.prop].id = '';
 		}
-		console.log('changed', $scope.edit[daset.prop]);
 	});
-
 
 	////cache all languages
 	////TODO: cache global
@@ -695,12 +758,6 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 			organisations: doc.organisations,
 			topics: doc.topics
 		};
-		//if () {
-		//	update.organisation = (doc.organisation.id ? {id: doc.organisation.id} : {new: doc.organisation.label});
-		//}
-		//if (doc.topic) {
-		//	update.topic = (doc.topic.id ? {id: doc.topic.id} : {new: doc.topic.label});
-		//}
 		service.update({id: $stateParams.id, doc: update},
 			function (data) {
 				$scope.initData(data);
@@ -798,7 +855,11 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 
 		OrganisationsService.index(function (list) {
 			list.sort(function (a, b) {
-				return a.label - b.label;
+				if (a.label < b.label)
+					return -1;
+				if (a.label > b.label)
+					return 1;
+				return 0;
 			});
 			listModalDialog($modal, {
 				list: list,
@@ -837,7 +898,11 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 
 		TopicsService.index(function (list) {
 			list.sort(function (a, b) {
-				return a.label - b.label;
+				if (a.label < b.label)
+					return -1;
+				if (a.label > b.label)
+					return 1;
+				return 0;
 			});
 			listModalDialog($modal, {
 				list: list,

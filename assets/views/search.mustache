@@ -16,41 +16,43 @@
 		</div>
 	</div>
 	{{#items}}
-	<div class="row">
-		<div class="col-md-4">
-			<div class="doc">
-				<div class="thumb">
-					<a href="{{_url}}/document/{{id}}"><img src="{{_url}}/{{_storage}}/{{thumb}}" class="responsive-image"></a>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="doc">
+					<div class="thumb">
+						<a href="{{_url}}/document/{{id}}"><img src="{{_url}}/{{_storage}}/{{thumb}}" class="responsive-image"></a>
+					</div>
+					<p class="id"><a href="{{_url}}/document/{{id}}">{{id}}</a></p>
+
+					<div class="badges">
+						<a href="{{_url}}/document/{{id}}">
+							{{#topics}}<span class="topic" title="{{subject}}">{{label}}</span>{{/topics}}
+							{{#organisations}}<span class="organisation" title="{{fullname}}">{{name}}</span>{{/organisations}}
+							{{#stats.comments}}<span class="comments">{{stats.comments}} {{#__}}Comments{{/__}}</span>{{/stats.comments}}
+							{{#stats.notes}}<span class="notes">{{stats.notes}} {{#__}}Notes{{/__}}</span>{{/stats.notes}}
+							{{#lang}}<span class="lang">{{lang}}</span>{{/lang}}
+						</a>
+					</div>
+					{{#created_ago}}<a href="{{_url}}/document/{{id}}" class="created">{{created_ago}}</a>{{/created_ago}}
 				</div>
-				<p class="id"><a href="{{_url}}/document/{{id}}">{{id}}</a></p>
-				<div class="badges">
-					<a href="{{_url}}/document/{{id}}">
-						{{#topics_data}}<span class="topic" title="{{subject}}">{{label}}</span>{{/topics_data}}
-						{{#organisations_data}}<span class="organisation" title="{{fullname}}">{{name}}</span>{{/organisations_data}}
-						{{#stats.comments}}<span class="comments">{{stats.comments}} {{#__}}Comments{{/__}}</span>{{/stats.comments}}
-						{{#stats.notes}}<span class="notes">{{stats.notes}} {{#__}}Notes{{/__}}</span>{{/stats.notes}}
-						{{#lang}}<span class="lang">{{lang}}</span>{{/lang}}
-					</a>
-				</div>
-				{{#created_ago}}<a href="{{_url}}/document/{{id}}" class="created">{{created_ago}}</a>{{/created_ago}}
+			</div>
+			<div class="col-md-8">
+				{{#highlights}}
+					<p>...{{{.}}}...</p>
+				{{/highlights}}
 			</div>
 		</div>
-		<div class="col-md-8">
-			{{#highlights}}
-			<p>...{{{.}}}...</p>
-			{{/highlights}}
-		</div>
-	</div>
 	{{/items}}
 	{{#query}}
-	{{^items}}
-	<div class="row">
-		<div class="col-md-12">
-			<h2>No results</h2>
-			<p>We could not find anything.</p>
-		</div>
-	</div>
-	{{/items}}
+		{{^items}}
+			<div class="row">
+				<div class="col-md-12">
+					<h2>No results</h2>
+
+					<p>We could not find anything.</p>
+				</div>
+			</div>
+		{{/items}}
 	{{/query}}
 </div>
 {{>footer}}

@@ -2,11 +2,11 @@
 
 /* require npm modules */
 var validator = require("validator");
-var mongojs = require("mongojs");
 var _ = require("underscore");
 
 /* require local modules */
 var slugmaker = require("./slugmaker");
+var utils = require("./utils");
 
 module.exports = orgs = function (opts, db, es) {
 
@@ -40,18 +40,18 @@ module.exports = orgs = function (opts, db, es) {
 		/* check supplied url */
 		if (data.url && !data.url.match(/^(http|https):\/\//)) data.url = "http://" + data.url;
 		if (data.url && !validator.isURL(data.url, {
-			protocols: ['http', 'https'],
-			require_tld: true,
-			require_protocol: true
-		})) data.url = false;
+				protocols: ['http', 'https'],
+				require_tld: true,
+				require_protocol: true
+			})) data.url = false;
 
 		/* check supplied logo url */
 		if (data.logo && !data.logo.match(/^(http|https):\/\//)) data.logo = "http://" + data.logo;
 		if (data.logo && !validator.isURL(data.logo, {
-			protocols: ['http', 'https'],
-			require_tld: true,
-			require_protocol: true
-		})) data.logo = false;
+				protocols: ['http', 'https'],
+				require_tld: true,
+				require_protocol: true
+			})) data.logo = false;
 
 		var org = {
 			id: slugmaker(data.name),
@@ -160,10 +160,15 @@ module.exports = orgs = function (opts, db, es) {
 	organisations.list = function (ids, callback) {
 		var list = [];
 		var query = [];
+		ids = ids.map(function (id) {
+			if (typeof id == "string")
+				return id;
+			return id.id;
+		});
 		ids.forEach(function (id) {
 			if (cache.hasOwnProperty(id)) {
 				list.push(cache[id]);
-			} else {
+			} else if (id !== null) {
 				query.push(id);
 			}
 		});
@@ -191,6 +196,22 @@ module.exports = orgs = function (opts, db, es) {
 				cache[user.id] = user;
 			});
 			callback(null, results);
+		});
+	};
+
+	/* recreate elastic search index for all organisations */
+	organisations.reindex = function (callback) {
+		db.collection("organisations").find({}, function (err, result) {
+			if (result.length === 0) return callback();
+			var list = [];
+			result.forEach(function (r) {
+				list.push(r);
+			});
+			utils.queue(list, function (organisation, cb) {
+				es.delete('organisation', organisation.id, function () {
+					es.create('organisation', organisation.id, es.prepareFieldsObj(organisation, es_store), cb);
+				});
+			}, callback);
 		});
 	};
 

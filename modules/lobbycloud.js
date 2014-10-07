@@ -6,7 +6,10 @@ var path = require("path");
 /* require npm modules */
 var elasticsearch = require("elasticsearch");
 var mongojs = require("mongojs");
+var clone = require("clone");
 var i18n = require("i18n");
+
+var utils = require("./utils");
 
 /* require local modules */
 var modules = {
@@ -19,17 +22,17 @@ var modules = {
 	topics: require("./topics"),
 	users: require("./users"),
 	queue: require("./queue"),
-	lang: require("./lang"),
+	lang: require("./lang")
 };
 
 /* get dirname of main module */
 var __root = path.dirname(process.mainModule.filename);
 
 /* the almighty lobbycloud module */
-var Lobbycloud = function(config){
+var Lobbycloud = function (config) {
 
 	var l = this;
-			
+
 	/* set up mongodb connection */
 	var db = new mongojs(config.db);
 
@@ -41,7 +44,7 @@ var Lobbycloud = function(config){
 
 	/* languages helper module */
 	l.lang = new modules.lang();
-	
+
 	/* set up exported objects */
 	l.invites = new modules.invites(path.resolve(__root, config.invitedb));
 	l.mailqueue = new modules.mailqueue(config.mails, config.url);
@@ -52,11 +55,52 @@ var Lobbycloud = function(config){
 	l.documents = new modules.documents(config, db, l);
 	l.backendapi = new modules.backendapi(l, i18n);
 
+	l.upgrade = function (cb) {
+		l.documents.upgrade(function (err) {
+			if (err) return cb(err);
+			l.queue.upgrade(cb);
+		});
+	};
+
+	l.reindex = function (cb) {
+		l.documents.reindex(function () {
+			l.organisations.reindex(function () {
+				l.topics.reindex(cb);
+			});
+		});
+	};
+
+	l.prepareDoc = function (d, cb) {
+		var doc = clone(d, false);
+		l.topics.list(doc.topics, function (err, topics_data) {
+			if (err) return cb(err);
+			l.organisations.list(doc.organisations, function (err, organisations_data) {
+				if (err) return cb(err);
+				doc.organisations = organisations_data;
+				doc.topics = topics_data;
+				cb(null, doc);
+			});
+		});
+	};
+
+	l.prepareDocs = function (docs, cb) {
+		var result = [];
+		utils.queue(docs, function (d, callback) {
+			l.prepareDoc(d, function (err, doc) {
+				if (err) return cb(err);
+				result.push(doc);
+				callback();
+			});
+		}, function () {
+			cb(null, result);
+		});
+	};
+
 	return l;
-	
+
 };
 
 /* always return new instance of Lobbycloud */
-module.exports = function(config) {
+module.exports = function (config) {
 	return (new Lobbycloud(config));
 };

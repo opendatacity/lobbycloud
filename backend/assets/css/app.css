@@ -42,7 +42,8 @@
 }
 
 .ng-table-counts {
-    display: none;
+	float: right;
+    /*display: none;*/
 }
 
 .ng-table th.sortable.sort-desc, .ng-table th.sortable.sort-asc {
@@ -53,7 +54,7 @@
 /* modals */
 
 .modal-dialog {
-    width: 600px;
+    max-width: 600px;
 }
 
 .modal-dialog .modal-body {
@@ -199,4 +200,15 @@
 
 .central {
 	text-align: center;
+}
+
+.table-docs, .table-queue {
+	font-size: 0.9em;
+}
+
+.filename {
+	float: left;
+	max-width: 150px;
+	word-wrap: break-word;
+	font-size: 0.9em;
 }

@@ -90,11 +90,15 @@
 				{{errormessage}}
 			</div>
 			<div>
-				<div class="pull-right">
-					<button ng-show="isQueue" class="btn btn-primary" ng-class="{disabled:!canPublish()}" ng-click="accept()" translate>Publish</button>
+				<div ng-show="isQueue" class="pull-right">
+					<button class="btn btn-primary" ng-class="{disabled:!canPublish()}" ng-click="accept()" translate>Publish</button>
 					<button class="btn btn-success" ng-click="update()" translate>Update</button>
-					<button ng-show="isQueue" class="btn btn-warning"ng-click="decline()"  translate>Decline</button>
-					<button class="btn btn-default" ui-sref="queue" translate>Cancel</button>
+					<button class="btn btn-warning"ng-click="decline()"  translate>Decline</button>
+					<button class="btn btn-default" ui-sref="queue" translate>Close</button>
+				</div>
+				<div ng-show="!isQueue" class="pull-right">
+					<button class="btn btn-success" ng-click="update()" translate>Update</button>
+					<button class="btn btn-default" ui-sref="docs" translate>Close</button>
 				</div>
 			</div>
 			<div class="clearfix"></div>
