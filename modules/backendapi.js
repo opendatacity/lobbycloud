@@ -188,10 +188,7 @@ module.exports = function (l, i18n) {
 				if ((!req.body) || (!req.body.id) || (!req.body.doc)) return res.send(400);
 				l.documents.update(req.body.id, req.body.doc, function (err, document) {
 						if (err) return res.send(400, err.message || err);
-						l.prepareDoc(document, function (err, doc) {
-							if (err) return res.send(500, err.message || err);
-							res.json(prepareClientDoc(doc, true));
-						});
+						res.json(prepareClientDoc(document, true));
 					}
 				);
 			}

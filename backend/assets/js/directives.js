@@ -222,6 +222,13 @@ app.filter('join', function () {
 	};
 });
 
+app.filter('linesToHTML', function () {
+	return function (value, format, preprocess) {
+		if (!value) return '';
+		return value.replace("\n", "<br/>");
+	};
+});
+
 
 app.constant('keyCodes', {
 	esc: 27,

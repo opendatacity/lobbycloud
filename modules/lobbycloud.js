@@ -74,10 +74,10 @@ var Lobbycloud = function (config) {
 		var doc = clone(d, false);
 		l.topics.list(doc.topics, function (err, topics_data) {
 			if (err) return cb(err);
+			doc.topics = topics_data;
 			l.organisations.list(doc.organisations, function (err, organisations_data) {
 				if (err) return cb(err);
 				doc.organisations = organisations_data;
-				doc.topics = topics_data;
 				cb(null, doc);
 			});
 		});

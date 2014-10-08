@@ -51,6 +51,11 @@
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
 }
 
+#viewer-text {
+	background-color: #fff;
+	padding: 20px;
+}
+
 /* modals */
 
 .modal-dialog {
@@ -96,7 +101,21 @@
 
 .row-item td img.thumb {
     height: 26px;
-    margin-top: -2px;
+ 	float: left;
+	display: inline;
+	max-width:20%;
+}
+
+.row-item td.first {
+	max-width: 150px;
+}
+
+.row-item td .filename {
+	padding-left: 8px;
+	max-width:80%;
+	float: left;
+	word-wrap: break-word;
+	font-size: 0.9em;
 }
 
 .row-item td .carousel {
@@ -203,12 +222,5 @@
 }
 
 .table-docs, .table-queue {
-	font-size: 0.9em;
-}
-
-.filename {
-	float: left;
-	max-width: 150px;
-	word-wrap: break-word;
 	font-size: 0.9em;
 }

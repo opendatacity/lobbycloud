@@ -36,7 +36,6 @@
 			<table class="table table-responsive table-hover table-docs ng-table-rowselected table-docs" ng-table="tableParams" template-pagination="partials/pagination.html" show-filter="true">
 				<thead>
 				<tr>
-					<th></th>
 					<th ng-repeat="head in tablecolumns" class="sortable" ng-class="{
                     'sort-asc': tableParams.isSortBy(head.sortable, 'asc'),
                     'sort-desc': tableParams.isSortBy(head.sortable, 'desc')}"
@@ -48,10 +47,8 @@
 				</thead>
 				<tbody ng-repeat="doc in $data" class="row-item">
 				<tr ng-class="{'selected': doc.$selected}">
-					<td class="clickable" ng-click="selectRow(doc)">
+					<td class="clickable first" ng-click="selectRow(doc)" filter="{ 'orig': 'text' }" sortable="'orig'">
 						<img class="thumb" ng-src="{{doc.thumbs[0].file}}"/>
-					</td>
-					<td filter="{ 'orig': 'text' }" sortable="'orig'">
 						<span class="filename">{{doc.orig}}</span>
 					</td>
 					<td sortable="'created'">{{doc.created | amDateFormat:'DD.MM.YYYY HH:mm'}}</td>

@@ -317,6 +317,11 @@ module.exports = documents = function (config, db, l) {
 						if (update.tags.length === 1) update.tags = update.tags[0].split(/\s+/g);
 					}
 				}
+				if (update.tags) {
+					update.tags = update.tags.map(function (t) {
+						return t.trim();
+					});
+				}
 				if ((update.tags) && (
 					update.tags.filter(function (o) {
 						return (typeof o === "string");
@@ -348,20 +353,18 @@ module.exports = documents = function (config, db, l) {
 				if (!data.organisations instanceof Array) data.organisations = [data.organisations];
 				update.organisations = [];
 				utils.queue(data.organisations, function (organisation, cb) {
-					var check = (typeof organisation === "object" && organisation.hasOwnProperty("id")) ? organisation.id : organisation;
-					l.organisations.check(check, function (err, exists, org_id) {
-						if ((err) || (!exists)) return callback(new Error("invalid organisation"));
-						update.organisations.push(org_id);
-						cb();
+						var check = (typeof organisation === "object" && organisation.hasOwnProperty("id")) ? organisation.id : organisation;
+						l.organisations.check(check, function (err, exists, org_id) {
+							if ((err) || (!exists)) return callback(new Error("invalid organisation"));
+							update.organisations.push(org_id);
+							cb();
+						});
+					},
+					function () {
+						if (update.organisations.length == 0)
+							return callback(new Error("?lease specify min. one organisation"));
+						_callback();
 					});
-				}, function () {
-					update.organisations = data.organisations.filter(function (organisation) {
-						return (organisation !== null);
-					}).map(function (organisation) {
-						return organisation.id;
-					});
-					_callback();
-				});
 			};
 
 			/* check any unchecked topic for its existance */
@@ -370,21 +373,19 @@ module.exports = documents = function (config, db, l) {
 				if (!data.topics instanceof Array) data.topics = [data.topics];
 				update.topics = [];
 				utils.queue(data.topics, function (topic, cb) {
-					var check = (typeof topic === "object" && topic.hasOwnProperty("id")) ? topic.id : topic;
-					l.organisations.check(check, function (err, exists, org_id) {
-						if ((err) || (!exists)) return callback(new Error("invalid topic"));
-						update.push(org_id);
-						data.topics[index] = {"id": org_id};
-						cb();
+						var check = (typeof topic === "object" && topic.hasOwnProperty("id")) ? topic.id : topic;
+						l.topics.check(check, function (err, exists, org_id) {
+							if ((err) || (!exists)) return callback(new Error("invalid topic"));
+							update.topics.push(org_id);
+							cb();
+						});
+					},
+					function () {
+						if (update.topics.length == 0)
+							return callback(new Error("Please specify min. one topic"));
+						_callback();
 					});
-				}, function () {
-					update.topics = data.topics.filter(function (topic) {
-						return (topic !== null);
-					}).map(function (topic) {
-						return topic.id;
-					});
-					_callback();
-				});
+
 			};
 
 			check_organisations(function () {
@@ -399,12 +400,14 @@ module.exports = documents = function (config, db, l) {
 						/* update cache */
 						cache[id] = doc;
 						/* update elastic search */
-						documents.index(doc.id, function (err) {
-							if (err) {
-								console.log('[update] error updating index for topics or organisation', err);
-								return cb(err);
-							}
-							l.prepareDoc(doc, callback);
+						l.prepareDoc(doc, function (err, _doc) {
+							documents.index(doc.id, function (err) {
+								if (err) {
+									console.log('[update] error updating index for topics or organisation', err);
+									return cb(err);
+								}
+								callback(null, _doc);
+							});
 						});
 					});
 				});
@@ -421,7 +424,9 @@ module.exports = documents = function (config, db, l) {
 	/* get by id */
 	documents.get = function (id, callback) {
 		if (!documents.checkid(id)) return callback(new Error("invalid id"));
-		if (cache.hasOwnProperty(id)) return callback(null, cache[id]);
+		if (cache.hasOwnProperty(id)) {
+			return l.prepareDoc(cache[id], callback);
+		}
 		db.collection("documents").findOne({id: id}, function (err, doc) {
 			if (err) return callback(err);
 			if (doc === null) return callback(new Error("document does not exist"));

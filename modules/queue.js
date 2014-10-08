@@ -459,7 +459,7 @@ module.exports = queue = function (config, db, l) {
 					doc.organisations.filter(function (o) {
 						return o.id
 					}).length !== doc.organisations.length
-				) return callback(new Error("organisations must be specified"));
+				) return callback(new Error("min. one organisation must be specified/invalid organisation"));
 
 				/* check if topics are set */
 				if (!doc.hasOwnProperty("topics") ||
@@ -468,7 +468,7 @@ module.exports = queue = function (config, db, l) {
 					doc.topics.filter(function (o) {
 						return o.id
 					}).length !== doc.topics.length
-				) return callback(new Error("topics must be specified"));
+				) return callback(new Error("min. one topic must be specified/invalid topic"));
 
 
 				/* update to stage 3 */

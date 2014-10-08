@@ -10,15 +10,27 @@
 <div ng-show="!loading">
 	<div class="row">
 		<div class="col-md-6">
-			<carousel>
-				<slide ng-repeat="slide in doc.images" active="slide.active">
-					<img ng-src="{{slide.file}}">
+			<ul class="nav nav-tabs">
+				<li class="active"><a data-toggle="tab" data-target="#viewer-img" href translate>PDF Viewer</a></li>
+				<li><a data-toggle="tab" data-target="#viewer-text" href translate>Extracted Text</a></li>
+			</ul>
+			<div class="tab-content">
+				<div id="viewer-img" class="tab-pane active">
+					<carousel>
+						<slide ng-repeat="slide in doc.images" active="slide.active">
+							<img ng-src="{{slide.file}}">
 
-					<div class="carousel-caption">
-						<strong style="color: #000"><span translate>Page</span> {{$index+1}}</strong>
-					</div>
-				</slide>
-			</carousel>
+							<div class="carousel-caption">
+								<strong style="color: #000"><span translate>Page</span> {{$index+1}}</strong>
+							</div>
+						</slide>
+					</carousel>
+				</div>
+				<div id="viewer-text" class="tab-pane">
+					<div class="text" ng-bind-html="doc.text|linesToHTML"></div>
+				</div>
+			</div>
+
 		</div>
 		<div class="col-md-6">
 			<form role="form" name="form">

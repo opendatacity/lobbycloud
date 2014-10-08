@@ -263,7 +263,7 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 		$scope.tableParams = new ngTableParams({
 			page: 1,
 			count: 10,
-			sorting: {name: 'asc'}
+			sorting: {created: 'desc'}
 		}, {
 			total: data.length,
 			getData: function ($defer, params) {
@@ -417,7 +417,7 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 		$scope.tableParams = new ngTableParams({
 			page: 1,
 			count: 10,
-			sorting: {name: 'asc'}
+			sorting: {created: 'desc'}
 		}, {
 			total: data.length,
 			getData: function ($defer, params) {
@@ -822,13 +822,14 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 
 	//check if doc can be accepted
 	$scope.canPublish = function () {
-		return (
-		($scope.doc) &&
-		(($scope.edit.topic && $scope.edit.topic.id) || ($scope.doc.topics.length > 0)) &&
-		(($scope.edit.organisation && $scope.edit.organisation.id) || ($scope.doc.organisations.length > 0)) &&
-		($scope.doc.lang) &&
-		($scope.doc.lang.id)
-		);
+		//return (
+		//($scope.doc) &&
+		//(($scope.edit.topic && $scope.edit.topic.id) || ($scope.doc.topics.length > 0)) &&
+		//(($scope.edit.organisation && $scope.edit.organisation.id) || ($scope.doc.organisations.length > 0)) &&
+		//($scope.doc.lang) &&
+		//($scope.doc.lang.id)
+		//);
+		return true;
 	};
 
 	$scope.addOrganisationDialog = function () {
