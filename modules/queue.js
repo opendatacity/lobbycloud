@@ -221,7 +221,6 @@ module.exports = queue = function (config, db, l) {
 		/* check any organisation for its existance */
 		var check_organisations = function (_callback) {
 			if ((!doc.organisations) || (doc.organisations.length === 0)) return _callback();
-			console.log(doc.organisations);
 			utils.queue(doc.organisations, function (organisation, callback) {
 				if (!organisation.hasOwnProperty('id') && organisation.hasOwnProperty('label')) {
 					l.organisations.check(organisation.label, function (err, exists, org_id) {
