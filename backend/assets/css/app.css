@@ -224,3 +224,7 @@
 .table-docs, .table-queue {
 	font-size: 0.9em;
 }
+
+.filter-control {
+    margin-right: 8px;
+}

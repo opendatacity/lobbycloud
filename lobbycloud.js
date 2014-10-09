@@ -394,7 +394,6 @@ app.get('/contribute/:id?', function (req, res) {
 				if (doc.lang && l.lang.check(doc.lang)) {
 					doc.lang_name = l.lang.get(doc.lang);
 				}
-				console.log(doc);
 				/* render form */
 				render(req, res, 'contribute', {
 					queue: {items: queue},

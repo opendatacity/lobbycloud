@@ -186,7 +186,6 @@ module.exports = documents = function (config, db, l) {
 					console.log("[documents] creation of search index for [" + doc.id + "] failed", err);
 					return callback(err);
 				}
-				if (config.debug) console.log("[documents] created new search index for [" + doc.id + "]");
 
 				// FIXME: seperate indexes for comments and notes
 
@@ -587,7 +586,7 @@ module.exports = documents = function (config, db, l) {
 					return (b.score - a.score)
 				});
 				/* call back */
-				callback(null, result);
+				l.prepareDocs(result, callback);
 			});
 		});
 	};

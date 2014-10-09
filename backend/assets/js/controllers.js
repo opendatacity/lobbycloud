@@ -237,6 +237,11 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 		$scope.tableParams.reload();
 	};
 
+	$scope.resetTextFilter = function () {
+		$scope.filter.text='';
+		$scope.tableParams.reload();
+	};
+
 	$scope.initData = function (data) {
 		//init filter
 		$scope.alldocs = data;
@@ -431,7 +436,12 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 	};
 
 	$scope.refilter = function () {
-		reloadTable();
+		$scope.tableParams.reload();
+	};
+
+	$scope.resetTextFilter = function () {
+		$scope.filter.text='';
+		$scope.tableParams.reload();
 	};
 
 	$scope.initData = function (data) {
@@ -576,9 +586,6 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 		doc.$processing = true;
 		QueueService.decline({id: doc.id},
 			function () {
-				$scope.alldocs = $scope.alldocs.filter(function (d) {
-					return d.id !== doc.id;
-				});
 				$scope.tableParams.reload();
 			}, function (err) {
 				doc.$processing = false;

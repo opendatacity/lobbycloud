@@ -27,18 +27,20 @@
 				<div class="list-title pull-left" translate translate-n="docs.length" translate-plural="{{docs.length}} documents">One document</div>
 			</div>
 			<div class="pull-right has-feedback">
-				<select ng-model="filter.type">
-					<option value="0">All</option>
-					<option value="1">Uploaded</option>
-					<option value="2">Processed</option>
-					<option value="3">Declined</option>
-					<option value="4">Cancelled</option>
-					<option value="5">Failed</option>
-				</select>
-			</div>
-			<div class="pull-right has-feedback">
+				<label translate>Text</label>
 				<input type="text" ng-model="filter.text" placeholder="{{'Filter'|translate}}" key-bind="{ enter: 'refilter()'}">
-				<span ng-show="filter.text.length>0" class="glyphicon glyphicon-remove form-control-feedback"></span>
+				<span ng-show="filter.text.length>0" class="form-control-feedback clickable" ng-click="resetTextFilter()"><i class="glyphicon glyphicon-remove"></i></span>
+			</div>
+			<div class="filter-control pull-right">
+				<label translate>Stage</label>
+				<select ng-model="filter.type">
+					<option value="0" translate>All</option>
+					<option value="1" translate>Uploaded</option>
+					<option value="2" translate>Processed</option>
+					<option value="3" translate>Declined</option>
+					<option value="4" translate>Cancelled</option>
+					<option value="5" translate>Failed</option>
+				</select>
 			</div>
 		</div>
 	</div>

@@ -98,10 +98,16 @@ var Lobbycloud = function (config) {
 		var doc = clone(d, false);
 		l.topics.list(doc.topics, function (err, topics_data) {
 			if (err) return cb(err);
-			doc.topics = topics_data;
+			doc.topics = (doc.topics || []).filter(function (t) {
+				return (!t.hasOwnProperty("id"));
+			});
+			doc.topics = doc.topics.concat(topics_data);
 			l.organisations.list(doc.organisations, function (err, organisations_data) {
 				if (err) return cb(err);
-				doc.organisations = organisations_data;
+				doc.organisations = (doc.organisations || []).filter(function (t) {
+					return (!t.hasOwnProperty("id"));
+				});
+				doc.organisations = doc.organisations.concat(organisations_data);
 				cb(null, doc);
 			});
 		});

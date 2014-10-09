@@ -639,7 +639,7 @@ module.exports = queue = function (config, db, l) {
 				/* add to cache */
 				cache[r.id] = r;
 			});
-			l.prepareDoc(list, callback);
+			l.prepareDocs(list, callback);
 		});
 	};
 
