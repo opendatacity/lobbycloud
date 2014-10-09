@@ -30,6 +30,7 @@ module.exports = documents = function (config, db, l) {
 			result.forEach(function (doc) {
 				doc.organisations = [doc.organisation];
 				doc.topics = [doc.topic];
+				doc.published = doc.published || doc.updated || doc.created;
 				_docs.push(doc);
 			});
 			l.prepareDocs(_docs, function (err, docs) {
@@ -46,7 +47,8 @@ module.exports = documents = function (config, db, l) {
 								}),
 								"organisations": doc.organisations.map(function (o) {
 									return o.id;
-								})
+								}),
+								"published": doc.published
 							},
 							"$unset": {
 								"topic": "",
@@ -86,7 +88,8 @@ module.exports = documents = function (config, db, l) {
 			if (!exists) return callback(new Error("not in queue"));
 			l.queue.get(id, function (err, doc) {
 				if (err) return callback(err);
-				if (!doc.hasOwnProperty("stage") || doc.stage !== 3) return callback(new Error("queue item is not approved"));
+				if (!doc.hasOwnProperty("stage") || doc.stage !== l.stages.ACCEPTED)
+					return callback(new Error("queue item is not approved"));
 				var update = {
 					id: doc.id,
 					indexed: false,
@@ -110,12 +113,12 @@ module.exports = documents = function (config, db, l) {
 					},
 					file: doc.file,
 					thumb: doc.data.thumbs[0].file,
-					data: doc.data
+					data: doc.data,
+					published: (new Date())
 				};
 				validateCommon(doc, update, function (err) {
 					if (err) return callback(err);
 					/* save */
-					console.log('create', update);
 					db.collection("documents").save(update, function (err, result) {
 						if (err) return callback(err);
 
@@ -134,45 +137,79 @@ module.exports = documents = function (config, db, l) {
 		});
 	};
 
+	documents.unpublish = function (id, callback) {
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
+
+		// FIXME: unpublishing leads to stats data loss, copy to queue & restore on republish?
+
+		l.queue.unaccept(id, function (err) {
+			if (err) return callback(err);
+
+			db.collection("documents").remove({id: id}, true, function (err, res) {
+				if (err) return callback(err);
+
+				/* remove from cache */
+				if (cache.hasOwnProperty(id)) delete cache[id];
+
+				//do not wait for elasticsearch and ignore it's errors
+				callback(null);
+
+				l.elastic.delete('document', id);
+			});
+
+		});
+	};
+
+
 	/* create elastic search index for document */
 	documents.index = function (id, callback) {
 		if (typeof callback !== "function") var callback = function () {
 		};
 		if (!documents.checkid(id)) return callback(new Error("invalid id"));
+
+		var createIndex = function (doc) {
+			l.elastic.create('document', doc.id, {
+				lang: doc.lang,
+				user: doc.user,
+				tags: doc.tags.join(','),
+				topics: doc.topics.map(function (o) {
+					return o.label;
+				}).join(','),
+				organisations: doc.organisations.map(function (o) {
+					return o.label;
+				}).join(','),
+				created: doc.created,
+				updated: doc.updated,
+				text: doc.data.text
+			}, function (err, resp) {
+				if (err) {
+					console.log("[documents] creation of search index for [" + doc.id + "] failed", err);
+					return callback(err);
+				}
+				if (config.debug) console.log("[documents] created new search index for [" + doc.id + "]");
+
+				// FIXME: seperate indexes for comments and notes
+
+				/* update indexed flag */
+				db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$set": {"indexed": true}}, "new": true}, function (err, doc) {
+					if (err) return callback(err);
+					/* update cache */
+					cache[id] = doc;
+					/* call back */
+					callback(null);
+				});
+			});
+		};
+
 		documents.get(id, function (err, doc) {
 			if (err) return callback(err);
-			l.elastic.delete('document', doc.id, function () {
-				l.elastic.create('document', doc.id, {
-					lang: doc.lang,
-					user: doc.user,
-					tags: doc.tags.join(','),
-					topics: doc.topics.map(function (o) {
-						return o.label;
-					}).join(','),
-					organisations: doc.organisations.map(function (o) {
-						return o.label;
-					}).join(','),
-					created: doc.created,
-					updated: doc.updated,
-					text: doc.data.text
-				}, function (err, resp) {
-					if (err) {
-						console.log("[documents] creation of search index for [" + doc.id + "] failed", err);
-						return callback(err);
-					}
-					if (config.debug) console.log("[documents] created new search index for [" + doc.id + "]");
-
-					// FIXME: seperate indexes for comments and notes
-
-					/* update indexed flag */
-					db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$set": {"indexed": true}}, "new": true}, function (err, doc) {
-						if (err) return callback(err);
-						/* update cache */
-						cache[id] = doc;
-						/* call back */
-						callback(null);
+			l.elastic.check('document', id, function (err, exists) {
+				if (exists) {
+					l.elastic.delete('document', id, function () {
+						createIndex(doc);
 					});
-				});
+				} else
+					createIndex(doc);
 			});
 		});
 	};
@@ -310,7 +347,6 @@ module.exports = documents = function (config, db, l) {
 				// FIXME: check if anything to update
 				/* set last modified */
 				update.modified = (new Date());
-				console.log('update', update);
 				db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$set": update}, "new": true}, function (err, doc) {
 					if (err) return callback(err);
 					/* update cache */
@@ -318,11 +354,8 @@ module.exports = documents = function (config, db, l) {
 					/* update elastic search */
 					l.prepareDoc(doc, function (err, _doc) {
 						documents.index(doc.id, function (err) {
-							if (err) {
-								console.log('[update] error updating index for topics or organisation', err);
-								return cb(err);
-							}
-							callback(null, _doc);
+							if (err) console.log('[update] error updating index for topics or organisation', err);
+							callback(err, _doc);
 						});
 					});
 				});
@@ -362,9 +395,7 @@ module.exports = documents = function (config, db, l) {
 				/* add to cache */
 				cache[r.id] = r;
 			});
-			l.prepareDocs(documents, function (err, docs) {
-				callback(err, docs);
-			});
+			l.prepareDocs(documents, callback);
 		});
 	};
 
@@ -374,7 +405,7 @@ module.exports = documents = function (config, db, l) {
 			var callback = num;
 			var num = 1;
 		}
-		db.collection("documents").find().sort({"created": -1}).limit(num, function (err, result) {
+		db.collection("documents").find().sort({"published": -1}).limit(num, function (err, result) {
 			if (err) return callback(err);
 			if (result.length === 0) return callback(null, []);
 			result.forEach(function (r) {

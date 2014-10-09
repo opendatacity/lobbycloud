@@ -33,6 +33,30 @@ var Lobbycloud = function (config) {
 
 	var l = this;
 
+	l.stages = {
+		UPLOADED: 0,
+		PROCESSED: 1,
+		FAILED: 2,
+		ACCEPTED: 3,
+		DECLINED: 4,
+		CANCELLED: 5,
+		canUpdate: function (stage) {
+			return (stage <= 1)
+		},
+		canCancel: function (stage) {
+			return (stage < 4);
+		},
+		canAccept: function (stage) {
+			return (stage == 1);
+		},
+		canDecline: function (stage) {
+			return (stage < 3);
+		},
+		isProcessed: function (stage) {
+			return (stage === 1 || stage >= 3);
+		}
+	};
+
 	/* set up mongodb connection */
 	var db = new mongojs(config.db);
 

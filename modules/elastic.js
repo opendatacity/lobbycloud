@@ -88,6 +88,17 @@ module.exports = function (config, es) {
 		});
 	};
 
+	/* check existence of es search entry */
+	me.check = function (type, id, callback) {
+		es.exists({
+			index: config.index,
+			type: type,
+			id: id
+		}, function (err, exists) {
+			callback(err, exists);
+		});
+	};
+
 	/* fuzzy & wildcard search by type, text in the specified es search entry properties */
 	me.suggest = function (type, query, fields, callback) {
 		es.search(

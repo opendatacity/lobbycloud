@@ -54,16 +54,20 @@ module.exports = function (l, i18n) {
 	};
 
 	/* strips down queue obj to values needed by ui */
-	var prepareClientQueue = function (item, full, callback) {
-		if (!item) return callback(null);
-		var qitem = {
+	var prepareClientQueue = function (item, full) {
+		if (!item) return null;
+		var result = {
 			id: item.id,
 			user: item.user,
 			orig: item.orig,
 			lang: item.lang,
 			stage: item.stage,
-			topics: [],
-			organisations: [],
+			topics: (item.topics || []).map(function (o) {
+				return {id: o.id, label: o.label};
+			}),
+			organisations: (item.organisations || []).map(function (o) {
+				return {id: o.id, label: o.label || o.name};
+			}),
 			comment: item.comment,
 			tags: item.tags,
 			created: new Date(item.created).valueOf(),
@@ -72,44 +76,17 @@ module.exports = function (l, i18n) {
 			images: (full && item.data ? item.data.images : null),
 			text: (full && item.data ? item.data.text : null)
 		};
-		var ids = [];
-		(item.topics || []).forEach(function (t) {
-			if (t.hasOwnProperty("id"))
-				ids.push(t.id);
-			else //unedited topics
-				qitem.topics.push(t);
-		});
-		l.topics.list(ids, function (err, topics_data) {
-			if ((!err) && topics_data) {
-				topics_data.map(function (t) {
-					qitem.topics.push({id: t.id, label: t.label});
-				});
-			}
-			ids = [];
-			(item.organisations || []).forEach(function (t) {
-				if (t.hasOwnProperty("id"))
-					ids.push(t.id);
-				else //unedited organisations
-					qitem.organisations.push(t);
-			});
-			l.organisations.list(ids, function (err, organisations_data) {
-				if ((!err) && organisations_data) {
-					organisations_data.map(function (t) {
-						qitem.organisations.push({id: t.id, label: t.label || t.name});
-					});
-				}
-				callback(qitem);
-			});
-		});
+		return result;
 	};
 
 	/* strips down document obj to values needed by ui */
 	var prepareClientDoc = function (doc, full) {
-		var d = {
+		var result = {
 			id: doc.id,
 			user: doc.user,
 			created: new Date(doc.created).valueOf(),
 			updated: new Date(doc.updated).valueOf(),
+			published: new Date(doc.published).valueOf(),
 			orig: doc.orig,
 			lang: doc.lang,
 			tags: doc.tags,
@@ -131,7 +108,7 @@ module.exports = function (l, i18n) {
 			comments: (full && doc.comments.length > 0 ? doc.comments : null),
 			notes: (full && doc.notes.length > 0 ? doc.notes : null)
 		};
-		return d;
+		return result;
 	};
 
 	api.features = {
@@ -191,6 +168,16 @@ module.exports = function (l, i18n) {
 						res.json(prepareClientDoc(document, true));
 					}
 				);
+			}
+		},
+		'docs.unpublish': {
+			access: l.users.roles.editor,
+			execute: function (req, res) {
+				if ((!req.body) || (!req.body.id)) return res.send(400);
+				l.documents.unpublish(req.body.id, function (err) {
+					if (err) return res.send(400, err.message || err);
+					res.send(200);
+				});
 			}
 		},
 		'user': {
@@ -262,19 +249,12 @@ module.exports = function (l, i18n) {
 			access: l.users.roles.editor,
 			execute: function (req, res) {
 				l.queue.all(function (err, data) {
-					var result = [];
-					var prepare = function (index) {
-						if (index >= data.length) {
-							return res.json(result);
-						}
-						if (data[index].stage !== 1)
-							return prepare(index + 1);
-						prepareClientQueue(data[index], false, function (t) {
-							result.push(t);
-							prepare(index + 1);
-						});
-					};
-					prepare(0);
+					data = data.filter(function (doc) {
+						return (doc.stage !== l.stages.ACCEPTED);
+					}).map(function (doc) {
+						return prepareClientQueue(doc, false);
+					});
+					res.json(data);
 				});
 			}
 		},
@@ -285,9 +265,7 @@ module.exports = function (l, i18n) {
 				if ((!req.body) || (!req.body.id)) return res.send(400);
 				l.queue.get(req.body.id, function (err, data) {
 						if (err) return res.send(400, err.message || err);
-						prepareClientQueue(data, true, function (qitem) {
-							res.json(qitem);
-						});
+						res.json(prepareClientQueue(data, true));
 					}
 				);
 			}
@@ -299,9 +277,7 @@ module.exports = function (l, i18n) {
 				if ((!req.body) || (!req.body.id) || (!req.body.doc)) return res.send(400);
 				l.queue.update(req.body.id, req.body.doc, function (err, data) {
 						if (err) return res.send(400, err.message || err);
-						prepareClientQueue(data, true, function (qitem) {
-							res.json(qitem);
-						});
+						res.json(prepareClientQueue(data, true));
 					}
 				);
 			}

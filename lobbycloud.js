@@ -349,7 +349,7 @@ app.get('/contribute/:id?', function (req, res) {
 	l.queue.user(req.user.id, function (err, queue) {
 
 		queue = queue.filter(function (item) {
-			return (item.stage < 3 || item.stage == 4);
+			return ((item.stage !== l.stages.CANCELLED) && (item.stage !== l.stages.ACCEPTED));
 		});
 
 		/* check for empty queue */
@@ -357,14 +357,14 @@ app.get('/contribute/:id?', function (req, res) {
 
 		queue.map(function (item) {
 			item["stage-" + item.stage] = true;
-			item["cancelable"] = (item.stage < 2);
-			item["editable"] = (item.stage < 2);
-			item["acceptable"] = (item.stage === 1);
+			item["cancelable"] = l.stages.canCancel(item.stage);
+			item["editable"] = l.stages.canUpdate(item.stage);
+			item["acceptable"] = l.stages.canAccept(item.stage);
 			item.created_unix = moment(item.created).unix();
 			item.created_formatted = moment(item.created).lang(req.locale || "en").format("YY-MM-DD HH:mm");
 			item.created_relative = moment(item.created).lang(req.locale || "en").fromNow();
 			item.updated_relative = moment(item.updated).lang(req.locale || "en").fromNow();
-			if (item.stage === 1 || item.stage >= 3) item.processed = true;
+			item.processed = l.stages.isProcessed(item.stage);
 		});
 
 		/* show queue index */
@@ -375,10 +375,9 @@ app.get('/contribute/:id?', function (req, res) {
 			if (!exists) return send404(req, res);
 			l.queue.get(id, function (err, doc) {
 				if (err) return send500(req, res, err);
-
 				/* check privileges */
 				if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
-				if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
+				if (!l.stages.canUpdate(doc.stage)) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
 
 				/* tags */
 				doc.tags_value = doc.tags.join(",");
@@ -395,7 +394,7 @@ app.get('/contribute/:id?', function (req, res) {
 				if (doc.lang && l.lang.check(doc.lang)) {
 					doc.lang_name = l.lang.get(doc.lang);
 				}
-
+				console.log(doc);
 				/* render form */
 				render(req, res, 'contribute', {
 					queue: {items: queue},
@@ -421,7 +420,7 @@ app.post('/contribute/:id/update', function (req, res) {
 
 			/* check privileges */
 			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
-			if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
+			if (!l.stages.canUpdate(doc.stage)) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
 
 			l.queue.update(id, {
 				topics: (req.body.topics || "").split(','),
@@ -451,28 +450,18 @@ app.get('/contribute/:id/cancel', function (req, res) {
 	l.queue.check(req.param("id"), function (err, exists, id) {
 		if (err) return send500(req, res, err);
 		if (!exists) return send404(req, res);
-
 		l.queue.get(id, function (err, doc) {
 			if (err) return send500(req, res, err);
-
 			/* check privileges */
 			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
-			if (doc.stage >= 3) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
-
-			l.queue.update(id, {
-				stage: 5
-			}, function (err, data) {
+			if (!l.stages.canCancel(doc.stage)) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
+			queue.cancel(id, function (err) {
 				if (err) return send500(req, res, err);
-
 				/* redirect to index :) */
 				res.redirect("/contribute");
-
 			});
-
 		});
-
 	});
-
 });
 
 /* quick accept for admins and so */
@@ -489,7 +478,7 @@ app.get('/contribute/:id/accept', function (req, res) {
 
 			/* check privileges */
 			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
-			if (doc.stage !== 1) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
+			if (!l.queue.canAccept(doc.stage)) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
 
 			l.queue.accept(req.param("id"), function (err) {
 				if (err) return send500(req, res, err);

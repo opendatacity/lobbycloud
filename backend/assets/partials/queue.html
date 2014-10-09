@@ -27,8 +27,18 @@
 				<div class="list-title pull-left" translate translate-n="docs.length" translate-plural="{{docs.length}} documents">One document</div>
 			</div>
 			<div class="pull-right has-feedback">
-				<input type="text" ng-model="quickfilter" placeholder="{{'Filter'|translate}}" key-bind="{ enter: 'filterQuick()'}">
-				<span ng-show="quickfilter.length>0" class="glyphicon glyphicon-remove form-control-feedback"></span>
+				<select ng-model="filter.type">
+					<option value="0">All</option>
+					<option value="1">Uploaded</option>
+					<option value="2">Processed</option>
+					<option value="3">Declined</option>
+					<option value="4">Cancelled</option>
+					<option value="5">Failed</option>
+				</select>
+			</div>
+			<div class="pull-right has-feedback">
+				<input type="text" ng-model="filter.text" placeholder="{{'Filter'|translate}}" key-bind="{ enter: 'refilter()'}">
+				<span ng-show="filter.text.length>0" class="glyphicon glyphicon-remove form-control-feedback"></span>
 			</div>
 		</div>
 	</div>
@@ -61,8 +71,8 @@
 							<i class="fa fa-spinner fa-spin"></i>
 						</div>
 						<div ng-show="!doc.$processing">
-							<a href="" class="btn btn-primary btn-sm" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"><i class="fa fa-edit"/></a>
-							<a href="" class="btn btn-primary btn-sm" title="{{'Decline Document'|translate}}" ng-click="declineDialog(doc)" eat-click><i class="fa fa-ban"/></a>
+							<a ng-show="stages.canUpdate(doc.stage)" href="" class="btn btn-primary btn-sm" title="{{'Edit Document'|translate}}" ui-sref="queueitem(doc)"><i class="fa fa-edit"/></a>
+							<a ng-show="stages.canDecline(doc.stage)" href="" class="btn btn-primary btn-sm" title="{{'Decline Document'|translate}}" ng-click="declineDialog(doc)" eat-click><i class="fa fa-ban"/></a>
 							<!--<a href="" class="btn btn-primary btn-sm" title="{{'Delete Document'|translate}}" ng-click="deleteDialog(doc)" eat-click><i class="fa fa-trash-o"/></a>-->
 						</div>
 					</td>
@@ -88,6 +98,7 @@
 								<li><span translate>Language</span> {{doc.lang}}</li>
 							</ul>
 							<ul class="list-unstyled">
+								<li><span translate>Stage</span> {{doc.stage}}</li>
 								<li class="text-info">File Informations</li>
 								<li><span translate>Filename</span> {{doc.orig}}</li>
 								<li><span translate>Uploaded</span> {{doc.created | amDateFormat:'LLL'}}</li>

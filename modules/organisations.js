@@ -166,7 +166,7 @@ module.exports = orgs = function (opts, db, es) {
 	organisations.list = function (ids, callback) {
 		var list = [];
 		var query = [];
-		ids = ids.map(function (id) {
+		ids = (ids || []).map(function (id) {
 			if (typeof id == "string")
 				return id;
 			return id.id;

@@ -209,6 +209,10 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 			name: 'Uploaded'
 		},
 		{
+			sortable: 'published',
+			name: 'Published'
+		},
+		{
 			sortable: 'topics',
 			name: 'Topic'
 		},
@@ -224,8 +228,12 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 
 	$scope.alldocs = [];
 
-	$scope.quickfilter = '';
-	$scope.filterQuick = function () {
+	$scope.filter = {
+		text: '',
+		range_enabled: false
+	};
+
+	$scope.refilter = function () {
 		$scope.tableParams.reload();
 	};
 
@@ -243,27 +251,22 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 				})
 			}
 		});
-		$scope.filter = {
-			title: '',
-			range: {
-				startDate: moment(min ? min : (new Date())),
-				endDate: moment(max ? max : (new Date()))
-			},
-			range_enabled: false
+		$scope.filter.range = {
+			startDate: moment(min ? min : (new Date())),
+			endDate: moment(max ? max : (new Date()))
 		};
+		$scope.filter.range_enabled = false;
 		$scope.$watch("filter.range", function (o, n) {
 			if ($scope.filter.range_enabled)
 				reloadTable(o, n);
 		});
 		$scope.$watch("filter.range_enabled", reloadTable);
-		$scope.$watch("filter.title", reloadTable);
-
 
 		//init table
 		$scope.tableParams = new ngTableParams({
 			page: 1,
 			count: 10,
-			sorting: {created: 'desc'}
+			sorting: {published: 'desc'}
 		}, {
 			total: data.length,
 			getData: function ($defer, params) {
@@ -276,7 +279,7 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 						return (value.uploaded >= startDate) && (value.uploaded <= endDate);
 					});
 				}
-				if ($scope.quickfilter.length > 0) {
+				if ($scope.filter.text.length > 0) {
 					orderedData = $filter('filter')(orderedData, function (value) {
 						return (value.orig
 							+ value.topics.map(function (o) {
@@ -286,7 +289,7 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 								return o.label
 							}).join(',')
 							+ value.tags.join(',')
-							).indexOf($scope.quickfilter) >= 0;
+							).indexOf($scope.filter.text) >= 0;
 					});
 				}
 				var sort = params.sorting();
@@ -337,11 +340,28 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 			});
 	};
 
-	$scope.depublishDialog = function (doc) {
-
+	$scope.unpublishDialog = function (doc) {
+		okcancelModalDialog($modal, {
+			headline: 'Unpublish Document',
+			question: 'Are you really sure to unpublish ' + doc.orig + '?'
+		}, function (ok) {
+			if (!ok) return;
+			doc.$processing = true;
+			DocsService.unpublish({id: doc.id},
+				function () {
+					$scope.alldocs = $scope.alldocs.filter(function (t) {
+						return doc.id !== t.id;
+					});
+					$scope.tableParams.reload();
+				}, function (err) {
+					doc.$processing = false;
+					alert(err.data);
+				}
+			);
+		});
 	};
 
-	//startup
+//startup
 	$scope.load();
 	$scope.resize();
 });
@@ -379,9 +399,39 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 	];
 
 	$scope.alldocs = [];
-	$scope.quickfilter = '';
-	$scope.filterQuick = function () {
-		$scope.tableParams.reload();
+
+	$scope.stages = {
+		UPLOADED: 0,
+		PROCESSED: 1,
+		FAILED: 2,
+		ACCEPTED: 3,
+		DECLINED: 4,
+		CANCELLED: 5,
+		canUpdate: function (stage) {
+			return (stage <= 1)
+		},
+		canCancel: function (stage) {
+			return (stage < 4);
+		},
+		canAccept: function (stage) {
+			return (stage == 1);
+		},
+		canDecline: function (stage) {
+			return (stage < 3);
+		},
+		isProcessed: function (stage) {
+			return (stage === 1 || stage >= 3);
+		}
+	};
+
+	$scope.filter = {
+		text: '',
+		range_enabled: false,
+		type: "2"
+	};
+
+	$scope.refilter = function () {
+		reloadTable();
 	};
 
 	$scope.initData = function (data) {
@@ -398,20 +448,17 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 				})
 			}
 		});
-		$scope.filter = {
-			title: '',
-			range: {
-				startDate: moment(min ? min : (new Date())),
-				endDate: moment(max ? max : (new Date()))
-			},
-			range_enabled: false
+		$scope.filter.range = {
+			startDate: moment(min ? min : (new Date())),
+			endDate: moment(max ? max : (new Date()))
 		};
+		$scope.filter.range_enabled = false;
 		$scope.$watch("filter.range", function (o, n) {
 			if ($scope.filter.range_enabled)
 				reloadTable(o, n);
 		});
 		$scope.$watch("filter.range_enabled", reloadTable);
-		$scope.$watch("filter.title", reloadTable);
+		$scope.$watch("filter.type", reloadTable);
 
 		//init table
 		$scope.tableParams = new ngTableParams({
@@ -430,7 +477,7 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 						return (value.uploaded >= startDate) && (value.uploaded <= endDate);
 					});
 				}
-				if ($scope.quickfilter.length > 0) {
+				if ($scope.filter.text.length > 0) {
 					orderedData = $filter('filter')(orderedData, function (value) {
 						return (value.orig
 							+ value.topics.map(function (o) {
@@ -440,10 +487,33 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 								return o.label
 							}).join(',')
 							+ value.tags.join(',')
-							).indexOf($scope.quickfilter) >= 0;
+							).indexOf($scope.filter.text) >= 0;
 					});
 				}
-
+				var filterType = function (type) {
+					orderedData = $filter('filter')(orderedData, function (value) {
+						return (value.stage == type);
+					});
+				};
+				switch ($scope.filter.type) {
+					case "0":
+						break;
+					case "1":
+						filterType($scope.stages.UPLOADED);
+						break;
+					case "2":
+						filterType($scope.stages.PROCESSED);
+						break;
+					case "3":
+						filterType($scope.stages.DECLINED);
+						break;
+					case "4":
+						filterType($scope.stages.CANCELLED);
+						break;
+					case "5":
+						filterType($scope.stages.FAILED);
+						break;
+				}
 				var sort = params.sorting();
 				if (sort)
 					if (sort.organisations) {

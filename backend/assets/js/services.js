@@ -137,6 +137,10 @@ app.factory('DocsService', function ($resource) {
 				method: 'POST',
 				params: {cmd: 'docs.update'}
 			},
+			unpublish: {
+				method: 'POST',
+				params: {cmd: 'docs.unpublish'}
+			}
 		}
 	);
 });

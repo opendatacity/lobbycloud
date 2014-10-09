@@ -267,7 +267,7 @@ module.exports = queue = function (config, db, l) {
 	queue.add = function (data, callback) {
 
 		var doc = {
-			"stage": 0,
+			"stage": l.stages.UPLOADED,
 			"data": {},
 			"created": (new Date()),
 			"updated": (new Date()),
@@ -332,29 +332,19 @@ module.exports = queue = function (config, db, l) {
 								if (err) {
 
 									/* set database to failed extraction */
-									db.collection("queue").findAndModify({
-										"query": {"id": doc.id}, "update": {
-											"$set": {
-												stage: 2,
-												data: {
-													error: err.message
-												},
-												updated: (new Date())
-											}
-										}, "new": true
-									}, function (err, doc) {
+									updatedoc(doc.id, {
+										stage: l.stages.FAILED,
+										data: {error: err.message},
+										updated: (new Date())
+									}, function (err) {
 										if (err) return console.error("[queue]", "extraction error", err); // FIXME: better error handling
-
-										/* update cache */
-										cache[id] = doc;
-
 										/* notify */
-										if (typeof queue.notify === "function") queue.notify(doc.id, 2, doc);
-
+										if (typeof queue.notify === "function")
+											queue.notify(doc.id, 2, doc);
 									});
 
 									/* don't proceed */
-									if (err) return console.error("[queue]", "extraction error", err); // FIXME: better error handling
+									return console.error("[queue]", "extraction error", err); // FIXME: better error handling
 								}
 
 								console.log("[queue]", "convert finished for doc", doc.id);
@@ -362,23 +352,14 @@ module.exports = queue = function (config, db, l) {
 								doc.data = data;
 
 								/* update data */
-								db.collection("queue").findAndModify({
-									"query": {"id": doc.id}, "update": {
-										"$set": {
-											stage: 1,
-											data: doc.data,
-											updated: (new Date())
-										}
-									}, "new": true
-								}, function (err, doc) {
+								updatedoc(doc.id, {
+									stage: l.stages.PROCESSED,
+									data: doc.data,
+									updated: (new Date())
+								}, function (err) {
 									if (err) return callback(err);
-
-									/* update cache */
-									cache[id] = doc;
-
 									/* notify */
 									if (typeof queue.notify === "function") queue.notify(doc.id, 1, doc);
-
 								});
 							});
 						});
@@ -395,46 +376,33 @@ module.exports = queue = function (config, db, l) {
 
 		/* check if queue item exists */
 		queue.check(id, function (err, exists) {
-			if (err || !exists) return callback((err || new Error("Thie queue item does not exist")));
+			if (err || !exists) return callback((err || new Error("This queue item does not exist")));
 
 			/* get doc to check stage */
 			queue.get(id, function (err, doc) {
 				if (err) return callback(err);
 
 				/* check stage */
-				if (doc.stage > 1) return callback(new Error("The document can not be updated"));
+				if (!l.stages.canUpdate(doc.stage)) return callback(new Error("The document can not be updated"));
 
 				var update = {};
 
 				/* check stage */
-				if (data.hasOwnProperty("stage")) {
-					data.stage = parseInt(data.stage, 10);
-					if (data.stage > 0 && data.stage <= 5) {
-						update.stage = data.stage;
-					}
-				}
+				//if (data.hasOwnProperty("stage")) {
+				//	data.stage = parseInt(data.stage, 10);
+				//	if (data.stage > 0 && data.stage <= 5) {
+				//		update.stage = data.stage;
+				//	}
+				//}
 
 				validateDoc(data, update, function () {
-
-					// FIXME: check if anything to update
 					/* set last modified */
 					update.updated = (new Date());
-					db.collection("queue").findAndModify({
-						"query": {"id": id},
-						"update": {"$set": update}, "new": true
-					}, function (err, doc) {
+					updatedoc(id, update, function (err, doc) {
 						if (err) return callback(err);
-
-						/* update cache */
-						cache[id] = doc;
-
-						/* call back */
-						callback(null, doc);
-
+						l.prepareDoc(doc, callback);
 					});
-
 				});
-
 			});
 
 		});
@@ -450,7 +418,7 @@ module.exports = queue = function (config, db, l) {
 				if (err) return callback(err);
 
 				/* check for stage */
-				if (doc.stage !== 1) return callback(new Error("this queue element cannot be accepted"));
+				if (!l.stages.canAccept(doc.stage)) return callback(new Error("this queue element cannot be accepted"));
 
 				/* check if organisations are set */
 				if (!doc.hasOwnProperty("organisations") ||
@@ -470,11 +438,9 @@ module.exports = queue = function (config, db, l) {
 					}).length !== doc.topics.length
 				) return callback(new Error("min. one topic must be specified/invalid topic"));
 
-
 				/* update to stage 3 */
-				queue.update(id, {stage: 3}, function (err, doc) {
+				updatedoc(id, {stage: l.stages.ACCEPTED}, function (err) {
 					if (err) return callback(err);
-
 					/* import document */
 					l.documents.import(id, function (err) {
 						if (err) {
@@ -482,31 +448,45 @@ module.exports = queue = function (config, db, l) {
 							if (config.debug) console.error("[queue] failed accepting", id);
 							if (config.debug) console.error("[queue]", err);
 							// FIXME: update manually
-
-							return db.collection("queue").findAndModify({"query": {"id": id}, "update": {"$set": {"stage": 1}}, "new": true}, function (_err, doc) {
+							updatedoc(id, {stage: l.stages.PROCESSED}, function (_err) {
 								if (_err) {
 									/* we are in deep trouble now */
 									console.error("[queue]", "could not roll back stage for queue item", id)
 									console.error("[queue]", _err);
 									return callback(_err);
 								}
-								/* update cache */
-								cache[id] = doc;
-
 								/* call back with original error */
 								callback(err);
-
 							});
-
 						}
-						;
-
 						/* yay */
 						if (config.debug) console.log("[queue]", "accepted", id);
 						callback(null, id);
 					});
 				});
 			});
+		});
+	};
+
+	queue.unaccept = function (id, callback) {
+		l.queue.check(id, function (err, exists) {
+			if (!exists) return callback(new Error("not in queue"));
+			updatedoc(id, {stage: l.stages.PROCESSED}, callback);
+		});
+	};
+
+	var updatedoc = function (id, values, callback) {
+		// FIXME: check if anything to update
+		db.collection("queue").findAndModify({
+			"query": {"id": id},
+			"update": {
+				"$set": values
+			}, "new": true
+		}, function (err, doc) {
+			if (err) return callback(err);
+			/* update cache */
+			cache[id] = doc;
+			callback(null, doc);
 		});
 	};
 
@@ -517,8 +497,8 @@ module.exports = queue = function (config, db, l) {
 			if (!exists) return callback(new Error("this queue element does not exist"));
 			queue.get(id, function (err, doc) {
 				if (err) return callback(err);
-				if (doc.stage >= 3) return callback("this queue element cannot be declined");
-				queue.update(id, {stage: 4}, function (err, doc) {
+				if (!l.stages.canDecline(doc.stage)) return callback("this queue element cannot be declined");
+				updatedoc(id, {stage: l.stages.DECLINED}, function (err) {
 					if (err) return callback(err);
 					if (config.debug) console.log("[queue]", "declined", id);
 					callback(null, id);
@@ -534,8 +514,8 @@ module.exports = queue = function (config, db, l) {
 			if (!exists) return callback(new Error("this queue element does not exist"));
 			queue.get(id, function (err, doc) {
 				if (err) return callback(err);
-				if (doc.stage >= 3) return callback("this queue element cannot be cancelled");
-				queue.update(id, {stage: 5}, function (err, doc) {
+				if (!l.stages.canCancel(doc.stage)) return callback("this queue element cannot be cancelled");
+				updatedoc(id, {stage: l.stages.CANCELLED}, function (err) {
 					if (err) return callback(err);
 					if (config.debug) console.log("[queue] cancelled", id);
 					callback(null, id);
@@ -582,17 +562,17 @@ module.exports = queue = function (config, db, l) {
 	/* clean accepted, cancelled and declined elements from queue */
 	queue.clean = function (callback) {
 		callback(true); // FIXME: implement this for realz
-	}
+	};
 
 	/* get by id */
 	queue.get = function (id, callback) {
 		id = slugmaker(id);
-		if (cache.hasOwnProperty(id)) return callback(null, cache[id]);
+		if (cache.hasOwnProperty(id)) return l.prepareDoc(cache[id], callback);
 		db.collection("queue").findOne({id: id}, function (err, result) {
 			if (err) return callback(err);
 			if (result === null) return callback(new Error("Queue item does not exist"));
 			cache[id] = result;
-			callback(null, result);
+			l.prepareDoc(result, callback)
 		});
 	};
 
@@ -627,7 +607,7 @@ module.exports = queue = function (config, db, l) {
 				/* add to cache */
 				cache[r.id] = r;
 			});
-			callback(null, list);
+			l.prepareDocs(list, callback);
 		});
 
 	};
@@ -652,7 +632,6 @@ module.exports = queue = function (config, db, l) {
 		/* get from collection */
 		db.collection("queue").find(find).sort({"created": -1}, function (err, result) {
 			if (err) return callback(err);
-
 			var list = [];
 			result.forEach(function (r) {
 				/* add to result set */
@@ -660,9 +639,9 @@ module.exports = queue = function (config, db, l) {
 				/* add to cache */
 				cache[r.id] = r;
 			});
-			callback(null, list);
+			l.prepareDoc(list, callback);
 		});
-	}
+	};
 
 	return this;
 

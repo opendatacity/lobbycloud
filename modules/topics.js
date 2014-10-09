@@ -22,13 +22,13 @@ module.exports = function (opts, db, es) {
 		if (cache.hasOwnProperty(id)) return callback(null, true, id);
 		db.collection("topics").find({id: id}, {_id: 1}).limit(1, function (err, result) {
 			if (err) return callback(err);
-			if (result.length==0){
+			if (result.length == 0) {
 				db.collection("topics").find({label: s}, {_id: 1}).limit(1, function (err, result) {
 					if (err) return callback(err);
 					callback(null, (result.length > 0), id);
 				});
-			}else
-			callback(null, (result.length > 0), id);
+			} else
+				callback(null, (result.length > 0), id);
 		});
 	};
 
@@ -142,7 +142,7 @@ module.exports = function (opts, db, es) {
 	topics.list = function (ids, callback) {
 		var list = [];
 		var query = [];
-		ids = ids.map(function (id) {
+		ids = (ids || []).map(function (id) {
 			if (typeof id == "string")
 				return id;
 			return id.id;

@@ -52,6 +52,7 @@ $(document).ready(function (e) {
 		var $e = $(this);
 		var $prop = $e.attr("data-prop");
 		var $q = $("input", $e);
+		var val = $q.attr('value');
 		$q.tagsinput({
 			addOnBlur:true,
 			freeInput:true,

@@ -27,7 +27,7 @@
 				<div class="list-title pull-left" translate translate-n="docs.length" translate-plural="{{docs.length}} documents">One document</div>
 			</div>
 			<div class="pull-right">
-				<input type="text" ng-model="quickfilter" placeholder="{{'Filter'|translate}}" key-bind="{ enter: 'filterQuick()'}">
+				<input type="text" ng-model="filter.text" placeholder="{{'Filter'|translate}}" key-bind="{ enter: 'refilter()'}">
 			</div>
 		</div>
 	</div>
@@ -52,16 +52,17 @@
 						<span class="filename">{{doc.orig}}</span>
 					</td>
 					<td sortable="'created'">{{doc.created | amDateFormat:'DD.MM.YYYY HH:mm'}}</td>
+					<td sortable="'published'">{{doc.published | amDateFormat:'DD.MM.YYYY HH:mm'}}</td>
 					<td sortable="'topics'">{{doc.topics|listLabels}}</td>
 					<td sortable="'organisations'">{{doc.organisations|listLabels}}</td>
 					<td sortable="'info.pages'">{{doc.info.pages}}</td>
-					<td class="doc-actions">
+					<td class="row-actions">
 						<div ng-show="doc.$processing">
 							<i class="fa fa-spinner fa-spin"></i>
 						</div>
 						<div ng-show="!doc.$processing">
-							<a href="" class="btn btn-primary btn-sm" title="{{'Edit Document'|translate}}" ui-sref="docitem(doc)"><i class="fa fa-edit"/></a>
-							<!--<i class="btn btn-primary fa fa-lock" title="{{'Depublish Document'|translate}}" ng-click="depublishDialog(doc)"/>-->
+							<a href="" class="btn btn-primary btn-sm" title="{{'Edit Document'|translate}}" ui-sref="docitem(doc)"><i class="fa fa-edit"></i></a>
+							<a href="" class="btn btn-primary btn-sm" title="{{'Unpublish Document'|translate}}" ng-click="unpublishDialog(doc)"> <i class="fa fa-lock"></i></a>
 						</div>
 					</td>
 				</tr>
