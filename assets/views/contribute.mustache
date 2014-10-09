@@ -45,37 +45,15 @@
 			<div class="update-form">
 				<!-- FIXME: document thumbnails or so here -->
 				<form id="update" method="post" action="{{{_url}}}/contribute/{{id}}/update" role="form">
-					<div class="form-group form-topic prop-select" data-prop="topic">
-						<label for="document-topic">{{#__}}Topic{{/__}}</label>
-						<div class="input-group">
-							<div class="input-group-btn dropdown-action">
-								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No topic{{/__}}</span> <span class="caret"></span></button>
-								<ul class="dropdown-menu">
-									<li><a href="javascript:;" {{^topic}}data-selected=""{{/topic}} data-action="disabled">{{#__}}No topic{{/__}}</a></li>
-									<li class="divider"></li>
-									<li><a href="javascript:;" {{#topic.id}}data-selected="{{topic.id}}"{{/topic.id}} data-action="select">{{#__}}Select topic{{/__}}</a></li>
-									<li><a href="javascript:;" {{#topic.new}}data-selected="{{topic.new}}"{{/topic.new}} data-action="suggest">{{#__}}Suggest new topic{{/__}}</a></li>
-								</ul>
-							</div>
-							<input type="hidden" class="form-control" id="document-topic-search" name="topic-query" placeholder="{{#__}}Search for topics{{/__}}">
-							<input type="text" class="form-control" id="document-topic" name="topic" disabled="disabled" placeholder="{{#__}}Topic{{/__}}">
-						</div>
+					<div class="form-group form-topic prop-tag-select" data-prop="topic">
+						<label>{{#__}}Topics{{/__}}</label>
+						<input type="text" class="form-control" id="document-topics-search"
+							   name="topics" value="{{topics_value}}" placeholder="{{#__}}Topics{{/__}}">
 					</div>
-					<div class="form-group form-organisation prop-select" data-prop="organisation">
-						<label for="document-organisation">{{#__}}Organisation{{/__}}</label>
-						<div class="input-group">
-							<div class="input-group-btn dropdown-action">
-								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="dropdown-label">{{#__}}No organisation{{/__}}</span> <span class="caret"></span></button>
-								<ul class="dropdown-menu">
-									<li><a href="javascript:;" {{^organisation}}data-selected=""{{/organisation}} data-action="disabled">{{#__}}No organisation{{/__}}</a></li>
-									<li class="divider"></li>
-									<li><a href="javascript:;" {{#organisation.id}}data-selected="{{organisation.id}}"{{/organisation.id}} data-action="select">{{#__}}Select organisation{{/__}}</a></li>
-									<li><a href="javascript:;" {{#organisation.new}}data-selected="{{organisation.new}}"{{/organisation.new}} data-action="suggest">{{#__}}Suggest new organisation{{/__}}</a></li>
-								</ul>
-							</div>
-							<input type="hidden" class="form-control" id="document-organisation-search" name="organisation-query" placeholder="{{#__}}Search for organisations{{/__}}">
-							<input type="text" class="form-control" id="document-organisation" name="organisation" disabled="disabled" placeholder="{{#__}}Organisation{{/__}}">
-						</div>
+					<div class="form-group form-organisation prop-tag-select" data-prop="organisation">
+						<label>{{#__}}Organisation{{/__}}</label>
+						<input type="text" class="form-control" id="document-organisation-search"
+							   name="organisations" value="{{organisations_value}}" placeholder="{{#__}}Organisations{{/__}}">
 					</div>
 
 					<div class="form-group">
@@ -132,13 +110,13 @@
 							<span class="label">{{created_formatted}}</span>
 						</h3>
 						<div class="panel-buttons">
-							{{#cancelable}}
-							<a href="{{{_url}}}/contribute/{{id}}/cancel" class="cancel _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Cancel publishing{{/__}}"><i class="fa fa-times-circle"></i></a>
-							{{/cancelable}}
-							{{#_user._is_editor}}
-							{{#acceptable}}
-							<a href="{{{_url}}}/contribute/{{id}}/accept" class="accept _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Publish this{{/__}}"><i class="fa fa-check-circle"></i></a>
-							{{/acceptable}}
+							<!--{{#cancelable}}-->
+							<!--<a href="{{{_url}}}/contribute/{{id}}/cancel" class="cancel _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Cancel publishing{{/__}}"><i class="fa fa-times-circle"></i></a>-->
+							<!--{{/cancelable}}-->
+							<!--{{#_user._is_editor}}-->
+							<!--{{#acceptable}}-->
+							<!--<a href="{{{_url}}}/contribute/{{id}}/accept" class="accept _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Publish this{{/__}}"><i class="fa fa-check-circle"></i></a>-->
+							<!--{{/acceptable}}-->
 							{{/_user._is_editor}}
 							{{#editable}}
 							<a href="{{{_url}}}/contribute/{{id}}#{{id}}" class="edit _tooltip" data-toggle="tooltip" data-placement="top" title="{{#__}}Edit this{{/__}}"><i class="fa fa-pencil"></i></a>

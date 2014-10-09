@@ -9,5 +9,6 @@
 	"Your passwords has been changed": "Your passwords has been changed",
 	"Password successfully changed.": "Password successfully changed.",
 	"Please log in to upload files": "Please log in to upload files",
-	"No files were received": "No files were received"
+	"No files were received": "No files were received",
+	"This is not a PDF file": "This is not a PDF file"
 }

@@ -832,11 +832,11 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 		return true;
 	};
 
-	$scope.addOrganisationDialog = function () {
+	$scope.createOrganisationDialog = function (o) {
 		editModalDialog($modal, {
 			organisation: {
 				create: true,
-				name: $scope.edit.organisation.label
+				name: o ? o.label : $scope.edit.organisation.label
 			}
 		}, 'partials/organisation.html', function (data) {
 			if (data) {
@@ -920,11 +920,11 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 		});
 	};
 
-	$scope.createTopicDialog = function () {
+	$scope.createTopicDialog = function (o) {
 		editModalDialog($modal, {
 			topic: {
 				create: true,
-				label: $scope.edit.topic.label
+				label: o.label || $scope.edit.topic.label
 			}
 		}, 'partials/topic.html', function (data) {
 			if (data) {

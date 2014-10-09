@@ -383,6 +383,14 @@ app.get('/contribute/:id?', function (req, res) {
 				/* tags */
 				doc.tags_value = doc.tags.join(",");
 
+				doc.organisations_value = (doc.organisations || []).map(function (o, i) {
+					return (o.label || o.name);
+				}).join(",");
+
+				doc.topics_value = (doc.topics || []).map(function (o) {
+					return o.label;
+				}).join(",");
+
 				/* lang */
 				if (doc.lang && l.lang.check(doc.lang)) {
 					doc.lang_name = l.lang.get(doc.lang);
@@ -416,8 +424,8 @@ app.post('/contribute/:id/update', function (req, res) {
 			if (doc.stage >= 2) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
 
 			l.queue.update(id, {
-				topics: (req.body.topics || null),
-				organisations: (req.body.organisations || null),
+				topics: (req.body.topics || "").split(','),
+				organisations: (req.body.organisations || "").split(','),
 				tags: (req.body.tags || null),
 				lang: (req.body.lang || null),
 				comment: (req.body.comment || null)
@@ -485,7 +493,6 @@ app.get('/contribute/:id/accept', function (req, res) {
 
 			l.queue.accept(req.param("id"), function (err) {
 				if (err) return send500(req, res, err);
-
 				/* redirect to index :) */
 				res.redirect("/contribute");
 			});

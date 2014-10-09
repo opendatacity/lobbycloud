@@ -174,7 +174,7 @@ module.exports = queue = function (config, db, l) {
 			data.topics.forEach(function (topic) {
 				if (typeof topic === "string") {
 					if (topic !== "")
-						doc.topics.push({label: topic});
+						doc.topics.push({label: topic.split('-')[0]});
 				} else if ((typeof topic === "object") && (topic.hasOwnProperty("id") || topic.hasOwnProperty("label"))) {
 					doc.topics.push(topic);
 				}
@@ -212,7 +212,7 @@ module.exports = queue = function (config, db, l) {
 			data.organisations.forEach(function (organisation) {
 				if (typeof organisation === "string") {
 					if (organisation !== "")
-						doc.organisations.push({label: organisation});
+						doc.organisations.push({label: organisation.split('-')[0]});
 				} else if ((typeof organisation === "object") && (organisation.hasOwnProperty("id") || organisation.hasOwnProperty("label"))) {
 					doc.organisations.push(organisation);
 				}
@@ -221,6 +221,7 @@ module.exports = queue = function (config, db, l) {
 		/* check any organisation for its existance */
 		var check_organisations = function (_callback) {
 			if ((!doc.organisations) || (doc.organisations.length === 0)) return _callback();
+			console.log(doc.organisations);
 			utils.queue(doc.organisations, function (organisation, callback) {
 				if (!organisation.hasOwnProperty('id') && organisation.hasOwnProperty('label')) {
 					l.organisations.check(organisation.label, function (err, exists, org_id) {
