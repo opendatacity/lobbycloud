@@ -69,7 +69,7 @@
 					</div>
 					<div class="list-sel-ctn">
 						<div ng-repeat="o in doc.organisations" class="list-sel-item">{{o.label}}
-							<i ng-if="o.id" class="glyphicon glyphicon-ok text-success" title="{{'Topic is valid'|translate}}"></i>
+							<i ng-if="o.id" class="glyphicon glyphicon-ok text-success" title="{{'Organisation is valid'|translate}}"></i>
 							<i ng-if="!o.id" class="glyphicon glyphicon-new-window clickable" title="{{'Create Organisation Entry'|translate}}" ng-click="createOrganisationDialog(o)"></i>
 							<i class="glyphicon glyphicon-remove clickable" title="{{'Remove'|translate}}" ng-click="removeOrganisation(o)"></i>
 						</div>

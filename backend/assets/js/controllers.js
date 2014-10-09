@@ -601,20 +601,26 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 	};
 
 	$scope.canSelectOrganisation = function () {
-		return (
-		$scope.doc &&
-		($scope.edit.organisation.id) &&
-		($scope.doc.organisations.filter(function (o) {
-			return o.id == $scope.edit.organisation.id
-		}).length == 0)
-		);
+		if ($scope.doc) {
+			if ($scope.edit.organisation.id) {
+				return ($scope.doc.organisations.filter(function (o) {
+					return o.id == $scope.edit.organisation.id
+				}).length == 0);
+			}
+			if ($scope.edit.organisation.label) {
+				var t = $scope.edit.organisation.label.split("-")[0].trim();
+				return ($scope.doc.organisations.filter(function (o) {
+					return o.label == t;
+				}).length == 0);
+			}
+		}
 	};
 
 	$scope.selectOrganisation = function () {
 		if ($scope.canSelectOrganisation()) {
 			$scope.doc.organisations.push({
 				id: $scope.edit.organisation.id,
-				label: $scope.edit.organisation.label
+				label: $scope.edit.organisation.label.split("-")[0].trim()
 			});
 			$scope.edit.organisation.label = '';
 			$scope.edit.organisation.id = '';
@@ -622,13 +628,20 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 	};
 
 	$scope.canSelectTopic = function () {
-		return (
-		$scope.doc &&
-		($scope.edit.topic.id) &&
-		($scope.doc.topics.filter(function (o) {
-			return o.id == $scope.edit.topic.id
-		}).length == 0)
-		);
+		if ($scope.doc) {
+			if ($scope.edit.topic.id) {
+				return ($scope.doc.topics.filter(function (o) {
+					return o.id == $scope.edit.topic.id
+				}).length == 0);
+			}
+			if ($scope.edit.topic.label) {
+				var t = $scope.edit.topic.label.split("-")[0].trim();
+				return ($scope.doc.topics.filter(function (o) {
+					return o.label == t;
+				}).length == 0);
+			}
+		}
+		return false;
 	};
 
 	$scope.canSelectTag = function () {
@@ -921,15 +934,17 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 	};
 
 	$scope.createTopicDialog = function (o) {
+		o = o || $scope.edit.topic;
 		editModalDialog($modal, {
 			topic: {
 				create: true,
-				label: o.label || $scope.edit.topic.label
+				label: o.label
 			}
 		}, 'partials/topic.html', function (data) {
 			if (data) {
 				TopicsService.add({topic: data.topic}, function (topic) {
-					$scope.edit.topic = topic;
+					o.id = topic.id;
+					o.label = topic.label;
 				}, function (err) {
 					alert(err.data);
 				});

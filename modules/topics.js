@@ -16,12 +16,18 @@ module.exports = function (opts, db, es) {
 	db.collection("topics").ensureIndex("created", {"background": true});
 
 	/* check if a topic exists */
-	topics.check = function (id, callback) {
-		id = slugmaker(id);
+	topics.check = function (s, callback) {
+		var id = slugmaker(s);
 		if (!id) return callback(new Error("Invalid ID"));
 		if (cache.hasOwnProperty(id)) return callback(null, true, id);
 		db.collection("topics").find({id: id}, {_id: 1}).limit(1, function (err, result) {
 			if (err) return callback(err);
+			if (result.length==0){
+				db.collection("topics").find({label: s}, {_id: 1}).limit(1, function (err, result) {
+					if (err) return callback(err);
+					callback(null, (result.length > 0), id);
+				});
+			}else
 			callback(null, (result.length > 0), id);
 		});
 	};

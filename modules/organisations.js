@@ -20,12 +20,18 @@ module.exports = orgs = function (opts, db, es) {
 	db.collection("organisations").ensureIndex("created", {"background": true});
 
 	/* check if organisation exists */
-	organisations.check = function (id, callback) {
-		id = slugmaker(id);
+	organisations.check = function (s, callback) {
+		var id = slugmaker(s);
 		if (cache.hasOwnProperty(id)) return callback(null, true, id);
 		db.collection("organisations").find({id: id}, {_id: 1}).limit(1, function (err, result) {
 			if (err) return callback(err);
-			callback(null, (result.length > 0), id);
+			if (result.length == 0) {
+				db.collection("organisations").find({name: s}, {_id: 1}).limit(1, function (err, result) {
+					if (err) return callback(err);
+					callback(null, (result.length > 0), id);
+				});
+			} else
+				callback(null, (result.length > 0), id);
 		});
 	};
 

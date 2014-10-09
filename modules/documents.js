@@ -87,142 +87,47 @@ module.exports = documents = function (config, db, l) {
 			l.queue.get(id, function (err, doc) {
 				if (err) return callback(err);
 				if (!doc.hasOwnProperty("stage") || doc.stage !== 3) return callback(new Error("queue item is not approved"));
-
-				/* check if organisation is an id */
-				if (doc.hasOwnProperty("organisations") && (!(doc.organisations instanceof Array))) return callback(new Error("organisations must be an array"));
-
-				/* check if topic is an id */
-				if (doc.hasOwnProperty("topics") && (!(doc.topics instanceof Array))) return callback(new Error("topcis must be an array"));
-
-				/* check organisations for existance */
-				var check_organisations = function (_callback) {
-					if (doc.organisations.length === 0) return _callback(null);
-					var _checked = 0;
-					var _error = null;
-					doc.organisations.forEach(function (organisation, index) {
-						if (organisation.hasOwnProperty("new")) {
-							/* create organisation */
-							return l.organisations.add({
-								name: organisation.new,
-							}, function (err, org) {
-								_checked++;
-								if (err) {
-									_error = new Error("organisation could not be created");
-								} else {
-									doc.organisations[index] = org.id;
-								}
-								if (_checked === doc.organisations.length) {
-									_callback(_error);
-								}
-							});
-						} else if (organisation.hasOwnProperty("id")) {
-							organisations.check(organisation.id, function (err, exists) {
-								_checked++;
-								if (err) {
-									_error = (new Error(err));
-								} else if (!exists) {
-									_error = (new Error("organisation does not exist"));
-								}
-								if (_checked === doc.organisations.length) {
-									_callback(_error);
-								}
-							});
-						} else {
-							_checked++;
-							_error = (new Error("organisation has to be created"));
-							if (_checked === doc.organisations.length) {
-								_callback(_error);
-							}
-						}
-					});
+				var update = {
+					id: doc.id,
+					indexed: false,
+					user: doc.user,
+					source: doc.source,
+					created: doc.created,
+					updated: (new Date()),
+					orig: doc.orig,
+					lang: [],
+					tags: [],
+					topics: [],
+					organisations: [],
+					comments: [], // comments without places
+					notes: [], // comments with places
+					changesets: [], // for lobbyplag
+					stats: {
+						downloads: 0,
+						views: 0,
+						comments: 0,
+						notes: 0
+					},
+					file: doc.file,
+					thumb: doc.data.thumbs[0].file,
+					data: doc.data
 				};
-
-				/* check topics for existance */
-				var check_topics = function (_callback) {
-					if (doc.topics.length === 0) return _callback(null);
-					var _checked = 0;
-					var _error = null;
-					doc.topics.forEach(function (topic, index) {
-						if (topic.hasOwnProperty("new")) {
-							/* create topic */
-							return l.topics.add({
-								name: topic.new,
-							}, function (err, top) {
-								_checked++;
-								if (err) {
-									_error = new Error("topic could not be created");
-								} else {
-									doc.topics[index] = top.id;
-								}
-								if (_checked === doc.topics.length) {
-									_callback(_error);
-								}
-							});
-						} else if (topic.hasOwnProperty("id")) {
-							topics.check(topic.id, function (err, exists) {
-								_checked++;
-								if (err) {
-									_error = (new Error(err));
-								} else if (!exists) {
-									_error = (new Error("topic does not exist"));
-								}
-								if (_checked === doc.topics.length) {
-									_callback(_error);
-								}
-							});
-						} else {
-							_checked++;
-							_error = (new Error("topic has to be created"));
-							if (_checked === doc.topics.length) {
-								_callback(_error);
-							}
-						}
-					});
-				};
-
-				check_organisations(function (err) {
+				validateCommon(doc, update, function (err) {
 					if (err) return callback(err);
-					check_topics(function (err) {
+					/* save */
+					console.log('create', update);
+					db.collection("documents").save(update, function (err, result) {
 						if (err) return callback(err);
 
-						/* save */
-						db.collection("documents").save({
-							id: doc.id,
-							indexed: false,
-							user: doc.user,
-							source: doc.source,
-							created: doc.created,
-							updated: (new Date()),
-							orig: doc.orig,
-							lang: doc.lang,
-							tags: doc.tags,
-							topics: doc.topics,
-							organisations: doc.organisations,
-							comments: [], // comments without places
-							notes: [], // comments with places
-							changesets: [], // for lobbyplag
-							stats: {
-								downloads: 0,
-								views: 0,
-								comments: 0,
-								notes: 0
-							},
-							file: doc.file,
-							thumb: doc.data.thumbs[0].file,
-							data: doc.data,
-						}, function (err, result) {
-							if (err) return callback(err);
+						/* cache it */
+						cache[doc.id] = result;
 
-							/* cache it */
-							cache[doc.id] = result;
+						/* call back */
+						callback(null, result);
 
-							/* call back */
-							callback(null, result);
+						/* build index */
+						documents.index(doc.id);
 
-							/* build index */
-							documents.index(doc.id);
-
-						});
 					});
 				});
 			});
@@ -294,120 +199,130 @@ module.exports = documents = function (config, db, l) {
 		});
 	};
 
+	var validateCommon = function (data, update, callback) {
+		if (data.hasOwnProperty("tags") && (data.tags !== null)) {
+			if (data.tags instanceof Array) {
+				/* everything is fine */
+				update.tags = data.tags;
+			} else if (typeof data.tags === "string") {
+				if (data.tags !== "") {
+					/* split by linefeeds, returns, pounds, commas and semicolons */
+					update.tags = data.tags.split(/[,;\r\n\#]+/g).map(function (tag) {
+						return tag.replace(/^\s+|\s+$/g, '')
+					});
+					/* if there is only one tag, this wasn't effective. split by any whitespace then */
+					if (update.tags.length === 1) update.tags = update.tags[0].split(/\s+/g);
+				}
+			}
+			if (update.tags) {
+				update.tags = update.tags.map(function (t) {
+					return t.trim();
+				});
+			}
+			if ((update.tags) && (
+				update.tags.filter(function (o) {
+					return (typeof o === "string");
+				}).length !== update.tags.length
+				)) {
+				return callback(new Error("invalid tag"));
+			}
+		}
+
+		/* check for language */
+		if (data.hasOwnProperty("lang") && (data.lang !== null)) {
+			if (typeof data.lang === "string" && data.lang !== "" && l.lang.check(data.lang)) {
+				update.lang = data.lang;
+			} else
+				return callback(new Error("invalid language"));
+		}
+
+		/* check for comment */
+		if (data.hasOwnProperty("comment") && (data.comment !== null)) {
+			if (typeof data.comment === "string" && data.comment !== "") {
+				update.comment = data.comment;
+			} else
+				return callback(new Error("invalid comment"));
+		}
+
+		/* check any unchecked organisation for its existance */
+		var check_organisations = function (_callback) {
+			if (!data.hasOwnProperty("organisations")) return _callback();
+			if (!data.organisations instanceof Array) data.organisations = [data.organisations];
+			update.organisations = [];
+			utils.queue(data.organisations, function (organisation, cb) {
+					var check = "";
+					if (typeof organisation === "object") {
+						check = organisation.hasOwnProperty("id") ? organisation.id : organisation.label;
+					} else if (typeof organisation === "string") {
+						check = organisation;
+					}
+					l.organisations.check(check, function (err, exists, org_id) {
+						if ((err) || (!exists)) return callback(new Error("invalid organisation"));
+						update.organisations.push(org_id);
+						cb();
+					});
+				},
+				function () {
+					if (update.organisations.length == 0)
+						return callback(new Error("?lease specify min. one organisation"));
+					_callback();
+				});
+		};
+
+		/* check any unchecked topic for its existance */
+		var check_topics = function (_callback) {
+			if (!data.hasOwnProperty("topics")) return _callback();
+			if (!data.topics instanceof Array) data.topics = [data.topics];
+			update.topics = [];
+			utils.queue(data.topics, function (topic, cb) {
+					var check = "";
+					if (typeof topic === "object") {
+						check = topic.hasOwnProperty("id") ? topic.id : topic.label;
+					} else if (typeof topic === "string") {
+						check = topic;
+					}
+					l.topics.check(check, function (err, exists, org_id) {
+						if ((err) || (!exists)) return callback(new Error("invalid topic"));
+						update.topics.push(org_id);
+						cb();
+					});
+				},
+				function () {
+					if (update.topics.length == 0)
+						return callback(new Error("Please specify min. one topic"));
+					_callback();
+				});
+
+		};
+
+		check_organisations(function () {
+			check_topics(callback);
+		});
+	};
+
 	/* update a document */
 	documents.update = function (id, data, callback) {
 		if (!documents.checkid(id)) return callback(new Error("invalid id"));
 		documents.get(id, function (err, doc) {
 			if (err) return callback(err);
-
 			var update = {};
-
-			/* check tags */
-			if (data.hasOwnProperty("tags")) {
-				if (data.tags instanceof Array) {
-					/* everything is fine */
-					update.tags = data.tags;
-				} else if (typeof data.tags === "string") {
-					if (data.tags !== "") {
-						/* split by linefeeds, returns, pounds, commas and semicolons */
-						update.tags = data.tags.split(/[,;\r\n\#]+/g).map(function (tag) {
-							return tag.replace(/^\s+|\s+$/g, '')
-						});
-						/* if there is only one tag, this wasn't effective. split by any whitespace then */
-						if (update.tags.length === 1) update.tags = update.tags[0].split(/\s+/g);
-					}
-				}
-				if (update.tags) {
-					update.tags = update.tags.map(function (t) {
-						return t.trim();
-					});
-				}
-				if ((update.tags) && (
-					update.tags.filter(function (o) {
-						return (typeof o === "string");
-					}).length !== update.tags.length
-					)) {
-					return callback(new Error("invalid tag"));
-				}
-			}
-
-			/* check for language */
-			if (data.hasOwnProperty("lang")) {
-				if (typeof data.lang === "string" && data.lang !== "" && l.lang.check(data.lang)) {
-					update.lang = data.lang;
-				} else
-					return callback(new Error("invalid language"));
-			}
-
-			/* check for comment */
-			if (data.hasOwnProperty("comment")) {
-				if (typeof data.comment === "string" && data.comment !== "") {
-					update.comment = data.comment;
-				} else
-					return callback(new Error("invalid language"));
-			}
-
-			/* check any unchecked organisation for its existance */
-			var check_organisations = function (_callback) {
-				if (!data.hasOwnProperty("organisations")) return _callback();
-				if (!data.organisations instanceof Array) data.organisations = [data.organisations];
-				update.organisations = [];
-				utils.queue(data.organisations, function (organisation, cb) {
-						var check = (typeof organisation === "object" && organisation.hasOwnProperty("id")) ? organisation.id : organisation;
-						l.organisations.check(check, function (err, exists, org_id) {
-							if ((err) || (!exists)) return callback(new Error("invalid organisation"));
-							update.organisations.push(org_id);
-							cb();
-						});
-					},
-					function () {
-						if (update.organisations.length == 0)
-							return callback(new Error("?lease specify min. one organisation"));
-						_callback();
-					});
-			};
-
-			/* check any unchecked topic for its existance */
-			var check_topics = function (_callback) {
-				if (!data.hasOwnProperty("topics")) return _callback();
-				if (!data.topics instanceof Array) data.topics = [data.topics];
-				update.topics = [];
-				utils.queue(data.topics, function (topic, cb) {
-						var check = (typeof topic === "object" && topic.hasOwnProperty("id")) ? topic.id : topic;
-						l.topics.check(check, function (err, exists, org_id) {
-							if ((err) || (!exists)) return callback(new Error("invalid topic"));
-							update.topics.push(org_id);
-							cb();
-						});
-					},
-					function () {
-						if (update.topics.length == 0)
-							return callback(new Error("Please specify min. one topic"));
-						_callback();
-					});
-
-			};
-
-			check_organisations(function () {
-				check_topics(function () {
-
-					// FIXME: check if anything to update
-					/* set last modified */
-					update.modified = (new Date());
-
-					db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$set": update}, "new": true}, function (err, doc) {
-						if (err) return callback(err);
-						/* update cache */
-						cache[id] = doc;
-						/* update elastic search */
-						l.prepareDoc(doc, function (err, _doc) {
-							documents.index(doc.id, function (err) {
-								if (err) {
-									console.log('[update] error updating index for topics or organisation', err);
-									return cb(err);
-								}
-								callback(null, _doc);
-							});
+			validateCommon(data, update, function () {
+				// FIXME: check if anything to update
+				/* set last modified */
+				update.modified = (new Date());
+				console.log('update', update);
+				db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$set": update}, "new": true}, function (err, doc) {
+					if (err) return callback(err);
+					/* update cache */
+					cache[id] = doc;
+					/* update elastic search */
+					l.prepareDoc(doc, function (err, _doc) {
+						documents.index(doc.id, function (err) {
+							if (err) {
+								console.log('[update] error updating index for topics or organisation', err);
+								return cb(err);
+							}
+							callback(null, _doc);
 						});
 					});
 				});
