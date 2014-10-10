@@ -116,19 +116,6 @@ var Lobbycloud = function (config) {
 
 	l.prepareDoc = function (d, callback) {
 		var doc = clone(d, false);
-
-		//if (doc.organisations)
-		//	doc.organisations.map(function(o){
-		//		if (o==null)
-		//			console.log(doc);
-		//	});
-		//if (doc.topics)
-		//	doc.topics.map(function(o){
-		//		if (o==null)
-		//			console.log(doc);
-		//	});
-
-
 		l.topics.list(doc.topics, function (err, topics_data) {
 			if (err) return callback(err);
 			doc.topics = (doc.topics || []).filter(function (t) {

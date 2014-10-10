@@ -41,7 +41,7 @@
 						<div class="has-feedback">
 							<input type="text" class="form-control" options="typeaheadOptions" datasets="datasetTopic" ng-model="edit.topic.label" ng-dblclick="selectTopicDialog()" ngtypeahead>
 							<span ng-show="(!edit.topic.id) && (edit.topic.label)" title="{{'Create Topic Entry'|translate}}" class="glyphicon glyphicon-new-window form-control-feedback clickable" ng-click="createTopicDialog()"></span>
-							<span ng-show="canSelectTopic()" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="selectTopic()"></span>
+							<span ng-show="edit.topic.id" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="selectTopic()"></span>
 						</div>
 						<span class="input-group-btn">
 							<button type="button" class="btn btn-default" title="{{'Select Topic'|translate}}" ng-click="selectTopicDialog()"><span class="caret"></span></button>
@@ -62,7 +62,7 @@
 						<div class="has-feedback">
 							<input type="text" class="form-control" options="typeaheadOptionsOrgs" datasets="datasetOrganisation" ng-model="edit.organisation.label" ng-dblclick="selectOrganisationDialog()" ngtypeahead>
 							<span ng-show="(!edit.organisation.id) && (edit.organisation.label)" title="{{'Create Organisation Entry'|translate}}" class="glyphicon glyphicon-new-window form-control-feedback clickable" ng-click="createOrganisationDialog()"></span>
-							<span ng-show="canSelectOrganisation()" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="selectOrganisation()"></span>
+							<span ng-show="edit.organisation.id" class="glyphicon glyphicon-plus-sign form-control-feedback clickable" ng-click="selectOrganisation()"></span>
 						</div>
 						<span class="input-group-btn">
 							<button type="button" class="btn btn-default" title="{{'Select Organisation'|translate}}" ng-click="selectOrganisationDialog()"><span class="caret"></span></button>

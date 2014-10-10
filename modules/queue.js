@@ -54,6 +54,8 @@ module.exports = queue = function (config, db, l) {
 				if (data.topic !== "")
 					doc.topics.push({label: data.topic});
 			} else if ((typeof data.topic === "object") && (data.topic.hasOwnProperty("id") || data.topic.hasOwnProperty("label"))) {
+				if (data.topic.hasOwnProperty("id") && (data.topic.id.length == 0))
+					delete data.topic.id;
 				doc.topics.push(data.topic);
 			}
 		}
@@ -102,6 +104,8 @@ module.exports = queue = function (config, db, l) {
 					if (organisation !== "")
 						doc.organisations.push({label: organisation.split('-')[0]});
 				} else if ((typeof organisation === "object") && (organisation.hasOwnProperty("id") || organisation.hasOwnProperty("label"))) {
+					if (organisation.hasOwnProperty("id") && (organisation.id.length == 0))
+						delete organisation.id;
 					doc.organisations.push(organisation);
 				}
 			});

@@ -49,7 +49,6 @@ module.exports = mailqueue = function (config, url) {
 		var lang = i18n.getLocale();
 		var tmplpath = path.resolve(__dirname, '../assets/mails');
 		var filename = tmplpath + '/' + settings.mailview + '-' + lang + '.mustache';
-		console.log();
 		fs.exists(filename, function (exists) {
 			if (!exists) {
 				console.log('mail template "' + filename + '" is missing');
