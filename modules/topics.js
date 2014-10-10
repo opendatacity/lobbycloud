@@ -143,6 +143,7 @@ module.exports = function (opts, db, es) {
 		var list = [];
 		var query = [];
 		ids = (ids || []).map(function (id) {
+			if (!id) return null;
 			if (typeof id == "string")
 				return id;
 			return id.id;

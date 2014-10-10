@@ -39,119 +39,7 @@ module.exports = queue = function (config, db, l) {
 	db.collection("queue").ensureIndex("created", {"background": true});
 	db.collection("queue").ensureIndex("stage", {"background": true});
 
-	queue.upgrade = function (cb) {
-		/* fix documents without topics and organisations fields */
-		db.collection("queue").find({"topics": {"$exists": false}}, function (err, result) {
-			if (err) return cb('[update queue] error updating', err);
-			var docs = [];
-			result.forEach(function (doc) {
-				docs.push(doc);
-			});
-			utils.queue(docs, function (doc, callback) {
-				if (doc.organisation) {
-					if (typeof doc.organisation === "string")
-						doc.organisations = [{label: doc.organisation}];
-					else if (typeof doc.organisation === "object") {
-						if (doc.organisation.hasOwnProperty("new")) {
-							doc.organisation.label = doc.organisation["new"];
-							delete doc.organisation["new"];
-							doc.organisations = [doc.organisation];
-						} else if (doc.organisation.hasOwnProperty("id") || doc.organisation.hasOwnProperty("label")) {
-							doc.organisations = [doc.organisation];
-						}
-					}
-				}
-				if (doc.topic) {
-					if (typeof doc.topic === "string")
-						doc.topics = [{label: doc.topic}];
-					else if (typeof doc.topic === "object") {
-						if (doc.topic.hasOwnProperty("new")) {
-							doc.topic.label = doc.topic["new"];
-							delete doc.topic["new"];
-							doc.topics = [doc.topic];
-						} else if (doc.topic.hasOwnProperty("id") || doc.topic.hasOwnProperty("label")) {
-							doc.topics = [doc.topic];
-						}
-					}
-				}
-				db.collection("queue").findAndModify({
-					"query": {"id": doc.id}, "update": {
-						"$set": {
-							"topics": doc.topics,
-							"organisations": doc.organisations
-						},
-						"$unset": {
-							"topic": "",
-							"organisation": ""
-						}
-					}, "new": true
-				}, function (err, doc) {
-					if (err) {
-						console.log('[update queue] error updating topics or organisation', err);
-						return cb(err);
-					}
-					if (config.debug) console.log("[queue] fixed document [" + doc.id + "]");
-					callback();
-				});
-			}, cb);
-		});
-	};
-
-	/* generate a random id for a document */
-	queue.rand = function () {
-		var key = [];
-		var chrs = "abcdefghijklmnopqrstuvwxyz0123456789";
-		var rnd = crypto.randomBytes(8);
-		while (key.length < 8) key.push(chrs[rnd[key.length] % chrs.length]);
-		return key.join("");
-	};
-
-	/* generate and check a random id for a queue item */
-	queue.idgen = function (callback) {
-		var id = queue.rand();
-		queue.check(id, function (err, exists) {
-			if (err) return callback(err);
-			if (exists) return queue.idgen(callback);
-			callback(null, id);
-		});
-	};
-
-	/* check queue length */
-	queue.length = function (stage, callback) {
-
-		/* check if stage argument is given */
-		if (typeof stage === "function") {
-			var callback = stage;
-			var stage = null;
-		}
-
-		/* devise statement according to query */
-		if (stage instanceof Array) {
-			/* get all stages */
-			var find = {"stage": {"$in": stage}};
-		} else if (typeof stage === "string" || typeof stage === "number") {
-			/* get particular stage */
-			var find = {"stage": stage};
-		} else {
-			/* get just everything */
-			var find = {};
-		}
-
-		db.collection("queue").find(find, {_id: 1}, function (err, result) {
-			if (err) return callback(err);
-			callback(null, result.length);
-		});
-	};
-
-	/* check if a document exists */
-	queue.check = function (id, callback) {
-		if (cache.hasOwnProperty(id)) return callback(null, true, id);
-		db.collection("queue").find({id: id}, {_id: 1}).limit(1, function (err, result) {
-			if (err) return callback(err);
-			callback(null, (result.length > 0), id);
-		});
-	};
-
+	/* collects & validates parameters for a doc update */
 	var validateDoc = function (data, doc, callback) {
 
 		/* check for language */
@@ -260,6 +148,136 @@ module.exports = queue = function (config, db, l) {
 		}
 		check_organisations(function () {
 			check_topics(callback);
+		});
+	};
+
+	/* updates the doc in db */
+	var updatedoc = function (id, values, callback) {
+		// FIXME: check if anything to update
+		db.collection("queue").findAndModify({
+			"query": {"id": id},
+			"update": {
+				"$set": values
+			}, "new": true
+		}, function (err, doc) {
+			if (err) return callback(err);
+			/* update cache */
+			cache[id] = doc;
+			callback(null, doc);
+		});
+	};
+
+	/* apply new fields structure to the db */
+	queue.upgrade = function (callback) {
+		/* fix documents without topics and organisations fields */
+		db.collection("queue").find({"topics": {"$exists": false}}, function (err, result) {
+			if (err) return callback('[update queue] error updating', err);
+			var docs = [];
+			result.forEach(function (doc) {
+				docs.push(doc);
+			});
+			utils.queue(docs, function (doc, cb) {
+				if (doc.organisation) {
+					if (typeof doc.organisation === "string")
+						doc.organisations = [{label: doc.organisation}];
+					else if (typeof doc.organisation === "object") {
+						if (doc.organisation.hasOwnProperty("new")) {
+							doc.organisation.label = doc.organisation["new"];
+							delete doc.organisation["new"];
+							doc.organisations = [doc.organisation];
+						} else if (doc.organisation.hasOwnProperty("id") || doc.organisation.hasOwnProperty("label")) {
+							doc.organisations = [doc.organisation];
+						}
+					}
+				}
+				if (doc.topic) {
+					if (typeof doc.topic === "string")
+						doc.topics = [{label: doc.topic}];
+					else if (typeof doc.topic === "object") {
+						if (doc.topic.hasOwnProperty("new")) {
+							doc.topic.label = doc.topic["new"];
+							delete doc.topic["new"];
+							doc.topics = [doc.topic];
+						} else if (doc.topic.hasOwnProperty("id") || doc.topic.hasOwnProperty("label")) {
+							doc.topics = [doc.topic];
+						}
+					}
+				}
+				db.collection("queue").findAndModify({
+					"query": {"id": doc.id}, "update": {
+						"$set": {
+							"topics": doc.topics,
+							"organisations": doc.organisations
+						},
+						"$unset": {
+							"topic": "",
+							"organisation": ""
+						}
+					}, "new": true
+				}, function (err, doc) {
+					if (err) {
+						console.log('[update queue] error updating topics or organisation', err);
+						return callback(err);
+					}
+					if (config.debug) console.log("[queue] fixed document [" + doc.id + "]");
+					cb();
+				});
+			}, callback);
+		});
+	};
+
+	/* generate a random id for a document */
+	queue.rand = function () {
+		var key = [];
+		var chrs = "abcdefghijklmnopqrstuvwxyz0123456789";
+		var rnd = crypto.randomBytes(8);
+		while (key.length < 8) key.push(chrs[rnd[key.length] % chrs.length]);
+		return key.join("");
+	};
+
+	/* generate and check a random id for a queue item */
+	queue.idgen = function (callback) {
+		var id = queue.rand();
+		queue.check(id, function (err, exists) {
+			if (err) return callback(err);
+			if (exists) return queue.idgen(callback);
+			callback(null, id);
+		});
+	};
+
+	/* check queue length */
+	queue.length = function (stage, callback) {
+
+		/* check if stage argument is given */
+		if (typeof stage === "function") {
+			var callback = stage;
+			var stage = null;
+		}
+
+		/* devise statement according to query */
+		if (stage instanceof Array) {
+			/* get all stages */
+			var find = {"stage": {"$in": stage}};
+		} else if (typeof stage === "string" || typeof stage === "number") {
+			/* get particular stage */
+			var find = {"stage": stage};
+		} else {
+			/* get just everything */
+			var find = {};
+		}
+
+		db.collection("queue").find(find, {_id: 1}, function (err, result) {
+			if (err) return callback(err);
+			callback(null, result.length);
+		});
+	};
+
+	/* check if a document exists */
+	queue.check = function (id, callback) {
+		if (cache.hasOwnProperty(id)) return callback(null, true, id);
+		db.collection("queue").find({id: id}, {_id: 1}).limit(1, function (err, result) {
+			if (err) return callback(err);
+			callback(null, (result.length > 0), id);
 		});
 	};
 
@@ -409,6 +427,32 @@ module.exports = queue = function (config, db, l) {
 
 	};
 
+	/* returns an error if not acceptable */
+	queue.validateAccept = function (doc) {
+		/* check for stage */
+		if (!l.stages.canAccept(doc.stage)) return new Error("this queue element cannot be accepted");
+
+		/* check if organisations are set */
+		if (!doc.hasOwnProperty("organisations") ||
+			doc.organisations == null ||
+			doc.organisations.length == 0 ||
+			doc.organisations.filter(function (o) {
+				return o.id
+			}).length !== doc.organisations.length
+		) return new Error("min. one organisation must be specified/invalid organisation");
+
+		/* check if topics are set */
+		if (!doc.hasOwnProperty("topics") ||
+			doc.topics == null ||
+			doc.topics.length == 0 ||
+			doc.topics.filter(function (o) {
+				return o.id
+			}).length !== doc.topics.length
+		) return new Error("min. one topic must be specified/invalid topic");
+
+		return null;
+	};
+
 	/* accept */
 	queue.accept = function (id, callback) {
 		queue.check(id, function (err, exists) {
@@ -416,28 +460,8 @@ module.exports = queue = function (config, db, l) {
 			if (!exists) return callback(new Error("this queue element does not exist"));
 			queue.get(id, function (err, doc) {
 				if (err) return callback(err);
-
-				/* check for stage */
-				if (!l.stages.canAccept(doc.stage)) return callback(new Error("this queue element cannot be accepted"));
-
-				/* check if organisations are set */
-				if (!doc.hasOwnProperty("organisations") ||
-					doc.organisations == null ||
-					doc.organisations.length == 0 ||
-					doc.organisations.filter(function (o) {
-						return o.id
-					}).length !== doc.organisations.length
-				) return callback(new Error("min. one organisation must be specified/invalid organisation"));
-
-				/* check if topics are set */
-				if (!doc.hasOwnProperty("topics") ||
-					doc.topics == null ||
-					doc.topics.length == 0 ||
-					doc.topics.filter(function (o) {
-						return o.id
-					}).length !== doc.topics.length
-				) return callback(new Error("min. one topic must be specified/invalid topic"));
-
+				err = queue.validateAccept(doc);
+				if (err) return callback(err);
 				/* update to stage 3 */
 				updatedoc(id, {stage: l.stages.ACCEPTED}, function (err) {
 					if (err) return callback(err);
@@ -468,25 +492,11 @@ module.exports = queue = function (config, db, l) {
 		});
 	};
 
+	/* resets state back to PROCESSES (used by documents.unpublish) */
 	queue.unaccept = function (id, callback) {
 		l.queue.check(id, function (err, exists) {
 			if (!exists) return callback(new Error("not in queue"));
 			updatedoc(id, {stage: l.stages.PROCESSED}, callback);
-		});
-	};
-
-	var updatedoc = function (id, values, callback) {
-		// FIXME: check if anything to update
-		db.collection("queue").findAndModify({
-			"query": {"id": id},
-			"update": {
-				"$set": values
-			}, "new": true
-		}, function (err, doc) {
-			if (err) return callback(err);
-			/* update cache */
-			cache[id] = doc;
-			callback(null, doc);
 		});
 	};
 

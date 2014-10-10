@@ -359,7 +359,7 @@ app.get('/contribute/:id?', function (req, res) {
 			item["stage-" + item.stage] = true;
 			item["cancelable"] = l.stages.canCancel(item.stage);
 			item["editable"] = l.stages.canUpdate(item.stage);
-			item["acceptable"] = l.stages.canAccept(item.stage);
+			item["acceptable"] = (l.stages.canAccept(item.stage) && (l.queue.validateAccept(item) == null));
 			item.created_unix = moment(item.created).unix();
 			item.created_formatted = moment(item.created).lang(req.locale || "en").format("YY-MM-DD HH:mm");
 			item.created_relative = moment(item.created).lang(req.locale || "en").fromNow();
@@ -477,7 +477,7 @@ app.get('/contribute/:id/accept', function (req, res) {
 
 			/* check privileges */
 			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
-			if (!l.queue.canAccept(doc.stage)) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
+			if (!l.stages.canAccept(doc.stage)) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
 
 			l.queue.accept(req.param("id"), function (err) {
 				if (err) return send500(req, res, err);

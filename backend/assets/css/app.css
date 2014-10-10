@@ -202,9 +202,16 @@
 	display: inline-block;
 }
 
-.list-sel-ctn .list-sel-item i.clickable {
+.list-sel-ctn .list-sel-item span {
+    padding-right: 2px;
+}
+
+.list-sel-ctn .list-sel-item i {
 	padding-left: 4px;
 	padding-top: 4px;
+}
+
+.list-sel-ctn .list-sel-item i.clickable {
 	color: #999;
 }
 

@@ -116,16 +116,29 @@ var Lobbycloud = function (config) {
 
 	l.prepareDoc = function (d, callback) {
 		var doc = clone(d, false);
+
+		//if (doc.organisations)
+		//	doc.organisations.map(function(o){
+		//		if (o==null)
+		//			console.log(doc);
+		//	});
+		//if (doc.topics)
+		//	doc.topics.map(function(o){
+		//		if (o==null)
+		//			console.log(doc);
+		//	});
+
+
 		l.topics.list(doc.topics, function (err, topics_data) {
 			if (err) return callback(err);
 			doc.topics = (doc.topics || []).filter(function (t) {
-				return (!t.hasOwnProperty("id"));
+				return ((typeof t === "object") && (!t.hasOwnProperty("id") && t.hasOwnProperty("label")));
 			});
 			doc.topics = doc.topics.concat(topics_data);
 			l.organisations.list(doc.organisations, function (err, organisations_data) {
 				if (err) return callback(err);
 				doc.organisations = (doc.organisations || []).filter(function (t) {
-					return (!t.hasOwnProperty("id"));
+					return ((typeof t === "object") && (!t.hasOwnProperty("id") && t.hasOwnProperty("label")));
 				});
 				doc.organisations = doc.organisations.concat(organisations_data);
 				callback(null, doc);

@@ -22,220 +22,8 @@ module.exports = documents = function (config, db, l) {
 	db.collection("documents").ensureIndex("created", {"background": true});
 	/* waaaay more indexes! */
 
-	documents.upgrade = function (callback) {
-		/* fix documents without topics and organisations fields */
-		db.collection("documents").find({"topics": {"$exists": false}}, function (err, result) {
-			if (err) return callback(err);
-			var _docs = [];
-			result.forEach(function (doc) {
-				doc.organisations = [doc.organisation];
-				doc.topics = [doc.topic];
-				doc.published = doc.published || doc.updated || doc.created;
-				_docs.push(doc);
-			});
-			l.prepareDocs(_docs, function (err, docs) {
-				if (err) {
-					console.log('[update docs] error resolving topics or organisation', err);
-					return callback(err);
-				}
-				utils.queue(docs, function (doc, callback) {
-					db.collection("documents").findAndModify({
-						"query": {"id": doc.id}, "update": {
-							"$set": {
-								"topics": doc.topics.map(function (o) {
-									return o.id;
-								}),
-								"organisations": doc.organisations.map(function (o) {
-									return o.id;
-								}),
-								"published": doc.published
-							},
-							"$unset": {
-								"topic": "",
-								"organisation": ""
-							}
-						}, "new": true
-					}, function (err, doc) {
-						if (err) {
-							console.log('[update docs] error updating topics or organisation', err);
-							return callback(err);
-						}
-						/* update elasticsearch index */
-						documents.index(doc.id, function (err) {
-							if (err) {
-								console.log('[update docs] error updating index for topics or organisation', err);
-								return callback(err);
-							}
-							if (config.debug) console.log("[documents] fixed document [" + doc.id + "]");
-							cb();
-						});
-					});
-				}, callback);
-			});
-		});
-	};
-
-	/* check a document id */
-	documents.checkid = function (id) {
-		return /^([a-z0-9]{8})$/.test(id);
-	};
-
-	/* import a document from the queue */
-	documents.import = function (id, callback) {
-		if (!documents.checkid(id)) return callback(new Error("invalid id"));
-		l.queue.check(id, function (err, exists) {
-			if (err) return callback(err);
-			if (!exists) return callback(new Error("not in queue"));
-			l.queue.get(id, function (err, doc) {
-				if (err) return callback(err);
-				if (!doc.hasOwnProperty("stage") || doc.stage !== l.stages.ACCEPTED)
-					return callback(new Error("queue item is not approved"));
-				var update = {
-					id: doc.id,
-					indexed: false,
-					user: doc.user,
-					source: doc.source,
-					created: doc.created,
-					updated: (new Date()),
-					orig: doc.orig,
-					lang: [],
-					tags: [],
-					topics: [],
-					organisations: [],
-					comments: [], // comments without places
-					notes: [], // comments with places
-					changesets: [], // for lobbyplag
-					stats: {
-						downloads: 0,
-						views: 0,
-						comments: 0,
-						notes: 0
-					},
-					file: doc.file,
-					thumb: doc.data.thumbs[0].file,
-					data: doc.data,
-					published: (new Date())
-				};
-				validateCommon(doc, update, function (err) {
-					if (err) return callback(err);
-					/* save */
-					db.collection("documents").save(update, function (err, result) {
-						if (err) return callback(err);
-
-						/* cache it */
-						cache[doc.id] = result;
-
-						/* call back */
-						callback(null, result);
-
-						/* build index */
-						documents.index(doc.id);
-
-					});
-				});
-			});
-		});
-	};
-
-	documents.unpublish = function (id, callback) {
-		if (!documents.checkid(id)) return callback(new Error("invalid id"));
-
-		// FIXME: unpublishing leads to stats data loss, copy to queue & restore on republish?
-
-		l.queue.unaccept(id, function (err) {
-			if (err) return callback(err);
-
-			db.collection("documents").remove({id: id}, true, function (err, res) {
-				if (err) return callback(err);
-
-				/* remove from cache */
-				if (cache.hasOwnProperty(id)) delete cache[id];
-
-				//do not wait for elasticsearch and ignore it's errors
-				callback(null);
-
-				l.elastic.delete('document', id);
-			});
-
-		});
-	};
-
-
-	/* create elastic search index for document */
-	documents.index = function (id, callback) {
-		if (typeof callback !== "function") var callback = function () {
-		};
-		if (!documents.checkid(id)) return callback(new Error("invalid id"));
-
-		var createIndex = function (doc) {
-			l.elastic.create('document', doc.id, {
-				lang: doc.lang,
-				user: doc.user,
-				tags: doc.tags.join(','),
-				topics: doc.topics.map(function (o) {
-					return o.label;
-				}).join(','),
-				organisations: doc.organisations.map(function (o) {
-					return o.label;
-				}).join(','),
-				created: doc.created,
-				updated: doc.updated,
-				text: doc.data.text
-			}, function (err, resp) {
-				if (err) {
-					console.log("[documents] creation of search index for [" + doc.id + "] failed", err);
-					return callback(err);
-				}
-
-				// FIXME: seperate indexes for comments and notes
-
-				/* update indexed flag */
-				db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$set": {"indexed": true}}, "new": true}, function (err, doc) {
-					if (err) return callback(err);
-					/* update cache */
-					cache[id] = doc;
-					/* call back */
-					callback(null);
-				});
-			});
-		};
-
-		documents.get(id, function (err, doc) {
-			if (err) return callback(err);
-			l.elastic.check('document', id, function (err, exists) {
-				if (exists) {
-					l.elastic.delete('document', id, function () {
-						createIndex(doc);
-					});
-				} else
-					createIndex(doc);
-			});
-		});
-	};
-
-	/* recreate elastic search index for all documents */
-	documents.reindex = function (callback) {
-		db.collection("documents").find({}, {id: 1}, function (err, result) {
-			if (result.length === 0) return callback();
-			var ids = [];
-			result.forEach(function (r) {
-				ids.push(r.id);
-			});
-			utils.queue(ids, documents.index, callback);
-		});
-	};
-
-	/* check if a document exists */
-	documents.check = function (id, callback) {
-		if (!documents.checkid(id)) return callback(new Error("invalid id"));
-		if (cache.hasOwnProperty(id)) return callback(null, true, id);
-		db.collection("documents").find({id: id}, {_id: 1}).limit(1, function (err, result) {
-			if (err) return callback(err);
-			callback(null, (result.length > 0), id);
-		});
-	};
-
-	var validateCommon = function (data, update, callback) {
+	/* collects & validates parameters for a doc update */
+	var validateDoc = function (data, update, callback) {
 		if (data.hasOwnProperty("tags") && (data.tags !== null)) {
 			if (data.tags instanceof Array) {
 				/* everything is fine */
@@ -336,13 +124,228 @@ module.exports = documents = function (config, db, l) {
 		});
 	};
 
+	/* fix documents without topics and organisations fields */
+	documents.upgrade = function (callback) {
+		db.collection("documents").find({"topics": {"$exists": false}}, function (err, result) {
+			if (err) return callback(err);
+			var _docs = [];
+			result.forEach(function (doc) {
+				if (doc.organisation !== null)
+					doc.organisations = [doc.organisation];
+				if (doc.topic !== null)
+					doc.topics = [doc.topic];
+				doc.published = doc.published || doc.updated || doc.created;
+				_docs.push(doc);
+			});
+			l.prepareDocs(_docs, function (err, docs) {
+				if (err) {
+					console.log('[update docs] error resolving topics or organisation', err);
+					return callback(err);
+				}
+				utils.queue(docs, function (doc, cb) {
+					db.collection("documents").findAndModify({
+						"query": {"id": doc.id}, "update": {
+							"$set": {
+								"topics": doc.topics.map(function (o) {
+									return o.id;
+								}),
+								"organisations": doc.organisations.map(function (o) {
+									return o.id;
+								}),
+								"published": doc.published
+							},
+							"$unset": {
+								"topic": "",
+								"organisation": ""
+							}
+						}, "new": true
+					}, function (err, doc) {
+						if (err) {
+							console.log('[update docs] error updating topics or organisation', err);
+							return callback(err);
+						}
+						/* update elasticsearch index */
+						documents.index(doc.id, function (err) {
+							if (err) {
+								console.log('[update docs] error updating index for topics or organisation', err);
+								return callback(err);
+							}
+							if (config.debug) console.log("[documents] fixed document [" + doc.id + "]");
+							cb();
+						});
+					});
+				}, callback);
+			});
+		});
+	};
+
+	/* check a document id */
+	documents.checkid = function (id) {
+		return /^([a-z0-9]{8})$/.test(id);
+	};
+
+	/* import a document from the queue */
+	documents.import = function (id, callback) {
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
+		l.queue.check(id, function (err, exists) {
+			if (err) return callback(err);
+			if (!exists) return callback(new Error("not in queue"));
+			l.queue.get(id, function (err, doc) {
+				if (err) return callback(err);
+				if (!doc.hasOwnProperty("stage") || doc.stage !== l.stages.ACCEPTED)
+					return callback(new Error("queue item is not approved"));
+				var update = {
+					id: doc.id,
+					indexed: false,
+					user: doc.user,
+					source: doc.source,
+					created: doc.created,
+					updated: (new Date()),
+					orig: doc.orig,
+					lang: [],
+					tags: [],
+					topics: [],
+					organisations: [],
+					comments: [], // comments without places
+					notes: [], // comments with places
+					changesets: [], // for lobbyplag
+					stats: {
+						downloads: 0,
+						views: 0,
+						comments: 0,
+						notes: 0
+					},
+					file: doc.file,
+					thumb: doc.data.thumbs[0].file,
+					data: doc.data,
+					published: (new Date())
+				};
+				validateDoc(doc, update, function (err) {
+					if (err) return callback(err);
+					/* save */
+					db.collection("documents").save(update, function (err, result) {
+						if (err) return callback(err);
+
+						/* cache it */
+						cache[doc.id] = result;
+
+						/* call back */
+						callback(null, result);
+
+						/* build index */
+						documents.index(doc.id);
+
+					});
+				});
+			});
+		});
+	};
+
+	/* unpublish a doc & enable the corresponding queue-doc */
+	documents.unpublish = function (id, callback) {
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
+
+		// FIXME: unpublishing leads to stats data loss, copy to queue & restore on republish?
+
+		l.queue.unaccept(id, function (err) {
+			if (err) return callback(err);
+
+			db.collection("documents").remove({id: id}, true, function (err, res) {
+				if (err) return callback(err);
+
+				/* remove from cache */
+				if (cache.hasOwnProperty(id)) delete cache[id];
+
+				//do not wait for elasticsearch and ignore it's errors
+				callback(null);
+
+				l.elastic.delete('document', id);
+			});
+
+		});
+	};
+
+	/* create elastic search index for document */
+	documents.index = function (id, callback) {
+		if (typeof callback !== "function") var callback = function () {
+		};
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
+
+		var createIndex = function (doc) {
+			l.elastic.create('document', doc.id, {
+				lang: doc.lang,
+				user: doc.user,
+				tags: doc.tags.join(','),
+				topics: doc.topics.map(function (o) {
+					return o.label;
+				}).join(','),
+				organisations: doc.organisations.map(function (o) {
+					return o.label;
+				}).join(','),
+				created: doc.created,
+				updated: doc.updated,
+				text: doc.data.text
+			}, function (err, resp) {
+				if (err) {
+					console.log("[documents] creation of search index for [" + doc.id + "] failed", err);
+					return callback(err);
+				}
+
+				// FIXME: seperate indexes for comments and notes
+
+				/* update indexed flag */
+				db.collection("documents").findAndModify({"query": {"id": id}, "update": {"$set": {"indexed": true}}, "new": true}, function (err, doc) {
+					if (err) return callback(err);
+					/* update cache */
+					cache[id] = doc;
+					/* call back */
+					callback(null);
+				});
+			});
+		};
+
+		documents.get(id, function (err, doc) {
+			if (err) return callback(err);
+			l.elastic.check('document', id, function (err, exists) {
+				if (exists) {
+					l.elastic.delete('document', id, function () {
+						createIndex(doc);
+					});
+				} else
+					createIndex(doc);
+			});
+		});
+	};
+
+	/* recreate elastic search index for all documents */
+	documents.reindex = function (callback) {
+		db.collection("documents").find({}, {id: 1}, function (err, result) {
+			if (result.length === 0) return callback();
+			var ids = [];
+			result.forEach(function (r) {
+				ids.push(r.id);
+			});
+			utils.queue(ids, documents.index, callback);
+		});
+	};
+
+	/* check if a document exists */
+	documents.check = function (id, callback) {
+		if (!documents.checkid(id)) return callback(new Error("invalid id"));
+		if (cache.hasOwnProperty(id)) return callback(null, true, id);
+		db.collection("documents").find({id: id}, {_id: 1}).limit(1, function (err, result) {
+			if (err) return callback(err);
+			callback(null, (result.length > 0), id);
+		});
+	};
+
 	/* update a document */
 	documents.update = function (id, data, callback) {
 		if (!documents.checkid(id)) return callback(new Error("invalid id"));
 		documents.get(id, function (err, doc) {
 			if (err) return callback(err);
 			var update = {};
-			validateCommon(data, update, function () {
+			validateDoc(data, update, function () {
 				// FIXME: check if anything to update
 				/* set last modified */
 				update.modified = (new Date());
