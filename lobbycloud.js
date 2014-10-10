@@ -454,7 +454,7 @@ app.get('/contribute/:id/cancel', function (req, res) {
 			/* check privileges */
 			if (doc.user.role === "user" && doc.user !== req.user.id) return send500(req, res, new Error("access violation: user " + req.user.id + " (" + req.user.role + ") tried to access queue item " + id));
 			if (!l.stages.canCancel(doc.stage)) return send500(req, res, new Error("stage violation: document " + id + " stage " + doc.stage));
-			queue.cancel(id, function (err) {
+			l.queue.cancel(id, function (err) {
 				if (err) return send500(req, res, err);
 				/* redirect to index :) */
 				res.redirect("/contribute");
@@ -989,10 +989,12 @@ var start = function () {
 	}
 };
 
-l.upgrade(function (err) {
-	//l.reindex(function(){});
+l.init(function (err) {
 	if (!err)
 		start();
+	else {
+		console.log(err);
+	}
 });
 
 /* gracefully shutdown on exit */

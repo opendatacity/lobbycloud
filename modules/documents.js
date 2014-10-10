@@ -22,10 +22,10 @@ module.exports = documents = function (config, db, l) {
 	db.collection("documents").ensureIndex("created", {"background": true});
 	/* waaaay more indexes! */
 
-	documents.upgrade = function (cb) {
+	documents.upgrade = function (callback) {
 		/* fix documents without topics and organisations fields */
 		db.collection("documents").find({"topics": {"$exists": false}}, function (err, result) {
-			if (err) return;
+			if (err) return callback(err);
 			var _docs = [];
 			result.forEach(function (doc) {
 				doc.organisations = [doc.organisation];
@@ -36,7 +36,7 @@ module.exports = documents = function (config, db, l) {
 			l.prepareDocs(_docs, function (err, docs) {
 				if (err) {
 					console.log('[update docs] error resolving topics or organisation', err);
-					return cb(err);
+					return callback(err);
 				}
 				utils.queue(docs, function (doc, callback) {
 					db.collection("documents").findAndModify({
@@ -58,19 +58,19 @@ module.exports = documents = function (config, db, l) {
 					}, function (err, doc) {
 						if (err) {
 							console.log('[update docs] error updating topics or organisation', err);
-							return cb(err);
+							return callback(err);
 						}
 						/* update elasticsearch index */
 						documents.index(doc.id, function (err) {
 							if (err) {
 								console.log('[update docs] error updating index for topics or organisation', err);
-								return cb(err);
+								return callback(err);
 							}
 							if (config.debug) console.log("[documents] fixed document [" + doc.id + "]");
-							callback();
+							cb();
 						});
 					});
-				}, cb);
+				}, callback);
 			});
 		});
 	};

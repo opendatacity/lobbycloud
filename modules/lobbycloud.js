@@ -79,50 +79,70 @@ var Lobbycloud = function (config) {
 	l.documents = new modules.documents(config, db, l);
 	l.backendapi = new modules.backendapi(l, i18n);
 
-	l.upgrade = function (cb) {
-		l.documents.upgrade(function (err) {
-			if (err) return cb(err);
-			l.queue.upgrade(cb);
+	l.init = function (callback) {
+		db.runCommand({ping: 1}, function (err, res) {
+			if (!err && res.ok) {
+				es.ping({
+					// ping usually has a 100ms timeout
+					requestTimeout: 1000
+				}, function (error) {
+					if (error) {
+						callback("[Elasticsearch] " + error.toString());
+					} else {
+						//l.reindex(function(){});
+						l.upgrade(callback)
+					}
+				});
+			} else {
+				callback("[MongoDB] " + (err ? err.toString() : null) || 'mongodb refused connection');
+			}
 		});
 	};
 
-	l.reindex = function (cb) {
+	l.upgrade = function (callback) {
+		l.documents.upgrade(function (err) {
+			if (err) return callback(err);
+			l.queue.upgrade(callback);
+		});
+	};
+
+	l.reindex = function (callback) {
 		l.documents.reindex(function () {
 			l.organisations.reindex(function () {
-				l.topics.reindex(cb);
+				l.topics.reindex(callback);
 			});
 		});
 	};
 
-	l.prepareDoc = function (d, cb) {
+	l.prepareDoc = function (d, callback) {
 		var doc = clone(d, false);
 		l.topics.list(doc.topics, function (err, topics_data) {
-			if (err) return cb(err);
+			if (err) return callback(err);
 			doc.topics = (doc.topics || []).filter(function (t) {
 				return (!t.hasOwnProperty("id"));
 			});
 			doc.topics = doc.topics.concat(topics_data);
 			l.organisations.list(doc.organisations, function (err, organisations_data) {
-				if (err) return cb(err);
+				if (err) return callback(err);
 				doc.organisations = (doc.organisations || []).filter(function (t) {
 					return (!t.hasOwnProperty("id"));
 				});
 				doc.organisations = doc.organisations.concat(organisations_data);
-				cb(null, doc);
+				callback(null, doc);
 			});
 		});
 	};
 
-	l.prepareDocs = function (docs, cb) {
+	l.prepareDocs = function (docs, callback) {
 		var result = [];
 		utils.queue(docs, function (d, callback) {
 			l.prepareDoc(d, function (err, doc) {
-				if (err) return cb(err);
+				if (err) return callback(err);
 				result.push(doc);
 				callback();
 			});
 		}, function () {
-			cb(null, result);
+			callback(null, result);
 		});
 	};
 
