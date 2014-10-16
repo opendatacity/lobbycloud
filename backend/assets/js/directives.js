@@ -120,7 +120,6 @@ app.directive('ngtypeahead', function () {
 				if (document.selection) {
 					var range = document.selection.createRange();
 					range.moveStart('character', -element.value.length);
-
 					position = range.text.length;
 				}
 				// Other browsers.
@@ -171,7 +170,8 @@ app.directive('ngtypeahead', function () {
 
 			// Propagate the closed event
 			element.bind('typeahead:closed', function () {
-				element.val(ngModel.$viewValue);
+				element.typeahead('val', ngModel.$viewValue);
+				//element.val(ngModel.$viewValue);
 				scope.$emit('typeahead:closed');
 			});
 

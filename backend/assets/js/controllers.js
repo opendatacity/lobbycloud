@@ -31,12 +31,17 @@ var editModalDialog = function ($modal, data, templateUrl, cb) {
 //			$log.info('Modal dismissed at: ' + new Date());
 	});
 };
+
 var listModalDialog = function ($modal, data, cb) {
 	var modalInstance = $modal.open({
 		templateUrl: 'partials/list.html',
 		controller: function ($scope, $modalInstance, data) {
 
 			$scope.data = data;
+
+			$scope.getText = function (o) {
+				return data.getText ? data.getText(o) : o.label;
+			};
 
 			$scope.ok = function () {
 				$modalInstance.close($scope.data.selected);
@@ -238,7 +243,7 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 	};
 
 	$scope.resetTextFilter = function () {
-		$scope.filter.text='';
+		$scope.filter.text = '';
 		$scope.tableParams.reload();
 	};
 
@@ -440,7 +445,7 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 	};
 
 	$scope.resetTextFilter = function () {
-		$scope.filter.text='';
+		$scope.filter.text = '';
 		$scope.tableParams.reload();
 	};
 
@@ -650,14 +655,10 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 	};
 
 	$scope.typeaheadOptionsOrgs = {
-		minLength: 3,
-		highlight: true
-	};
-
-	$scope.typeaheadOptionsLang = {
 		minLength: 1,
 		highlight: true
 	};
+	$scope.typeaheadOptionsLang = $scope.typeaheadOptionsOrgs;
 	$scope.datasetOrganisation = dataset('organisation');
 	$scope.datasetTopic = dataset('topic');
 
@@ -669,12 +670,6 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 			label: ''
 		},
 		tag: ''
-	};
-
-	var select = function (sender, object, suggestion, daset) {
-		if (daset) {
-			$scope.edit[daset.prop] = suggestion;
-		}
 	};
 
 	$scope.canSelectOrganisation = function () {
@@ -749,6 +744,17 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 		}
 	};
 
+	var select = function (sender, object, suggestion, daset) {
+		if (daset) {
+			if (suggestion.id)
+				$scope.edit[daset.prop].id = suggestion.id;
+			if (suggestion.label)
+				$scope.edit[daset.prop].label = suggestion.label;
+			if (suggestion.name)
+				$scope.edit[daset.prop].label = suggestion.name;
+		}
+	};
+
 	$scope.$on("typeahead:enter", function (sender, event, value, daset) {
 		if (daset.prop == 'organisation') $scope.selectOrganisation();
 		if (daset.prop == 'topic') $scope.selectTopic();
@@ -756,9 +762,11 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 	$scope.$on("typeahead:selected", select);
 	$scope.$on("typeahead:autocompleted", select);
 	$scope.$on("typeahead:changed", function (sender, value, daset) {
-		if (daset.prop == 'organisation') {
-			$scope.edit[daset.prop].id = '';
-		}
+		//if (daset.prop == 'organisation') {
+		$scope.edit[daset.prop].id = '';
+		//} else if (daset.prop == 'lang') {
+		//	$scope.doc[daset.prop].id = '';
+		//}
 	});
 
 	////cache all languages
@@ -804,11 +812,11 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 	//load languages & doc
 	$scope.load = function () {
 
-		var noneLang = {id: '', label: 'None'};
+		//var noneLang = {id: '', label: 'None'};
 		var loadLangs = function (cb) {
 			LangsService.list({},
 				function (data) {
-					data.unshift(noneLang);
+					//data.unshift(noneLang);
 					$scope.langs = data;
 					cb();
 				},
@@ -945,20 +953,17 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 	$scope.selectOrganisationDialog = function () {
 
 		OrganisationsService.index(function (list) {
-			list.sort(function (a, b) {
-				if (a.label < b.label)
-					return -1;
-				if (a.label > b.label)
-					return 1;
-				return 0;
-			});
 			listModalDialog($modal, {
 				list: list,
 				prop: 'Organisation',
-				selected: $scope.edit.organisation
+				selected: $scope.edit.organisation,
+				getText: function (o) {
+					return [o.name, o.fullname].join(' - ');
+				}
 			}, function (data) {
 				if (data) {
-					$scope.edit.organisation = data;
+					$scope.edit.organisation.id = data.id;
+					$scope.edit.organisation.label = data.name;
 				}
 			});
 
@@ -1034,7 +1039,10 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 		listModalDialog($modal, {
 			list: $scope.langs,
 			prop: 'Language',
-			selected: $scope.doc.lang
+			selected: $scope.doc.lang,
+			getText: function (o) {
+				return [o.id, o.label].join(" - ");
+			}
 		}, function (data) {
 			if (data) {
 				$scope.doc.lang = data;

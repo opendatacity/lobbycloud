@@ -44,6 +44,9 @@
 				</div>
 				<div class="tab-pane" id="text">
 					<div class="text">
+						{{#data.no_text}}
+							{{#__}}[We could not extract text from this document.]{{/__}}
+						{{/data.no_text}}
 						{{#data.text_lines}}
 						<p>{{.}}</p>
 						{{/data.text_lines}}

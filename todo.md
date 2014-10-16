@@ -31,14 +31,12 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 * Browse Tags
 * Research
 * Contribute
-* My (ppublished) Documents
+* My (published) Documents
 * Revamp Upload to All-Page-Dragndrop
 * Pagination
 * Wrong Login Error Message
 
 ## Setup
-
-* Secure MongoDB and Elasticsearch HTTP Interfaces against mischief
 
 
 ## Content
@@ -49,10 +47,15 @@ This is just for the LobbyCloud team to keep track of things we would otherwise 
 
   * <s>Upload Guidelines</s>
 
-* Video
+  * Dokument A als Duplikat von Dokument B markieren (Beispiele: https://lobbycloud.eu/document/a8fdytok und https://lobbycloud.eu/document/6fncky1v) - Semantik dazu: Wenn das Feld “Duplikat” leer ist, wird das Dokument im Frontend angezeigt. Wenn es auf ein anderes Dokumen verweist, nicht. Im Frontend wird “xx Mal erhalten” angezeigt (je nachdem, wie viel Duplikate es gibt)
+
+  * Video
 
   * <s>About stuff (paid for by greens, made by odc, etc)</s>
 
 ## Backend
 
-* beauty
+  * autocomplete for tags
+
+------
+

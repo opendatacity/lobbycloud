@@ -126,7 +126,15 @@ module.exports = function (l, i18n) {
 			//langs
 			access: l.users.roles.user,
 			execute: function (req, res) {
-				res.json(l.lang.all());
+				var data = l.lang.all();
+				data.sort(function (a, b) {
+					if (a.id < b.id)
+						return -1;
+					if (a.id > b.id)
+						return 1;
+					return 0;
+				});
+				res.json(data);
 			}
 		},
 		'invite.create': {
@@ -324,8 +332,15 @@ module.exports = function (l, i18n) {
 			execute: function (req, res) {
 				l.organisations.all(function (err, data) {
 					if (err) return res.send(400, err.message || err);
+					data.sort(function (a, b) {
+						if (a.name < b.name)
+							return -1;
+						if (a.name > b.name)
+							return 1;
+						return 0;
+					});
 					res.json(data.map(function (t) {
-						return {id: t.id, label: t.name + ' - ' + t.fullname};
+						return {id: t.id, name: t.name, fullname: t.fullname};
 					}));
 				});
 			}

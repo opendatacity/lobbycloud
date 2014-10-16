@@ -546,6 +546,7 @@ app.get('/document/:id', function (req, res) {
 
 			/* prepare some stuff */
 			doc.data.text_lines = doc.data.text.split(/\n/g);
+			doc.data.no_text = doc.data.text_lines.join('').trim().length == 0;
 			doc.data.info.size_readable = filesize(doc.data.info.size);
 			doc.data.info.creationdate_readable = moment(doc.data.info.creationdate).lang(req.locale || "en").format("LLL");
 			doc.data.info.moddate_readable = moment(doc.data.info.moddate).lang(req.locale || "en").format("LLL");
@@ -935,6 +936,13 @@ app.all('/api/topic/suggest', function (req, res) {
 	if (q === null || q === "") return res.json([]);
 	l.topics.suggest(q, function (err, result) {
 		if (result && (result.length > 0)) {
+			result.sort(function (a, b) {
+				if (a.label < b.label)
+					return -1;
+				if (a.label > b.label)
+					return 1;
+				return 0;
+			});
 			return res.json(result.map(function (r) {
 				return {id: r.id, label: r.label};
 			}));
@@ -950,8 +958,15 @@ app.all('/api/organisation/suggest', function (req, res) {
 	if (q === null || q === "") return res.json([]);
 	l.organisations.suggest(q, function (err, result) {
 		if (result && (result.length > 0)) {
+			result.sort(function (a, b) {
+				if (a.name < b.name)
+					return -1;
+				if (a.name > b.name)
+					return 1;
+				return 0;
+			});
 			return res.json(result.map(function (r) {
-				return {id: r.id, label: [r.name, r.fullname].join(" - ")};
+				return {id: r.id, label: [r.name, r.fullname].join(" - "), name: r.name, fullname: r.fullname};
 			}));
 		}
 		res.json([]);

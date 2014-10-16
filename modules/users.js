@@ -326,7 +326,7 @@ module.exports = function (opts, db, es, mailqueue, i18n) {
 			created: (new Date())
 		};
 		users.check(defaultuser.id, function (err, exists) {
-			if (!exists)
+			if (!exists) {
 				users.password(defaultuser.password, function (err, method, key, salt, it, time) {
 					if (err) console.log(err);
 					defaultuser.password = [method, key, salt, it];
@@ -334,10 +334,11 @@ module.exports = function (opts, db, es, mailqueue, i18n) {
 						console.log(err, result);
 					});
 				});
+			}
 		});
 	};
 //	db.collection("users").remove();
-//	users.initDefaultAdmin();
+	users.initDefaultAdmin();
 
 	return users;
 
