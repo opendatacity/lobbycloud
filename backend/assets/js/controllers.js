@@ -672,7 +672,7 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 			label: ''
 		},
 		tag: '',
-		lang: {}
+		lang: {label: ''}
 	};
 
 	$scope.canSelectOrganisation = function () {
@@ -792,12 +792,12 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 		//prepare language select
 		$scope.langs.forEach(function (l) {
 			if (l.id === data.lang) {
-				$scope.lang = l.label;
+				$scope.edit.lang = l;
 				data.lang = l;
 			}
 		});
 		if ((!data.lang) || (!data.lang.id)) {
-			$scope.lang = data.lang;
+			$scope.edit.lang.label = data.lang;
 			data.lang = {label: data.lang};
 		}
 		//expand img urls
@@ -855,7 +855,7 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 		var update = {
 			tags: doc.tags,
 			comment: doc.comment,
-			lang: doc.lang.id,
+			lang: $scope.edit.lang.id,
 			organisations: doc.organisations,
 			topics: doc.topics
 		};
@@ -1048,8 +1048,9 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 			}
 		}, function (data) {
 			if (data) {
-				$scope.doc.lang = data;
-				$scope.lang = data.label;
+				$scope.edit.lang.label = data.label;
+				$scope.edit.lang.id = data.id;
+				$scope.doc.lang = data.id;
 			}
 		});
 
