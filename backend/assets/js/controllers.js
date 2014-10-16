@@ -290,6 +290,7 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 					});
 				}
 				if ($scope.filter.text.length > 0) {
+					var ftext = $scope.filter.text.toLowerCase();
 					orderedData = $filter('filter')(orderedData, function (value) {
 						return (value.orig
 							+ value.topics.map(function (o) {
@@ -299,7 +300,7 @@ app.controller('DocsController', function ($scope, $state, $modal, $filter, ngTa
 								return o.label
 							}).join(',')
 							+ value.tags.join(',')
-							).indexOf($scope.filter.text) >= 0;
+							).toLowerCase().indexOf(ftext) >= 0;
 					});
 				}
 				var sort = params.sorting();
@@ -493,6 +494,7 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 					});
 				}
 				if ($scope.filter.text.length > 0) {
+					var ftext = $scope.filter.text.toLowerCase();
 					orderedData = $filter('filter')(orderedData, function (value) {
 						return (value.orig
 							+ value.topics.map(function (o) {
@@ -502,7 +504,7 @@ app.controller('QueueController', function ($scope, $state, $modal, $filter, ngT
 								return o.label
 							}).join(',')
 							+ value.tags.join(',')
-							).indexOf($scope.filter.text) >= 0;
+							).toLowerCase().indexOf(ftext) >= 0;
 					});
 				}
 				var filterType = function (type) {
@@ -669,7 +671,8 @@ app.controller('DocController', function ($scope, $state, $stateParams, $timeout
 		topic: {
 			label: ''
 		},
-		tag: ''
+		tag: '',
+		lang: {}
 	};
 
 	$scope.canSelectOrganisation = function () {
