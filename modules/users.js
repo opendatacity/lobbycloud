@@ -11,7 +11,7 @@ var _ = require("underscore");
 
 /* prepare regexp */
 
-module.exports = function (opts, db, es, mailqueue, i18n) {
+module.exports = function (config, db, es, mailqueue, i18n) {
 
 	var users = this;
 
@@ -311,8 +311,7 @@ module.exports = function (opts, db, es, mailqueue, i18n) {
 		});
 	};
 
-	/* user testing default user REMOVEME */
-	users.initDefaultAdmin = function () {
+	users.initDefaultAdmin = function (callback) {
 		var defaultuser = {
 			id: 'admin',
 			password: 'admin',
@@ -326,19 +325,18 @@ module.exports = function (opts, db, es, mailqueue, i18n) {
 			created: (new Date())
 		};
 		users.check(defaultuser.id, function (err, exists) {
+			if (err) return callback(err);
 			if (!exists) {
 				users.password(defaultuser.password, function (err, method, key, salt, it, time) {
-					if (err) console.log(err);
+					if (err) return callback(err);
 					defaultuser.password = [method, key, salt, it];
-					db.collection("users").save(defaultuser, function (err, result) {
-						console.log(err, result);
-					});
+					db.collection("users").save(defaultuser, callback);
 				});
+			} else {
+				callback();
 			}
 		});
 	};
-//	db.collection("users").remove();
-	users.initDefaultAdmin();
 
 	return users;
 

@@ -89,8 +89,19 @@ var Lobbycloud = function (config) {
 					if (error) {
 						callback("[Elasticsearch] " + error.toString());
 					} else {
-						//l.reindex(function(){});
-						l.upgrade(callback)
+						var maintenance = [];
+						if (config.debug.bootstrap_admin)
+							maintenance.push(users.initDefaultAdmin);
+						if (config.debug.upgrade_data)
+							maintenance.push(l.upgrade);
+						if (config.debug.reindex_docs)
+							maintenance.push(l.reindex);
+						utils.queue(maintenance, function (m, cb) {
+							m(function (err) {
+								if (err) return callback(err);
+								cb();
+							});
+						}, callback);
 					}
 				});
 			} else {
