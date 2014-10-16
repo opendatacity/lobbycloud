@@ -90,11 +90,11 @@ var Lobbycloud = function (config) {
 						callback("[Elasticsearch] " + error.toString());
 					} else {
 						var maintenance = [];
-						if (config.debug.bootstrap_admin)
+						if (config.maintenance.bootstrap_admin)
 							maintenance.push(users.initDefaultAdmin);
-						if (config.debug.upgrade_data)
+						if (config.maintenance.upgrade_data)
 							maintenance.push(l.upgrade);
-						if (config.debug.reindex_docs)
+						if (config.maintenance.reindex_docs)
 							maintenance.push(l.reindex);
 						utils.queue(maintenance, function (m, cb) {
 							m(function (err) {

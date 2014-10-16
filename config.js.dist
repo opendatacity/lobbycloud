@@ -89,7 +89,7 @@ module.exports = {
 				}
 			}
 		},
-		debug: {
+		maintenance: {
 			bootstrap_admin:false,
 			upgrade_data:false,
 			reindex_docs:false
